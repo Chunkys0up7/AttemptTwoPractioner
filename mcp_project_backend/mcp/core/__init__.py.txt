@@ -1,0 +1,5 @@
+# This file makes the 'core' directory a Python sub-package.
+# It can be empty or import key components from its modules for easier access.
+# Example:
+# from .config import settings
+# from .workflow_engine_service import WorkflowEngineService

@@ -1,0 +1,87 @@
+# mcp/core/executors/streamlit_executor.py
+# Concrete executor for MCPs of type "Streamlit App".
+# This is more complex as it involves managing a running web server process.
+# Option 1: MCP just provides a link/info if Streamlit app is externally managed.
+# Option 2: MCP attempts to run/manage the Streamlit app process (e.g., in Docker). This is advanced.
+
+# from .base_executor import BaseExecutor
+# from mcp.core.mcp_configs import StreamlitAppConfig
+# from typing import Dict, Any
+# import subprocess
+# import os
+# import tempfile
+# import shutil
+
+# class StreamlitExecutor(BaseExecutor):
+#     async def execute(self, config: StreamlitAppConfig, inputs: Dict[str, Any]) -> Dict[str, Any]:
+#         # await self._log_message(config.type, f"Handling Streamlit App: {config.git_repo_url or 'local content'}")
+
+#         # if not isinstance(config, StreamlitAppConfig):
+#         #     raise TypeError("Configuration for StreamlitExecutor must be StreamlitAppConfig.")
+
+#         # For this executor, "execution" might mean:
+#         # 1. If git_repo_url is provided:
+#         #    - Clone the repo to a temporary location.
+#         #    - (Optionally) Install dependencies from requirements_content if provided.
+#         #    - Start the Streamlit app using `streamlit run main_script_path`.
+#         #    - This would likely need to run as a background process.
+#         #    - The "output" could be the URL where the Streamlit app is temporarily accessible.
+#         #    - This is complex due to process management, port allocation, and cleanup.
+
+#         # 2. Simpler approach: This MCP type is informational.
+#         #    The 'config' just stores metadata about an *externally deployed* Streamlit app.
+#         #    The "execution" simply returns this metadata.
+#         #    This seems more aligned with a "component" in a marketplace unless MCP is a PaaS.
+
+#         # Assuming the simpler, informational approach for now:
+#         output_data = {
+#             "status": "Information Provided",
+#             "app_type": "Streamlit",
+#             "git_repository": str(config.git_repo_url) if config.git_repo_url else None,
+#             "main_script": config.main_script_path,
+#             "access_info": "This component describes a Streamlit application. Deploy and access it externally."
+#         }
+#         if config.requirements_content:
+#             output_data["requirements_preview"] = config.requirements_content[:200] + "..."
+
+#         # await self._log_message(config.type, f"Streamlit app information processed: {output_data}")
+#         return output_data
+
+        # Example of trying to run it (highly conceptual and needs robust process management):
+        # if config.git_repo_url:
+        #     temp_dir = tempfile.mkdtemp(prefix="mcp_streamlit_")
+        #     try:
+        #         await self._log_message(config.type, f"Cloning {config.git_repo_url} to {temp_dir}")
+        #         # Use asyncio.create_subprocess_exec for async git clone
+        #         clone_proc = await asyncio.create_subprocess_exec(
+        #             "git", "clone", str(config.git_repo_url), temp_dir,
+        #             stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        #         )
+        #         stdout, stderr = await clone_proc.communicate()
+        #         if clone_proc.returncode != 0:
+        #             raise RuntimeError(f"Git clone failed: {stderr.decode()}")
+
+        #         app_dir = os.path.join(temp_dir, os.listdir(temp_dir)[0]) # Assuming repo clones into a subdir
+
+        #         if config.requirements_content:
+        #             with open(os.path.join(app_dir, "requirements.txt"), "w") as req_file:
+        #                 req_file.write(config.requirements_content)
+        #             # Install dependencies (e.g., in a venv)
+        #             # pip_proc = await asyncio.create_subprocess_exec(...)
+
+        #         # Find a free port (this is non-trivial)
+        #         # app_port = 8501 # find_free_port()
+        #         # command = ["streamlit", "run", config.main_script_path, "--server.port", str(app_port), "--server.headless", "true"]
+                
+        #         # Start streamlit process (needs to be managed, e.g., Popen and then poll/kill)
+        #         # This part is very complex for a simple executor.
+        #         # A better approach would be to deploy Streamlit apps to a dedicated platform
+        #         # and MCP just links to them or triggers deployments.
+
+        #         return {"status": "Streamlit app setup (simulated)", "access_url": f"http://localhost:{app_port}"}
+        #     finally:
+        #         shutil.rmtree(temp_dir)
+        # else:
+        #     return {"status": "Configuration incomplete for Streamlit app (no Git repo)."}
+
+        return {"status": "Streamlit App configuration processed (simulated)."}

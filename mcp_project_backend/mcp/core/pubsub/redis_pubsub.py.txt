@@ -1,0 +1,72 @@
+# mcp/core/pubsub/redis_pubsub.py
+# Redis-specific implementation of the Pub/Sub manager.
+
+# import asyncio
+# import json
+# import aioredis # Using aioredis for async Redis operations
+# from .base_pubsub import BasePubSubManager
+# from typing import Dict, Any, AsyncGenerator
+
+# class RedisPubSubManager(BasePubSubManager):
+#     def __init__(self, redis_url: str):
+#         self.redis_url = redis_url
+#         self.publisher_client: Optional[aioredis.Redis] = None
+
+#     async def connect_publisher(self):
+#         if not self.publisher_client or self.publisher_client.closed:
+#             self.publisher_client = await aioredis.from_url(self.redis_url)
+#             print("Redis Pub/Sub Publisher connected.")
+
+#     async def disconnect_publisher(self):
+#         if self.publisher_client:
+#             await self.publisher_client.close()
+#             self.publisher_client = None
+#             print("Redis Pub/Sub Publisher disconnected.")
+
+#     async def publish(self, channel: str, message: Dict[str, Any]):
+#         if not self.publisher_client:
+#             # Or raise an error, or attempt to connect
+#             print("Error: Redis publisher not connected. Cannot publish.")
+#             return
+#         try:
+#             await self.publisher_client.publish(channel, json.dumps(message))
+#         except Exception as e:
+#             print(f"Error publishing to Redis channel {channel}: {e}")
+
+
+#     async def subscribe_to_channel(self, channel: str) -> AsyncGenerator[Dict[str, Any], None]:
+#         subscriber_client = None
+#         pubsub_instance = None
+#         try:
+#             subscriber_client = await aioredis.from_url(self.redis_url)
+#             pubsub_instance = subscriber_client.pubsub()
+#             await pubsub_instance.subscribe(channel)
+#             print(f"Subscribed to Redis channel: {channel}")
+
+#             while True: # Keep listening
+#                 # Use a timeout to allow checking for client disconnect in the SSE handler
+#                 # or to allow the generator to be cancelled.
+#                 message = await pubsub_instance.get_message(ignore_subscribe_messages=True, timeout=1.0)
+#                 if message and message.get("type") == "message":
+#                     try:
+#                         yield json.loads(message["data"])
+#                     except json.JSONDecodeError:
+#                         print(f"Error decoding JSON from Redis channel {channel}: {message['data']}")
+#                 # A small sleep can prevent a tight loop if there are no messages
+#                 # and can help with task switching in asyncio.
+#                 await asyncio.sleep(0.01)
+
+#         except asyncio.CancelledError:
+#             print(f"Subscription to Redis channel {channel} cancelled.")
+#             # This happens when the client disconnects and the SSE generator is cancelled.
+#         except Exception as e:
+#             print(f"Error in Redis subscription for channel {channel}: {e}")
+#         finally:
+#             if pubsub_instance:
+#                 try:
+#                     await pubsub_instance.unsubscribe(channel)
+#                 except Exception as e_unsub:
+#                     print(f"Error unsubscribing from {channel}: {e_unsub}")
+#             if subscriber_client:
+#                 await subscriber_client.close()
+#             print(f"Closed subscription resources for Redis channel: {channel}")

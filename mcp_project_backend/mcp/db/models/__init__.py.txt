@@ -1,0 +1,13 @@
+# This file makes the 'models' directory a Python sub-package.
+# It should import all SQLAlchemy ORM models defined in this directory
+# so they are registered with SQLAlchemy's metadata. This is important for Alembic
+# and for Base.metadata.create_all() if used.
+
+# Example:
+# from .user import User, Role
+# from .mcp_definition import MCPDefinition, MCPVersion
+# from .workflow_definition import WorkflowDefinition, WorkflowStep
+# from .workflow_run import WorkflowRun # , WorkflowRunStepLog (if defined as a separate model)
+# from .action_log import ActionLog
+# from .external_db_config import ExternalDatabaseConfig
+# from mcp.db.base import Base # Make Base accessible if models need it directly sometimes (though usually inherited)

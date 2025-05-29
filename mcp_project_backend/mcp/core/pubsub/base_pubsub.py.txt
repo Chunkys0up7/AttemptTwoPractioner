@@ -1,0 +1,38 @@
+# mcp/core/pubsub/base_pubsub.py
+# Defines an abstract base class for Pub/Sub implementations,
+# allowing for different backends (e.g., Redis, Kafka, in-memory for testing).
+
+# import abc
+# from typing import Dict, Any, AsyncGenerator
+
+# class BasePubSubManager(abc.ABC):
+#     @abc.abstractmethod
+#     async def connect_publisher(self):
+#         """Connects the publisher client."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def disconnect_publisher(self):
+#         """Disconnects the publisher client."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def publish(self, channel: str, message: Dict[str, Any]):
+#         """Publishes a message to a channel."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def subscribe_to_channel(self, channel: str) -> AsyncGenerator[Dict[str, Any], None]:
+#         """
+#         Subscribes to a channel and yields incoming messages.
+#         This method itself needs to handle the lifecycle of a single subscription.
+#         """
+#         # This is tricky because the generator needs to manage its own connection for listening
+#         # The yield is essential for EventSourceResponse.
+#         # Example to satisfy linter, real implementation is more complex.
+#         if False: # Never actually runs
+#             yield {}
+
+
+    # Methods for managing subscriber connections or cleanup might also be needed,
+    # depending on the Pub/Sub backend and how EventSourceResponse handles disconnections.

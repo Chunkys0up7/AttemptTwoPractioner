@@ -1,0 +1,26 @@
+# mcp/api/routers/workflow_definition_routes.py
+# This file defines API endpoints for managing WorkflowDefinitions and their WorkflowSteps.
+# - CRUD operations for WorkflowDefinitions.
+# - CRUD operations for WorkflowSteps within a workflow (adding, removing, reordering MCP versions as steps).
+# - Listing WorkflowDefinitions.
+
+# Example (conceptual):
+# from fastapi import APIRouter, Depends
+# from sqlalchemy.orm import Session
+# from typing import List
+# from mcp.api.deps import get_db_session, get_current_active_user
+# from mcp.schemas.workflow_definition_schemas import WorkflowDefinitionCreate, WorkflowDefinitionRead
+# from mcp.db.crud.crud_workflow_definition import crud_workflow_definition
+# from mcp.db.models.user import User
+
+# router = APIRouter()
+
+# @router.post("/", response_model=WorkflowDefinitionRead)
+# async def create_workflow_definition(
+#     wf_def_in: WorkflowDefinitionCreate,
+#     db: Session = Depends(get_db_session),
+#     current_user: User = Depends(get_current_active_user)
+# ):
+#     return crud_workflow_definition.create(db=db, obj_in=wf_def_in, owner_id=current_user.id)
+
+# # ... other GET, PUT, DELETE endpoints for workflow definitions and their steps ...

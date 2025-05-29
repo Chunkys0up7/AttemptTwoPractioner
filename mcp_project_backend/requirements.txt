@@ -1,0 +1,45 @@
+# Project dependencies for the MCP backend.
+# This file is typically used if not managing dependencies with Poetry, PDM, or a similar tool via pyproject.toml.
+# If using pyproject.toml with Poetry, generate this file using: `poetry export -f requirements.txt --output requirements.txt --without-hashes`
+
+# Core FastAPI and server
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# Database - SQLAlchemy and PostgreSQL
+SQLAlchemy[mypy]>=2.0.0
+psycopg2-binary>=2.9.0
+alembic>=1.11.0
+
+# Pydantic for data validation and settings
+pydantic[email]>=2.0.0
+pydantic-settings>=2.0.0 # For settings management
+
+# Redis for caching and Pub/Sub
+redis>=4.6.0
+aioredis>=2.0.0 # For asynchronous Pub/Sub
+
+# Authentication and Security
+python-jose[cryptography]>=3.3.0 # For JWTs
+passlib[bcrypt]>=1.7.0 # For password hashing
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# MCP Execution specific dependencies
+papermill>=2.4.0 # For notebook execution
+nbformat>=5.9.0
+
+# Cloud SDKs (add as needed)
+google-cloud-bigquery>=3.0.0 # For BigQuery connector
+
+# Monitoring
+prometheus-client>=0.17.0
+psutil>=5.9.0
+
+# Development/Testing dependencies (often in a separate requirements-dev.txt)
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# httpx>=0.24.0
+# mypy>=1.5.0
+# ruff>=0.0.285

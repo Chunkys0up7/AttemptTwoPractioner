@@ -1,0 +1,82 @@
+# tests/conftest.py
+# This file is used by Pytest to define fixtures, hooks, and plugins
+# that are available to all tests in the project.
+
+# import pytest
+# from fastapi.testclient import TestClient
+# from sqlalchemy import create_engine
+# from sqlalchemy.orm import sessionmaker, Session
+# from mcp.api.main import app # Import your FastAPI app
+# from mcp.db.base import Base # Your SQLAlchemy Base
+# from mcp.api.deps import get_db_session # Your DB session dependency
+# from mcp.core.config import settings # Your app settings
+
+# # Use a separate test database (e.g., SQLite in-memory)
+# TEST_SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:" # Or a test Postgres DB URL
+
+# engine = create_engine(
+#     TEST_SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False} # Needed for SQLite
+# )
+# TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# @pytest.fixture(scope="session", autouse=True)
+# def create_test_db():
+#     """Create all tables in the test database before tests run, and drop after."""
+#     Base.metadata.create_all(bind=engine)
+#     yield
+#     Base.metadata.drop_all(bind=engine)
+
+
+# @pytest.fixture(scope="function")
+# def db_session() -> Session:
+#     """Pytest fixture for a database session for each test function."""
+#     connection = engine.connect()
+#     transaction = connection.begin()
+#     session = TestingSessionLocal(bind=connection)
+#     yield session
+#     session.close()
+#     transaction.rollback() # Ensure tests are isolated
+#     connection.close()
+
+
+# @pytest.fixture(scope="module") # Or "session" if app doesn't change across module tests
+# def test_client(db_session) -> TestClient: # db_session might not be needed if overriding dependency
+#     """Pytest fixture for the FastAPI TestClient."""
+    
+#     # Override the get_db_session dependency for testing
+#     def override_get_db():
+#         try:
+#             db = TestingSessionLocal()
+#             yield db
+#         finally:
+#             db.close()
+    
+#     app.dependency_overrides[get_db_session] = override_get_db
+#     client = TestClient(app)
+#     yield client
+#     # Clean up dependency override after tests in module are done
+#     app.dependency_overrides.clear()
+
+
+# @pytest.fixture(scope="module")
+# def normal_user_token_headers(test_client: TestClient, db_session: Session) -> dict[str, str]:
+#     # Create a normal user and get their token for testing authenticated endpoints
+#     # from mcp.db.crud.crud_user import crud_user
+#     # from mcp.api.schemas.auth_schemas import UserCreate # Assuming UserCreate schema
+#     # from mcp.core.security.jwt_manager import JWTManager
+
+#     # user_email = "testuser@example.com"
+#     # user_password = "testpassword"
+#     # existing_user = crud_user.get_by_email(db_session, email=user_email)
+#     # if not existing_user:
+#     #     user_in = UserCreate(email=user_email, password=user_password, full_name="Test User")
+#     #     crud_user.create(db_session, obj_in=user_in) # Ensure create hashes password
+
+#     # login_data = {"username": user_email, "password": user_password}
+#     # r = test_client.post(f"{settings.API_V1_STR}/auth/login", data=login_data) # Adjust form data if needed
+#     # token = r.json()["access_token"]
+#     # headers = {"Authorization": f"Bearer {token}"}
+#     # return headers
+#     return {"Authorization": "Bearer fake_normal_user_token"} # Placeholder
+
+# # Add more fixtures as needed (e.g., for creating specific test data, admin user tokens).

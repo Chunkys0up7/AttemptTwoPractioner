@@ -1,0 +1,46 @@
+# mcp/db/crud/crud_user.py
+# CRUD operations specific to User and Role models.
+
+# from sqlalchemy.orm import Session
+# from .base_crud import CRUDBase
+# from mcp.db.models.user import User #, Role
+# from mcp.api.schemas.auth_schemas import UserCreate # Assuming a UserCreate schema
+# from mcp.core.security.password_manager import PasswordManager # For hashing passwords
+# from typing import Optional
+
+# # Define Pydantic schemas for User creation/update if not already in auth_schemas.py
+# # class UserCreateInternal(BaseModel): # Example if UserCreate has more fields for internal use
+# #     email: EmailStr
+# #     password: str # Plain password for creation
+# #     full_name: Optional[str] = None
+# #     is_active: bool = True
+# #     role_name: UserRoleEnum = UserRoleEnum.VIEWER
+
+# # class UserUpdateInternal(BaseModel):
+# #     # Fields that can be updated
+# #     pass
+
+
+# class CRUDUser(CRUDBase[User, UserCreate, UserCreate]): # Assuming UserCreate for both for now
+#     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
+#         return db.query(self.model).filter(self.model.email == email).first()
+
+#     def create(self, db: Session, *, obj_in: UserCreate) -> User:
+#         # Create a dictionary for db_obj creation, excluding plain password
+#         # obj_in_data = obj_in.model_dump(exclude={'password'}) # Pydantic v2
+#         obj_in_data = obj_in.dict(exclude={'password'}) # Pydantic v1
+        
+#         hashed_password = PasswordManager.get_password_hash(obj_in.password)
+#         db_obj = self.model(**obj_in_data, hashed_password=hashed_password)
+#         db.add(db_obj)
+#         db.commit()
+#         db.refresh(db_obj)
+#         return db_obj
+
+#     # Add methods for updating user, changing password, managing roles etc.
+
+# # class CRUDRole(CRUDBase[Role, RoleCreateSchema, RoleUpdateSchema]): # If Role model exists
+# #     pass
+
+# crud_user = CRUDUser(User)
+# # crud_role = CRUDRole(Role) # If Role model exists

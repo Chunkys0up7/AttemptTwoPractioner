@@ -1,0 +1,98 @@
+# mcp/core/mcp_configs.py
+# This file defines the Pydantic models for the type-specific configurations
+# of different MCPs (Model Context Protocols). These models ensure that each
+# MCP type has a clearly defined and validated structure for its parameters.
+# These definitions should align with frontend/types.ts and BACKEND_ENHANCEMENTS.md.
+
+# from pydantic import BaseModel, Field, HttpUrl
+# from typing import Optional, List, Dict, Union, Literal, Any
+
+# # Base class for common config fields if any (optional)
+# # class BaseMCPTypeConfig(BaseModel):
+# #     pass
+
+# class LLMConfig(BaseModel):
+#     type: Literal["LLM Prompt Agent"] = "LLM Prompt Agent"
+#     model_name: str = Field(..., description="Name of the LLM model to use, e.g., 'gemini-2.5-flash-preview-04-17'", alias="model")
+#     system_prompt: Optional[str] = Field(default=None, description="The system prompt for the LLM.", alias="systemPrompt")
+#     user_prompt_template: Optional[str] = Field(default=None, description="Template for the user prompt, may contain placeholders like {{input_var}}.", alias="userPromptTemplate")
+#     temperature: Optional[float] = Field(default=0.7, ge=0, le=2, description="Controls randomness. Lower is more deterministic.")
+#     max_tokens: Optional[int] = Field(default=1024, gt=0, description="Maximum number of tokens to generate.", alias="maxTokens")
+#     top_p: Optional[float] = Field(default=None, ge=0, le=1, description="Nucleus sampling parameter.", alias="topP")
+#     top_k: Optional[int] = Field(default=None, gt=0, description="Top-k sampling parameter.", alias="topK")
+#     # Add other LLM specific parameters as needed
+
+# class NotebookCell(BaseModel): # Aligns with frontend/types.ts
+#     id: str
+#     type: Literal['code', 'markdown']
+#     content: str
+
+# class NotebookConfig(BaseModel):
+#     type: Literal["Jupyter Notebook"] = "Jupyter Notebook"
+#     # Option 1: Reference a notebook file managed elsewhere (e.g., Git repo, S3)
+#     notebook_path_ref: Optional[str] = Field(default=None, description="Path or reference to the .ipynb file.")
+#     # Option 2: Store notebook content directly (less common for large notebooks)
+#     notebook_cells: Optional[List[NotebookCell]] = Field(default=None, description="List of notebook cells if storing content directly.", alias="notebookCells")
+#     parameters: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Parameters to pass to the notebook via Papermill.")
+#     timeout_seconds: Optional[int] = Field(default=3600, description="Execution timeout for the notebook.")
+
+# class ScriptConfig(BaseModel): # For Python Script / TypeScript Script
+#     # This will be part of a discriminated union, so Pydantic needs to know which literal it is.
+#     # The parent MCPVersion.mcp_type will store "Python Script" or "TypeScript Script".
+#     # The 'type' field here could be redundant if mcp_type from parent is always used for discrimination.
+#     # However, for self-contained validation of the config payload, it can be useful.
+#     type: Literal["Python Script", "TypeScript Script"]
+#     code_content: str = Field(..., description="The actual script code.", alias="codeContent")
+#     # interpreter: Optional[str] = Field(default="python", description="Script interpreter, e.g., 'python', 'node' (for TypeScript/JavaScript).")
+#     # args: Optional[List[str]] = Field(default_factory=list, description="Command-line arguments for the script.")
+#     # env_vars: Optional[Dict[str, str]] = Field(default_factory=dict, description="Environment variables for the script execution context.")
+#     # timeout_seconds: Optional[int] = Field(default=600, description="Execution timeout for the script.")
+
+# class StreamlitAppConfig(BaseModel):
+#     type: Literal["Streamlit App"] = "Streamlit App"
+#     git_repo_url: Optional[HttpUrl] = Field(default=None, description="URL of the Git repository containing the Streamlit app.", alias="gitRepoUrl")
+#     main_script_path: Optional[str] = Field(default="app.py", description="Path to the main Streamlit script within the repository (e.g., app.py).", alias="mainScriptPath")
+#     requirements_content: Optional[str] = Field(default=None, description="Content of the requirements.txt file for the Streamlit app.", alias="requirements")
+#     # port: Optional[int] = Field(default=8501, description="Port on which the Streamlit app will run if managed by MCP.")
+#     # server_command: Optional[str] = Field(default="streamlit run", description="Command to start the Streamlit server.")
+
+# class MCPPackageConfig(BaseModel): # For Meta Component Package (MCP)
+#     type: Literal["MCP"] = "MCP"
+#     mcp_configuration: str = Field(..., description="The configuration definition for the Meta Component Package, typically JSON or YAML string.", alias="mcpConfiguration")
+#     # This string would itself define a sub-workflow or a collection of components.
+#     # Its internal structure would need its own validation schema if MCP is to interpret it.
+
+# # Configuration models for simpler types (Data, Utility, Output)
+# # These might not have specific fields beyond what's common in AIComponent,
+# # but defining them helps with the discriminated union.
+# class DataComponentConfig(BaseModel):
+#     type: Literal["Data"] = "Data"
+#     # Example: source_url: Optional[HttpUrl] = None, format: Optional[str] = None
+
+# class UtilityComponentConfig(BaseModel):
+#     type: Literal["Utility"] = "Utility"
+#     # Example: function_name: Optional[str] = None
+
+# class OutputComponentConfig(BaseModel):
+#     type: Literal["Output"] = "Output"
+#     # Example: target_path: Optional[str] = None, output_format: Optional[str] = None
+
+
+# # Union of all specific configuration types.
+# # This is what will be stored (serialized) in the database for an MCPVersion's config.
+# MCPConfigPayload = Union[
+#     LLMConfig,
+#     NotebookConfig,
+#     ScriptConfig,
+#     StreamlitAppConfig,
+#     MCPPackageConfig,
+#     DataComponentConfig,     # Add if defined
+#     UtilityComponentConfig,  # Add if defined
+#     OutputComponentConfig    # Add if defined
+# ]
+
+# # Helper for parsing (as shown in BACKEND_ENHANCEMENTS.md)
+# # def parse_mcp_config(config_data: Dict, mcp_type_str: str) -> MCPConfigPayload:
+# #     if 'type' not in config_data: # Add discriminator if missing
+# #         config_data['type'] = mcp_type_str
+# #     return MCPConfigPayload.model_validate(config_data) # Pydantic v2

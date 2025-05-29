@@ -1,0 +1,48 @@
+# mcp/api/deps.py
+# This file contains FastAPI dependency functions.
+# Dependencies are used for things like:
+# - Getting a database session (e.g., `get_db_session`).
+# - Authenticating users and getting the current user (e.g., `get_current_user`).
+# - Checking permissions / roles (e.g., `require_admin_role`).
+# - Common query parameters or request body components.
+
+# Example (conceptual):
+# from fastapi import Depends, HTTPException, status
+# from sqlalchemy.orm import Session
+# from mcp.db.session import SessionLocal
+# from mcp.core.security.jwt_manager import JWTManager
+# from mcp.core.config import settings
+# from mcp.db.models.user import User
+# from mcp.db.crud.crud_user import crud_user
+
+# def get_db_session():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+
+# async def get_current_user(
+#     token: str = Depends(oauth2_scheme), # Assuming oauth2_scheme is defined (e.g., OAuth2PasswordBearer)
+#     db: Session = Depends(get_db_session)
+# ) -> User:
+#     credentials_exception = HTTPException(
+#         status_code=status.HTTP_401_UNAUTHORIZED,
+#         detail="Could not validate credentials",
+#         headers={"WWW-Authenticate": "Bearer"},
+#     )
+#     payload = JWTManager.decode_token(token, settings.SECRET_KEY)
+#     if payload is None:
+#         raise credentials_exception
+#     user_id: str = payload.get("sub")
+#     if user_id is None:
+#         raise credentials_exception
+#     user = crud_user.get(db, id=int(user_id)) # Adjust ID type if necessary
+#     if user is None:
+#         raise credentials_exception
+#     return user
+
+# async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
+#     if not current_user.is_active: # Assuming an is_active field on User model
+#         raise HTTPException(status_code=400, detail="Inactive user")
+#     return current_user

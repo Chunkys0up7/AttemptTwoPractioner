@@ -1,0 +1,25 @@
+# mcp/api/schemas/dashboard_schemas.py
+# Pydantic models for data structures returned by dashboard-specific API endpoints.
+
+# from pydantic import BaseModel
+# from typing import List, Optional
+
+# class DashboardSummaryItem(BaseModel):
+#     name: str
+#     count: int
+#     link: Optional[str] = None
+
+# class DashboardSystemHealth(BaseModel):
+#     service_name: str
+#     status: str # "OK", "Warning", "Error"
+#     details: Optional[str] = None
+
+# class DashboardSummary(BaseModel):
+#     active_workflow_runs: int
+#     completed_runs_today: int
+#     failed_runs_today: int
+#     total_mcp_definitions: int
+#     total_workflow_definitions: int
+#     recent_components: List[DashboardSummaryItem] = []
+#     trending_workflows: List[DashboardSummaryItem] = []
+#     system_health: List[DashboardSystemHealth] = []

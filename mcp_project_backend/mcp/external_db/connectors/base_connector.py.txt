@@ -1,0 +1,68 @@
+# mcp/external_db/connectors/base_connector.py
+# Defines an abstract base class (ABC) for database connectors.
+# Each specific database connector (PostgreSQL, MySQL, BigQuery, etc.)
+# will inherit from this class and implement its abstract methods.
+
+# import abc
+# from typing import Any, List, Dict, Optional, AsyncGenerator
+
+# # Define a Pydantic model or TypedDict for connection_params if desired for clarity
+# # class ConnectionParams(TypedDict):
+# #     db_type: str
+# #     host: Optional[str]
+# #     # ... other common and specific params
+
+# class BaseDBConnector(abc.ABC):
+#     def __init__(self, connection_params: Dict[str, Any]):
+#         """
+#         Initializes the connector with necessary connection parameters.
+#         :param connection_params: A dictionary of parameters derived from ExternalDatabaseConfig.
+#         """
+#         self.connection_params = connection_params
+#         self._connection: Optional[Any] = None # Stores the actual DB connection object
+
+#     @abc.abstractmethod
+#     async def connect(self) -> None:
+#         """Establishes a connection to the database."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def disconnect(self) -> None:
+#         """Closes the database connection and cleans up resources."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def is_connected(self) -> bool:
+#         """Checks if the connection is currently active."""
+#         pass
+
+#     @abc.abstractmethod
+#     async def execute_sql_statement(
+#         self, 
+#         sql: str, 
+#         params: Optional[Union[List[Any], Dict[str, Any]]] = None, 
+#         fetch_one: bool = False,
+#         fetch_all: bool = True, # Default to fetching all results
+#         max_rows: Optional[int] = None # For limiting rows from SELECT
+#     ) -> Optional[Union[Dict[str, Any], List[Dict[str, Any]]]]: # Returns rows as list of dicts
+#         """
+#         Executes an arbitrary SQL statement.
+#         For SELECT, returns list of dicts (rows).
+#         For INSERT/UPDATE/DELETE, might return row count or None.
+#         """
+#         pass
+
+#     @abc.abstractmethod
+#     async def scan_db_schema(self) -> Any: # Return type should be a structured schema object
+#         """
+#         Scans the database schema and returns a structured representation
+#         (e.g., list of schemas, tables, columns, types, constraints).
+#         """
+#         pass
+
+    # Optional common utility methods can be added here if applicable to many connectors.
+    # def _convert_row_to_dict(self, cursor_description, row_tuple) -> Dict[str, Any]:
+    #     """Helper to convert a database row tuple to a dictionary."""
+    #     if row_tuple is None:
+    #         return None
+    #     return dict(zip([col[0] for col in cursor_description], row_tuple))

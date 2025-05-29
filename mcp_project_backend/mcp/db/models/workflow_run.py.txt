@@ -1,0 +1,55 @@
+# mcp/db/models/workflow_run.py
+# Defines SQLAlchemy ORM models for WorkflowRun and potentially related entities
+# like WorkflowRunStepLog or WorkflowRunEvent to track execution details.
+
+# from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, DateTime, Enum as DBEnum
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.dialects.postgresql import JSONB, UUID
+# from sqlalchemy.sql import func
+# from mcp.db.base import Base
+# from mcp.schemas.workflow_run_schemas import WorkflowRunStatusEnum # Using the Pydantic enum for consistency
+# import uuid
+
+# class WorkflowRun(Base):
+#     __tablename__ = "workflow_runs"
+
+#     id = Column(Integer, primary_key=True, index=True) # Or UUID: Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     workflow_definition_id = Column(Integer, ForeignKey("workflow_definitions.id"), nullable=False)
+    
+#     status = Column(DBEnum(WorkflowRunStatusEnum, name="workflow_run_status"), nullable=False, default=WorkflowRunStatusEnum.PENDING, index=True)
+#     initial_inputs = Column(JSONB, nullable=True) # Inputs provided when the run was triggered
+#     final_outputs = Column(JSONB, nullable=True) # Final outputs of the entire workflow
+#     error_message = Column(Text, nullable=True) # If the run failed
+    
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     started_at = Column(DateTime(timezone=True), nullable=True)
+#     ended_at = Column(DateTime(timezone=True), nullable=True)
+#     # triggered_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+#     triggered_by_actor_id = Column(String, nullable=True) # User ID or system trigger identifier
+
+#     workflow_definition = relationship("WorkflowDefinition", back_populates="runs")
+#     # triggered_by_user = relationship("User", back_populates="workflow_runs")
+    
+#     # Optional: Detailed step logs/events could be a separate table or JSONB array here
+#     # For example, if storing logs directly in WorkflowRun:
+#     # execution_logs = Column(JSONB, nullable=True, default=list) # List of log/event objects
+#     # Or a relationship to a WorkflowRunStepLog model if more structured logging is needed:
+#     # step_logs = relationship("WorkflowRunStepLog", back_populates="workflow_run", cascade="all, delete-orphan")
+
+
+# # Optional: Detailed logs per step execution (if not storing in WorkflowRun.execution_logs)
+# # class WorkflowRunStepLog(Base):
+# #     __tablename__ = "workflow_run_step_logs"
+# #     id = Column(Integer, primary_key=True, index=True)
+# #     workflow_run_id = Column(Integer, ForeignKey("workflow_runs.id"), nullable=False)
+# #     workflow_step_id = Column(Integer, ForeignKey("workflow_steps.id"), nullable=False) # Original step definition
+# #     step_name_at_execution = Column(String, nullable=False) # Name of step when it ran
+# #     timestamp = Column(DateTime(timezone=True), server_default=func.now())
+# #     event_type = Column(String, nullable=False) # e.g., LOG, STATUS_CHANGE, ARTIFACT, ERROR
+# #     message = Column(Text, nullable=True)
+# #     payload = Column(JSONB, nullable=True) # Any structured data associated with event
+# #     status_before = Column(String, nullable=True)
+# #     status_after = Column(String, nullable=True)
+
+# #     workflow_run = relationship("WorkflowRun", back_populates="step_logs")
+# #     workflow_step = relationship("WorkflowStep") # The definition of the step

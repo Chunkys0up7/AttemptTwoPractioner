@@ -1,0 +1,64 @@
+# mcp/db/crud/crud_action_log.py
+# CRUD operations specific to the ActionLog model.
+# Primarily, this will involve creating log entries. Reading logs might be
+# done with more complex queries tailored to filtering/searching.
+
+# from sqlalchemy.orm import Session
+# from .base_crud import CRUDBase
+# from mcp.db.models.action_log import ActionLog
+# from pydantic import BaseModel # For Create/Update schemas if simpler than full ActionLog
+# from typing import Optional, Dict, Any, List
+# from datetime import datetime
+
+# # Define a Pydantic schema for creating an ActionLog entry if needed,
+# # though the AuditingService might construct the model directly.
+# class ActionLogCreateSchema(BaseModel):
+#     actor_id: Optional[str] = None
+#     action_type: str
+#     entity_type: Optional[str] = None
+#     entity_id: Optional[str] = None
+#     details: Optional[Dict[str, Any]] = None
+#     # timestamp is usually auto-set by the model's default
+
+# # ActionLog probably doesn't have a typical Update schema.
+
+# class CRUDActionLog(CRUDBase[ActionLog, ActionLogCreateSchema, ActionLogCreateSchema]): # Using Create for Update too
+    
+#     def create_log(
+#         self,
+#         db: Session,
+#         *,
+#         actor_id: Optional[str],
+#         action_type: str,
+#         entity_type: Optional[str] = None,
+#         entity_id: Optional[str] = None,
+#         details: Optional[Dict[str, Any]] = None
+#     ) -> ActionLog:
+#         log_entry = self.model(
+#             timestamp=datetime.utcnow(), # Ensure UTC
+#             actor_id=actor_id,
+#             action_type=action_type,
+#             entity_type=entity_type,
+#             entity_id=str(entity_id) if entity_id is not None else None,
+#             details=details
+#         )
+#         db.add(log_entry)
+#         db.commit()
+#         db.refresh(log_entry)
+#         return log_entry
+
+#     def get_logs_for_entity(
+#         self, db: Session, *, entity_type: str, entity_id: str, skip: int = 0, limit: int = 100
+#     ) -> List[ActionLog]:
+#         return (
+#             db.query(self.model)
+#             .filter(self.model.entity_type == entity_type, self.model.entity_id == str(entity_id))
+#             .order_by(self.model.timestamp.desc())
+#             .offset(skip)
+#             .limit(limit)
+#             .all()
+#         )
+    
+    # Add more specific query methods as needed (e.g., by actor, by action_type, time range).
+
+# crud_action_log = CRUDActionLog(ActionLog)

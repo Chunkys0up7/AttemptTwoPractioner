@@ -1,0 +1,10 @@
+# This file makes the 'crud' directory a Python sub-package.
+# CRUD stands for Create, Read, Update, Delete.
+# This package contains modules for interacting with database models.
+# Each CRUD module is typically focused on a specific model or related models.
+
+# Example:
+# from .base_crud import CRUDBase
+# from .crud_user import crud_user
+# from .crud_mcp_definition import crud_mcp_definition, crud_mcp_version
+# # ... and so on for all CRUD modules
