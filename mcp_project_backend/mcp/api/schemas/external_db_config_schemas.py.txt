@@ -1,0 +1,34 @@
+# mcp/api/schemas/external_db_config_schemas.py
+# Pydantic models for managing external database connection configurations.
+
+# from pydantic import BaseModel, Field
+# from typing import Optional, Dict, Any
+
+# class ExternalDbConfigBase(BaseModel):
+#     name: str = Field(..., example="My Production Postgres")
+#     db_type: str = Field(..., example="postgresql") # e.g., "postgresql", "mysql", "bigquery"
+#     host: Optional[str] = None
+#     port: Optional[int] = None
+#     database_name: Optional[str] = None # Or dataset_id for BigQuery
+#     username: Optional[str] = None
+#     # Password should not be directly in request/response.
+#     # It might be a write-only field or managed via a secrets engine.
+#     additional_params: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Type-specific params, e.g., BigQuery project_id, service_account_key_path")
+
+# class ExternalDbConfigCreate(ExternalDbConfigBase):
+#     password_or_secret_ref: Optional[str] = Field(None, description="Password or reference to a secret")
+
+# class ExternalDbConfigUpdate(ExternalDbConfigBase):
+#     name: Optional[str] = None # Allow partial updates
+#     db_type: Optional[str] = None
+#     password_or_secret_ref: Optional[str] = Field(None, description="To update password/secret reference")
+
+
+# class ExternalDbConfigRead(ExternalDbConfigBase):
+#     id: int
+#     # Never return passwords or sensitive connection details directly.
+#     # Indicate if configured, or last test status.
+#     is_configured: bool = True # Placeholder
+
+#     class Config:
+#         orm_mode = True

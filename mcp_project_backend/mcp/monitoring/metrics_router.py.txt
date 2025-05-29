@@ -1,0 +1,34 @@
+# mcp/monitoring/metrics_router.py
+# Defines the FastAPI router for exposing Prometheus metrics.
+
+# from fastapi import APIRouter
+# from starlette.responses import PlainTextResponse
+# from prometheus_client import generate_latest, CONTENT_TYPE_LATEST, CollectorRegistry
+# from prometheus_client import Counter, Histogram # Example metrics
+
+# router = APIRouter()
+
+# # Create a custom registry (optional, good for isolating app metrics)
+# # registry = CollectorRegistry()
+
+# # Example metrics (define these where relevant actions occur, e.g., in services or API deps)
+# # REQUEST_COUNT = Counter("mcp_requests_total", "Total number of API requests.", ["method", "endpoint"], registry=registry)
+# # REQUEST_LATENCY = Histogram("mcp_request_latency_seconds", "API request latency.", ["method", "endpoint"], registry=registry)
+# # WORKFLOW_EXECUTIONS_TOTAL = Counter("mcp_workflow_executions_total", "Total number of workflow executions.", ["workflow_name", "status"], registry=registry)
+
+
+# @router.get("/metrics", response_class=PlainTextResponse)
+# async def metrics():
+#     """
+#     Endpoint to expose Prometheus metrics.
+#     """
+#     # data = generate_latest(registry) # Use custom registry
+#     data = generate_latest() # Use default Prometheus registry
+#     return PlainTextResponse(data, media_type=CONTENT_TYPE_LATEST)
+
+# # How to use example metrics elsewhere:
+# # from .metrics_router import REQUEST_COUNT, REQUEST_LATENCY (if defined here)
+# # In an API endpoint or middleware:
+# # REQUEST_COUNT.labels(method=request.method, endpoint=request.url.path).inc()
+# # with REQUEST_LATENCY.labels(method=request.method, endpoint=request.url.path).time():
+# #     response = await call_next(request)

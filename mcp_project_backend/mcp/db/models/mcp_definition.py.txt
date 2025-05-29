@@ -1,0 +1,67 @@
+# mcp/db/models/mcp_definition.py
+# Defines the SQLAlchemy ORM models for MCPDefinition and MCPVersion.
+
+# from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, DateTime, ARRAY
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.dialects.postgresql import JSONB, UUID # For PostgreSQL specific types
+# from sqlalchemy.sql import func # For server-side default timestamps
+# from mcp.db.base import Base # Assuming Base is defined in mcp.db.base
+# from mcp.core.mcp_configs import MCPConfigPayload, parse_mcp_config, SpecificComponentType # For config property
+# from sqlalchemy.ext.hybrid import hybrid_property # For the config property
+# import uuid
+
+# class MCPDefinition(Base):
+#     __tablename__ = "mcp_definitions"
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, index=True, nullable=False, unique=True) # Consider uniqueness per owner/tenant
+#     description = Column(Text, nullable=True)
+#     mcp_type = Column(String, nullable=False) # Stores SpecificComponentType string, e.g., "LLM Prompt Agent"
+#     tags = Column(ARRAY(String), nullable=True)
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+#     # owner_id = Column(Integer, ForeignKey("users.id"), nullable=True) # Example ownership
+
+#     versions = relationship("MCPVersion", back_populates="definition", cascade="all, delete-orphan")
+#     # owner = relationship("User", back_populates="mcp_definitions")
+
+
+# class MCPVersion(Base):
+#     __tablename__ = "mcp_versions"
+
+#     id = Column(Integer, primary_key=True, index=True) # Or UUID: Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     mcp_definition_id = Column(Integer, ForeignKey("mcp_definitions.id"), nullable=False)
+#     version_string = Column(String, nullable=False, default="1.0.0") # E.g., "1.0.0", "1.1.0-beta"
+#     description = Column(Text, nullable=True)
+#     # This mcp_type is inherited/copied from MCPDefinition for direct access and consistency checks
+#     # It should match the 'type' discriminator in the config_payload_data.
+#     mcp_type = Column(String, nullable=False)
+    
+#     # Store the type-specific configuration as JSONB
+#     config_payload_data = Column(JSONB, nullable=True) # Renamed for clarity from just 'config'
+    
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+#     # is_latest = Column(Boolean, default=False, index=True) # Could be useful
+
+#     definition = relationship("MCPDefinition", back_populates="versions")
+#     workflow_steps = relationship("WorkflowStep", back_populates="mcp_version") # If WorkflowStep links here
+
+#     @hybrid_property
+#     def config(self) -> Optional[MCPConfigPayload]:
+#         if self.config_payload_data is None:
+#             # For types like 'Data', 'Utility', 'Output' that might not have specific config,
+#             # returning None or a default empty config object might be appropriate.
+#             # Or, ensure even simple types have a minimal Pydantic model (e.g., just `type: Literal["Data"]`).
+#             return None
+#         return parse_mcp_config(self.config_payload_data, self.mcp_type)
+
+#     @config.setter
+#     def config(self, new_config: Optional[MCPConfigPayload]):
+#         if new_config is None:
+#             self.config_payload_data = None
+#         else:
+#             # Ensure mcp_type matches the actual config object's type discriminator
+#             if hasattr(new_config, 'type') and self.mcp_type != new_config.type:
+#                  raise ValueError(f"MCPVersion.mcp_type ('{self.mcp_type}') and new_config.type ('{new_config.type}') mismatch during config setting.")
+#             self.config_payload_data = new_config.model_dump(by_alias=True) # Use by_alias for Pydantic v2

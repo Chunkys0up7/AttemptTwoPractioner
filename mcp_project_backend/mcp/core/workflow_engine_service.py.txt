@@ -1,0 +1,160 @@
+# mcp/core/workflow_engine_service.py
+# This file contains the core logic for executing workflows.
+# Responsibilities:
+# - Retrieving workflow definitions and their steps.
+# - Dynamically loading and instantiating MCP configurations for each step.
+# - Managing the execution sequence of steps.
+# - Handling input/output mapping between steps.
+# - Invoking the appropriate MCP executors (LLM, Notebook, Script).
+# - Recording workflow run status, logs, and results.
+# - Interacting with WorkflowStreamingService to publish real-time updates.
+
+# from sqlalchemy.orm import Session
+# from typing import Dict, Any, Optional
+# from mcp.db.models import WorkflowDefinition, WorkflowRun, MCPVersion, User
+# from mcp.db.crud import crud_workflow_definition, crud_workflow_run, crud_mcp_version
+# from mcp.schemas.workflow_run_schemas import WorkflowRunStatusEnum
+# from mcp.core.executors import llm_executor, notebook_executor, script_executor # Import concrete executors
+# from mcp.core.mcp_configs import MCPConfigPayload # For type hinting
+# from mcp.core.workflow_streaming_service import WorkflowStreamingService # For real-time updates
+# from mcp.core.auditing_service import AuditingService # For logging actions
+
+# class WorkflowEngineService:
+#     def __init__(self, db_session: Session, current_user: Optional[User] = None): # User for auditing
+#         self.db_session = db_session
+#         self.current_user = current_user
+#         # self.streaming_service = WorkflowStreamingService(db_session) # Or inject pubsub manager
+#         # self.auditing_service = AuditingService(db_session)
+
+#     async def execute_workflow(self, workflow_definition_id: int, runtime_inputs: Optional[Dict[str, Any]] = None) -> WorkflowRun:
+#         wf_def = crud_workflow_definition.get_with_steps(self.db_session, id=workflow_definition_id)
+#         if not wf_def:
+#             raise ValueError(f"WorkflowDefinition with id {workflow_definition_id} not found.")
+
+#         # 1. Create WorkflowRun entry in DB
+#         actor_id = str(self.current_user.id) if self.current_user else "system"
+#         workflow_run = crud_workflow_run.create_for_definition(
+#             db=self.db_session,
+#             workflow_definition_id=wf_def.id,
+#             status=WorkflowRunStatusEnum.PENDING,
+#             # initial_inputs=runtime_inputs # Store if needed
+#             triggered_by=actor_id
+#         )
+#         # self.auditing_service.create_action_log_entry(...)
+#         # await self.streaming_service.publish_run_update(workflow_run.id, "status_change", {"status": "PENDING"})
+        
+#         self.db_session.commit() # Commit initial run record
+
+#         # Asynchronously run the actual execution logic (e.g., using background tasks in FastAPI)
+#         # For simplicity here, we'll call it directly, but in production, this should be offloaded.
+#         # background_tasks.add_task(self._process_workflow_run, workflow_run_id=workflow_run.id, wf_def=wf_def, runtime_inputs=runtime_inputs)
+#         # return workflow_run # Return immediately with PENDING status
+
+#         try:
+#             await self._process_workflow_run(workflow_run_id=workflow_run.id, wf_def=wf_def, runtime_inputs=runtime_inputs)
+#         except Exception as e:
+#             # Update run status to FAILED if _process_workflow_run raises unhandled error
+#             crud_workflow_run.update_status(self.db_session, run_id=workflow_run.id, status=WorkflowRunStatusEnum.FAILED, error_message=str(e))
+#             # self.auditing_service.create_action_log_entry(...)
+#             # await self.streaming_service.publish_run_update(workflow_run.id, "status_change", {"status": "FAILED", "error": str(e)})
+#             self.db_session.commit()
+#             raise e # Re-raise for API layer to handle
+
+#         final_run_state = crud_workflow_run.get(self.db_session, id=workflow_run.id)
+#         return final_run_state
+
+
+#     async def _process_workflow_run(self, workflow_run_id: int, wf_def: WorkflowDefinition, runtime_inputs: Optional[Dict[str, Any]]):
+#         # Update status to RUNNING
+#         crud_workflow_run.update_status(self.db_session, run_id=workflow_run_id, status=WorkflowRunStatusEnum.RUNNING)
+#         # self.auditing_service.create_action_log_entry(...)
+#         # await self.streaming_service.publish_run_update(workflow_run_id, "status_change", {"status": "RUNNING"})
+#         self.db_session.commit()
+
+#         step_outputs_context: Dict[str, Any] = runtime_inputs or {} # Holds outputs from previous steps
+
+#         for step_def in sorted(wf_def.steps, key=lambda s: s.order): # Ensure steps are ordered
+#             # await self.streaming_service.publish_run_update(workflow_run_id, "step_started", {"step_id": step_def.id, "name": step_def.name})
+#             try:
+#                 mcp_version = crud_mcp_version.get(self.db_session, id=step_def.mcp_version_id)
+#                 if not mcp_version or not mcp_version.config: # .config is the Pydantic model property
+#                     raise ValueError(f"MCPVersion or its config not found for step {step_def.name}")
+
+#                 # Prepare inputs for this step based on step_def.input_mappings and step_outputs_context
+#                 step_inputs = self._resolve_step_inputs(step_def.input_mappings, step_outputs_context)
+
+#                 # Get the typed MCP configuration payload
+#                 mcp_typed_config: MCPConfigPayload = mcp_version.config
+
+#                 # Select executor based on mcp_version.mcp_type (which should match mcp_typed_config.type)
+#                 executor = self._get_executor(mcp_version.mcp_type)
+#                 if not executor:
+#                     raise NotImplementedError(f"No executor for MCP type: {mcp_version.mcp_type}")
+
+#                 # Execute the step
+#                 # The executor method should be designed to accept the specific Pydantic config type
+#                 # and potentially the workflow_run_id for logging/streaming within the executor.
+#                 # output = await executor.execute(config=mcp_typed_config, inputs=step_inputs, workflow_run_id=workflow_run_id)
+#                 # For now, simplified:
+#                 output = {"result": f"Output of {step_def.name} with type {mcp_version.mcp_type}"} # Placeholder output
+
+#                 # Store step output in context for subsequent steps
+#                 step_outputs_context[str(step_def.id)] = output # Or use step_def.name if unique
+
+#                 # Record step success, log output
+#                 # crud_workflow_run.add_step_log(...)
+#                 # await self.streaming_service.publish_run_update(workflow_run_id, "step_completed", {"step_id": step_def.id, "name": step_def.name, "output_preview": str(output)[:100]})
+#                 self.db_session.commit()
+
+#             except Exception as e:
+#                 # Record step failure, log error
+#                 crud_workflow_run.update_status(self.db_session, run_id=workflow_run_id, status=WorkflowRunStatusEnum.FAILED, error_message=f"Error in step {step_def.name}: {e}")
+#                 # crud_workflow_run.add_step_log(...) with error
+#                 # await self.streaming_service.publish_run_update(workflow_run_id, "step_failed", {"step_id": step_def.id, "name": step_def.name, "error": str(e)})
+#                 # await self.streaming_service.publish_run_update(workflow_run_id, "status_change", {"status": "FAILED", "error": str(e)})
+#                 self.db_session.commit()
+#                 return # Stop workflow processing on first error
+
+#         # If all steps completed successfully
+#         crud_workflow_run.update_status(self.db_session, run_id=workflow_run_id, status=WorkflowRunStatusEnum.SUCCESS)
+#         # Store final_outputs if needed: crud_workflow_run.update_outputs(self.db_session, run_id=workflow_run_id, outputs=step_outputs_context)
+#         # await self.streaming_service.publish_run_update(workflow_run_id, "status_change", {"status": "SUCCESS"})
+#         self.db_session.commit()
+
+
+#     def _resolve_step_inputs(self, input_mappings: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+#         # Logic to map inputs for the current step.
+#         # For each input defined in input_mappings:
+#         #   - If it's a static value, use it.
+#         #   - If it refers to an output of a previous step (e.g., {"source_step_id": "prev_step_X", "source_output_name": "output_Y"}),
+#         #     retrieve it from the 'context' dictionary.
+#         resolved_inputs = {}
+#         for target_param, mapping_config in input_mappings.items():
+#             if "static_value" in mapping_config:
+#                 resolved_inputs[target_param] = mapping_config["static_value"]
+#             elif "source_step_id" in mapping_config and "source_output_name" in mapping_config:
+#                 source_step_id = mapping_config["source_step_id"]
+#                 source_output_name = mapping_config["source_output_name"]
+#                 if source_step_id in context and source_output_name in context[source_step_id]:
+#                     resolved_inputs[target_param] = context[source_step_id][source_output_name]
+#                 else:
+#                     # Handle missing input - could raise error or use a default
+#                     raise ValueError(f"Input '{target_param}' could not be resolved: source {source_step_id}.{source_output_name} not found in context.")
+#             # Add more sophisticated mapping logic if needed
+#         return resolved_inputs
+
+
+#     def _get_executor(self, mcp_type: str) -> Optional[Any]: # Return type should be BaseExecutor
+#         # Factory method to return the correct executor instance based on MCP type
+#         # These executors should be initialized with necessary dependencies (e.g., db_session for logging, streaming_service)
+#         if mcp_type == "LLM Prompt Agent":
+#             # return llm_executor.LLMExecutor(db_session=self.db_session, streaming_service=self.streaming_service)
+#             return llm_executor.LLMExecutor() # Simplified for now
+#         elif mcp_type == "Jupyter Notebook":
+#             # return notebook_executor.NotebookExecutor(...)
+#             return notebook_executor.NotebookExecutor()
+#         elif mcp_type == "Python Script" or mcp_type == "TypeScript Script": # Need to differentiate if TS runs differently
+#             # return script_executor.ScriptExecutor(...)
+#             return script_executor.ScriptExecutor()
+#         # Add other executors (StreamlitApp, MCP package itself)
+#         return None

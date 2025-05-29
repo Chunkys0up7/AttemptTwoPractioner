@@ -1,0 +1,30 @@
+# mcp/components/ai_copilot_service.py
+# This file will contain the backend service logic for the AI Co-Pilot feature.
+# Responsibilities:
+# - Receiving context from the UI (e.g., current workflow definition, selected component).
+# - Interacting with an LLM (like Gemini) to generate suggestions for:
+#   - Workflow optimization.
+#   - Component configuration.
+#   - Schema repair or mapping.
+#   - Code snippets for script components.
+# - Formatting suggestions for display in the UI.
+
+# from mcp.core.config import settings # For LLM API keys
+# # from mcp.core.llm_clients import GeminiClient # Example
+
+# class AICoPilotService:
+#     def __init__(self):
+#         # self.llm_client = GeminiClient(api_key=settings.GEMINI_API_KEY) # Or other LLM
+#         pass
+
+#     async def get_workflow_optimization_suggestions(self, workflow_definition: dict) -> List[str]:
+#         # Prepare prompt with workflow_definition context
+#         # Call LLM
+#         # Parse response and return suggestions
+#         return ["Suggestion 1: Consider replacing component X with Y for better performance.", "Suggestion 2: Parallelize steps A and B."] # Placeholder
+
+#     async def get_component_config_advice(self, component_type: str, current_config: dict) -> List[str]:
+#         # Provide advice based on component type and its current configuration
+#         return [f"For {component_type}, ensure parameter 'timeout' is set appropriately."] # Placeholder
+
+    # Add more methods for other types of AI-powered assistance.

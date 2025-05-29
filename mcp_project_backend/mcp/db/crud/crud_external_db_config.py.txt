@@ -1,0 +1,51 @@
+# mcp/db/crud/crud_external_db_config.py
+# CRUD operations specific to the ExternalDatabaseConfig model.
+
+# from sqlalchemy.orm import Session
+# from .base_crud import CRUDBase
+# from mcp.db.models.external_db_config import ExternalDatabaseConfig
+# from mcp.api.schemas.external_db_config_schemas import ExternalDbConfigCreate, ExternalDbConfigUpdate
+# # Secrets management would be integrated here if passwords are not stored directly.
+
+# class CRUDExternalDbConfig(CRUDBase[ExternalDatabaseConfig, ExternalDbConfigCreate, ExternalDbConfigUpdate]):
+#     def create(self, db: Session, *, obj_in: ExternalDbConfigCreate) -> ExternalDatabaseConfig:
+#         # obj_in_data = obj_in.model_dump(exclude_none=True) # Pydantic v2
+#         obj_in_data = obj_in.dict(exclude_none=True) # Pydantic v1
+        
+#         # Handle password/secret_ref securely.
+#         # If obj_in.password_or_secret_ref is a plain password, it should be encrypted
+#         # or stored in a vault, and a reference stored in the DB model.
+#         # For this placeholder, we assume password_secret_ref is stored as is.
+#         if "password_or_secret_ref" in obj_in_data:
+#             obj_in_data["password_secret_ref"] = obj_in_data.pop("password_or_secret_ref")
+#             # Real implementation:
+#             # plain_password = obj_in_data.pop("password_or_secret_ref")
+#             # obj_in_data["password_secret_ref"] = self.encrypt_or_store_secret(plain_password)
+
+
+#         db_obj = self.model(**obj_in_data)
+#         db.add(db_obj)
+#         db.commit()
+#         db.refresh(db_obj)
+#         return db_obj
+
+#     def update(self, db: Session, *, db_obj: ExternalDatabaseConfig, obj_in: ExternalDbConfigUpdate) -> ExternalDatabaseConfig:
+#         # update_data = obj_in.model_dump(exclude_unset=True) # Pydantic v2
+#         update_data = obj_in.dict(exclude_unset=True) # Pydantic v1
+
+#         if "password_or_secret_ref" in update_data and update_data["password_or_secret_ref"] is not None:
+#             # Handle password update securely
+#             # plain_password = update_data.pop("password_or_secret_ref")
+#             # db_obj.password_secret_ref = self.encrypt_or_store_secret(plain_password)
+#             db_obj.password_secret_ref = update_data.pop("password_or_secret_ref")
+
+
+#         return super().update(db, db_obj=db_obj, obj_in=update_data) # Call base update for other fields
+
+#     # def encrypt_or_store_secret(self, plain_secret: str) -> str:
+#     #     # Placeholder for actual encryption or vault interaction logic
+#     #     # DO NOT store plain passwords.
+#     #     return f"ref_to_encrypted_{plain_secret[:5]}"
+
+
+# crud_external_db_config = CRUDExternalDbConfig(ExternalDatabaseConfig)

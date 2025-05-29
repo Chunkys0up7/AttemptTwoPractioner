@@ -1,0 +1,36 @@
+# mcp/db/models/action_log.py
+# Defines the SQLAlchemy ORM model for ActionLog, used for auditing significant events.
+
+# import uuid
+# from sqlalchemy import Column, String, DateTime, Text
+# from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+# from sqlalchemy.sql import func
+# from mcp.db.base import Base # Assuming Base is defined in mcp.db.base
+# from datetime import datetime # Native Python datetime
+
+# class ActionLog(Base):
+#     __tablename__ = "action_logs"
+
+#     id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     timestamp = Column(DateTime(timezone=True), default=lambda: datetime.now(datetime.timezone.utc), nullable=False)
+#     actor_id = Column(String, nullable=True, index=True) # User ID, system component name, or API key ID
+    
+#     action_type = Column(String, nullable=False, index=True) 
+#     # E.g., "MCP_DEFINITION_CREATED", "MCP_VERSION_UPDATED", "WORKFLOW_EXECUTED", 
+#     # "WORKFLOW_RUN_STATUS_CHANGED", "USER_LOGIN_SUCCESS", "USER_LOGIN_FAILURE"
+
+#     entity_type = Column(String, nullable=True, index=True) # E.g., "MCPDefinition", "MCPVersion", "WorkflowRun"
+#     entity_id = Column(String, nullable=True, index=True)   # Actual ID (string or UUID string) of the affected entity
+    
+#     details = Column(JSONB, nullable=True) 
+#     # Additional context as JSON, e.g., 
+#     # {"old_values": {...}, "new_values": {...}}, 
+#     # {"error_message": "..."}
+#     # {"ip_address": "...", "user_agent": "..."}
+
+#     # Optional: A brief summary message
+#     # summary_message = Column(Text, nullable=True)
+
+    # Add __repr__ for easier debugging if needed
+    # def __repr__(self):
+    #     return f"<ActionLog(id={self.id}, action='{self.action_type}', actor='{self.actor_id}')>"

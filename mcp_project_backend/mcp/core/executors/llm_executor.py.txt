@@ -1,0 +1,47 @@
+# mcp/core/executors/llm_executor.py
+# Concrete executor for MCPs of type "LLM Prompt Agent".
+
+# from .base_executor import BaseExecutor
+# from mcp.core.mcp_configs import LLMConfig # Specific Pydantic model for LLM config
+# from typing import Dict, Any
+# # Potentially import an LLM service client (e.g., for Anthropic, OpenAI, Gemini)
+# # from mcp.core.llm_clients import GeminiClient # Example
+
+# class LLMExecutor(BaseExecutor):
+#     async def execute(self, config: LLMConfig, inputs: Dict[str, Any]) -> Dict[str, Any]:
+#         # await self._log_message(config.type, f"Executing LLM Prompt Agent: {config.model_name}")
+
+#         # 1. Validate that `config` is indeed an LLMConfig instance (Pydantic handles this at assignment)
+#         # if not isinstance(config, LLMConfig):
+#         #     raise TypeError("Configuration for LLMExecutor must be LLMConfig.")
+
+#         # 2. Prepare the prompt using inputs and config.user_prompt_template
+#         #    Example: user_prompt = config.user_prompt_template.format(**inputs)
+#         prompt_to_send = "Translate 'hello' to French." # Placeholder
+#         if config.user_prompt_template and "prompt_input" in inputs: # Assuming one input 'prompt_input'
+#             try:
+#                 prompt_to_send = config.user_prompt_template.replace("{{inputText}}", str(inputs["prompt_input"])) # Simple replace
+#             except KeyError:
+#                 # await self._log_message(config.type, f"Input 'prompt_input' not found for template.", level="ERROR")
+#                 raise ValueError("Missing 'prompt_input' for user prompt template.")
+#         elif "prompt" in inputs: # Direct prompt input
+#             prompt_to_send = str(inputs["prompt"])
+
+
+#         # 3. Initialize and call the appropriate LLM client
+#         #    gemini_client = GeminiClient(api_key=settings.GEMINI_API_KEY) # Get API key from settings
+#         #    response_text = await gemini_client.generate_content(
+#         #        model_name=config.model_name,
+#         #        prompt=prompt_to_send,
+#         #        system_prompt=config.system_prompt,
+#         #        temperature=config.temperature,
+#         #        max_tokens=config.max_tokens
+#         #    )
+#         # await self._log_message(config.type, f"LLM input: {prompt_to_send}")
+#         response_text = "Bonjour" # Placeholder response
+
+#         # await self._log_message(config.type, f"LLM output: {response_text}")
+
+#         # 4. Return outputs in the defined output schema
+#         #    Assuming a single output named "completion" or "result"
+#         return {"completion": response_text}

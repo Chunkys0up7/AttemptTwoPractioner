@@ -1,0 +1,35 @@
+# mcp/core/workflow_streaming_service.py
+# This service is responsible for publishing workflow execution updates
+# to a Pub/Sub system (e.g., Redis Pub/Sub), which will then be picked up
+# by the SSE streaming endpoint to send to clients.
+
+# from mcp.core.pubsub.redis_pubsub import RedisPubSubManager # Or BasePubSub
+# from mcp.api.main import pubsub_manager # Assuming global pubsub_manager from main.py
+# import json
+# from typing import Dict, Any
+
+# class WorkflowStreamingService:
+#     # def __init__(self, pubsub_manager: RedisPubSubManager): # Inject manager
+#     #     self.pubsub_manager = pubsub_manager
+
+#     async def publish_run_update(
+#         self,
+#         run_id: str, # Can be int or UUID, convert to string for channel name
+#         event_type: str, # e.g., "status_change", "log", "step_started", "step_completed"
+#         payload: Dict[str, Any]
+#     ):
+#         """
+#         Publishes an update for a specific workflow run to the Pub/Sub system.
+#         """
+#         channel = f"workflow_run_events:{run_id}"
+#         message = {
+#             "event_type": event_type,
+#             "payload": payload,
+#             # timestamp: datetime.utcnow().isoformat() # Optional timestamp
+#         }
+#         # Ensure pubsub_manager is initialized and connected in main.py lifespan
+#         # await pubsub_manager.publish(channel, message)
+#         print(f"STREAMING (Simulated Publish to {channel}): Event: {event_type}, Payload: {json.dumps(payload)}")
+
+    # This service might also handle logic for constructing specific event payloads
+    # before publishing if it's more complex than what the WorkflowEngineService does directly.

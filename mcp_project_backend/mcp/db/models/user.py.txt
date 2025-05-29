@@ -1,0 +1,42 @@
+# mcp/db/models/user.py
+# Defines SQLAlchemy ORM models for User and Role, for authentication and authorization.
+
+# from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.sql import func
+# from mcp.db.base import Base
+# from enum import Enum
+
+# class UserRoleEnum(str, Enum):
+#     ADMIN = "Admin"
+#     EDITOR = "Editor"
+#     VIEWER = "Viewer"
+
+# class User(Base):
+#     __tablename__ = "users"
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     email = Column(String, unique=True, index=True, nullable=False)
+#     full_name = Column(String, index=True, nullable=True)
+#     hashed_password = Column(String, nullable=False)
+#     is_active = Column(Boolean, default=True)
+#     # role_id = Column(Integer, ForeignKey("roles.id"), nullable=True) # Simple role link
+#     role_name = Column(DBEnum(UserRoleEnum, name="user_role_enum"), default=UserRoleEnum.VIEWER, nullable=False)
+
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+#     # role = relationship("Role", back_populates="users")
+#     # mcp_definitions_owned = relationship("MCPDefinition", back_populates="owner")
+#     # workflow_definitions_owned = relationship("WorkflowDefinition", back_populates="owner")
+#     # workflow_runs_triggered = relationship("WorkflowRun", back_populates="triggered_by_user")
+
+
+# # Optional: Separate Role table if roles have more attributes or for many-to-many user-role mapping.
+# # For simple single-role-per-user, an Enum field on User might be sufficient as shown above.
+# # class Role(Base):
+# #     __tablename__ = "roles"
+# #     id = Column(Integer, primary_key=True, index=True)
+# #     name = Column(String, unique=True, index=True, nullable=False) # e.g., "Admin", "Editor", "Viewer"
+# #     description = Column(String, nullable=True)
+# #     users = relationship("User", back_populates="role")

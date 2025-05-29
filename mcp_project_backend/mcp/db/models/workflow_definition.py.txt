@@ -1,0 +1,47 @@
+# mcp/db/models/workflow_definition.py
+# Defines the SQLAlchemy ORM models for WorkflowDefinition and WorkflowStep.
+
+# from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, DateTime, Integer
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.dialects.postgresql import JSONB
+# from sqlalchemy.sql import func
+# from mcp.db.base import Base
+
+# class WorkflowDefinition(Base):
+#     __tablename__ = "workflow_definitions"
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String, index=True, nullable=False)
+#     description = Column(Text, nullable=True)
+#     tags = Column(ARRAY(String), nullable=True)
+#     created_at = Column(DateTime(timezone=True), server_default=func.now())
+#     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+#     # owner_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+#     steps = relationship("WorkflowStep", back_populates="workflow_definition", cascade="all, delete-orphan", order_by="WorkflowStep.order")
+#     # owner = relationship("User", back_populates="workflow_definitions")
+#     runs = relationship("WorkflowRun", back_populates="workflow_definition")
+
+
+# class WorkflowStep(Base):
+#     __tablename__ = "workflow_steps"
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     workflow_definition_id = Column(Integer, ForeignKey("workflow_definitions.id"), nullable=False)
+#     mcp_version_id = Column(Integer, ForeignKey("mcp_versions.id"), nullable=False) # Links to a specific MCPVersion
+    
+#     name = Column(String, nullable=False) # User-defined name for this step instance
+#     description = Column(Text, nullable=True)
+#     order = Column(Integer, nullable=False) # Execution order within the workflow
+    
+#     # Stores how inputs for this step's MCP are mapped.
+#     # Example: {"mcp_input_A": {"source_step_id": 123, "source_output_name": "output_X"},
+#     #           "mcp_input_B": {"static_value": "hello"}}
+#     input_mappings = Column(JSONB, nullable=True, default=dict)
+    
+#     # Optional: Store specific configuration overrides for this step, if different from MCPVersion's default.
+#     # This is advanced and might complicate things; usually, one would create a new MCPVersion.
+#     # config_overrides = Column(JSONB, nullable=True)
+
+#     workflow_definition = relationship("WorkflowDefinition", back_populates="steps")
+#     mcp_version = relationship("MCPVersion", back_populates="workflow_steps")

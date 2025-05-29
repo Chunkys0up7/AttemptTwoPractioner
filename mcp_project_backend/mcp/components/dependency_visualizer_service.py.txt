@@ -1,0 +1,35 @@
+# mcp/components/dependency_visualizer_service.py
+# Backend service to generate data for the Dependency Visualizer UI.
+# Responsibilities:
+# - Analyzing MCP definitions and workflow definitions to identify dependencies.
+# - Dependencies could be:
+#   - Between MCPs within a workflow.
+#   - Between different MCP versions (e.g., "version 1.1 depends on base component X v1.0").
+#   - Between MCPs and external data sources (if ExternalDatabaseConfig is integrated).
+# - Formatting this dependency data into a graph structure (nodes and edges)
+#   suitable for rendering by a frontend library like ReactFlow or Vis.js.
+
+# from sqlalchemy.orm import Session
+# from typing import List, Dict, Any
+# # from mcp.db.models import MCPDefinition, MCPVersion, WorkflowDefinition, WorkflowStep, ExternalDatabaseConfig
+# # import networkx as nx # For graph analysis if complex relationships are involved
+
+# class DependencyVisualizerService:
+#     def __init__(self, db_session: Session):
+#         self.db_session = db_session
+
+#     async def get_workflow_dependency_graph(self, workflow_definition_id: int) -> Dict[str, List[Dict[str, Any]]]:
+#         # Fetch workflow and its steps
+#         # Construct nodes (MCPs in the workflow) and edges (connections based on input_mappings)
+#         # Example output format for React Flow:
+#         # {
+#         #     "nodes": [{"id": "step1_mcpA", "data": {"label": "MCP A (Step 1)"}, "position": ...}, ...],
+#         #     "edges": [{"id": "e1-2", "source": "step1_mcpA", "target": "step2_mcpB", "label": "data_output_x"}, ...]
+#         # }
+#         return {"nodes": [], "edges": []} # Placeholder
+
+#     async def get_mcp_lineage_graph(self, mcp_version_id: int) -> Dict[str, List[Dict[str, Any]]]:
+#         # Trace dependencies for a specific MCP version (e.g., what it uses, what uses it)
+#         # This could involve looking at its configuration for references to other MCPs (if it's an MCP Package)
+#         # or external DB configs.
+#         return {"nodes": [], "edges": []} # Placeholder

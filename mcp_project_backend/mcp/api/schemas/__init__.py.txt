@@ -1,0 +1,7 @@
+# This file makes the 'schemas' directory a Python sub-package.
+# It's good practice to import all schema modules here to make them easily accessible.
+# Example:
+# from . import auth_schemas
+# from . import mcp_definition_schemas
+# from . import mcp_version_schemas
+# # ... and so on for all schema files

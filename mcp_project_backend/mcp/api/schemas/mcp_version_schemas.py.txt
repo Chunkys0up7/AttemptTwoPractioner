@@ -1,0 +1,32 @@
+# mcp/api/schemas/mcp_version_schemas.py
+# This file contains Pydantic models for MCPVersion entities.
+# These define the structure for creating and reading specific versions of MCPs,
+# including their type-specific configurations.
+
+# from pydantic import BaseModel, Field
+# from typing import Optional, List
+# from mcp.core.mcp_configs import MCPConfigPayload, SpecificComponentType # As defined in BACKEND_ENHANCEMENTS.md
+
+# class MCPVersionBase(BaseModel):
+#     version_string: str = Field(..., example="1.0.0") # E.g., "1.0.0", "1.0.1-alpha"
+#     description: Optional[str] = None
+#     # This mcp_type must match the 'type' discriminator in the MCPConfigPayload
+#     mcp_type: SpecificComponentType # Matches frontend's SpecificComponentType
+#     config: MCPConfigPayload # This is the typed Union of specific configs
+
+# class MCPVersionCreate(MCPVersionBase):
+#     mcp_definition_id: int # The parent MCPDefinition
+
+# class MCPVersionUpdate(BaseModel): # Allow partial updates
+#     version_string: Optional[str] = None
+#     description: Optional[str] = None
+#     # Updating mcp_type or config structure might be complex and better handled by new version.
+#     # config: Optional[MCPConfigPayload] = None # If config updates are allowed
+
+# class MCPVersionRead(MCPVersionBase):
+#     id: int
+#     mcp_definition_id: int
+#     # Potentially add creation/update timestamps
+
+#     class Config:
+#         orm_mode = True # For Pydantic v1, or from_attributes = True for Pydantic v2

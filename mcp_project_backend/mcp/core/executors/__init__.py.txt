@@ -1,0 +1,6 @@
+# This file makes the 'executors' directory a Python sub-package.
+# Import concrete executor classes here for easier access from the WorkflowEngineService.
+# Example:
+# from .llm_executor import LLMExecutor
+# from .notebook_executor import NotebookExecutor
+# from .script_executor import ScriptExecutor

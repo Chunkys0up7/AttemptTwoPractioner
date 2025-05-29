@@ -1,0 +1,2 @@
+# This file makes the 'tests' directory a Python package.
+# It will contain all automated tests for the backend application.

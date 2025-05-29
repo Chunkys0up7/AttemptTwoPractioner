@@ -1,0 +1,24 @@
+# mcp/api/routers/dashboard_routes.py
+# This file defines API endpoints that provide aggregated data specifically
+# for populating the frontend dashboard.
+# - Summary statistics (e.g., number of active runs, recent components).
+# - Data for charts or quick overview widgets.
+
+# Example (conceptual):
+# from fastapi import APIRouter, Depends
+# from sqlalchemy.orm import Session
+# from mcp.api.deps import get_db_session, get_current_active_user
+# from mcp.schemas.dashboard_schemas import DashboardSummary # Example schema
+# # from mcp.core.dashboard_service import DashboardService # Example service
+
+# router = APIRouter()
+
+# @router.get("/summary", response_model=DashboardSummary)
+# async def get_dashboard_summary(
+#     db: Session = Depends(get_db_session),
+#     # current_user: User = Depends(get_current_active_user) # If summary is user-specific
+# ):
+#     # service = DashboardService(db_session=db)
+#     # summary_data = await service.get_summary_data()
+#     # return summary_data
+#     return DashboardSummary(active_runs=0, recent_components=[], system_health_status="OK") # Placeholder

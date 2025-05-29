@@ -1,0 +1,41 @@
+# mcp/api/routers/mcp_definition_routes.py
+# This file defines API endpoints for managing MCPDefinitions and MCPVersions.
+# - CRUD operations for MCPDefinitions (e.g., create a new "LLM Prompt Agent" definition).
+# - CRUD operations for MCPVersions (e.g., create a new version of an existing MCP definition with specific configurations).
+# - Listing MCPDefinitions and their versions.
+# - Semantic search for MCPs (future enhancement).
+
+# Example (conceptual):
+# from fastapi import APIRouter, Depends, HTTPException
+# from sqlalchemy.orm import Session
+# from typing import List
+# from mcp.api.deps import get_db_session, get_current_active_user # Assuming auth
+# from mcp.schemas.mcp_definition_schemas import MCPDefinitionCreate, MCPDefinitionRead
+# from mcp.schemas.mcp_version_schemas import MCPVersionCreate, MCPVersionRead
+# from mcp.db.crud.crud_mcp_definition import crud_mcp_definition, crud_mcp_version
+# from mcp.db.models.user import User # For current_user type hint
+
+# router = APIRouter()
+
+# @router.post("/", response_model=MCPDefinitionRead)
+# async def create_mcp_definition(
+#     mcp_def_in: MCPDefinitionCreate,
+#     db: Session = Depends(get_db_session),
+#     current_user: User = Depends(get_current_active_user) # Example authorization
+# ):
+#     # Add logic to associate with user/team if necessary
+#     return crud_mcp_definition.create(db=db, obj_in=mcp_def_in, owner_id=current_user.id)
+
+# @router.post("/{definition_id}/versions/", response_model=MCPVersionRead)
+# async def create_mcp_version(
+#     definition_id: int,
+#     mcp_version_in: MCPVersionCreate, # This schema should include the typed MCPConfigPayload
+#     db: Session = Depends(get_db_session),
+#     current_user: User = Depends(get_current_active_user)
+# ):
+#     # Ensure definition_id exists and user has permission
+#     # The mcp_version_in.config will be a Pydantic model (e.g., LLMConfig)
+#     # The CRUD operation will handle serializing this to JSONB for the DB.
+#     return crud_mcp_version.create_with_definition(db=db, obj_in=mcp_version_in, definition_id=definition_id)
+
+# # ... other GET, PUT, DELETE endpoints for definitions and versions ...

@@ -1,0 +1,20 @@
+# mcp/db/session.py
+# This file contains utilities for managing database sessions,
+# particularly the FastAPI dependency for getting a DB session.
+
+# from sqlalchemy.orm import Session
+# from mcp.db.base import SessionLocal # Assuming SessionLocal is defined in base.py or database.py
+
+# def get_db_session() -> Session:
+#     """
+#     FastAPI dependency that provides a SQLAlchemy database session.
+#     It ensures the session is closed after the request is finished.
+#     """
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+
+# # You might also include helper functions here for common session operations
+# # if not using a more structured repository/CRUD layer.

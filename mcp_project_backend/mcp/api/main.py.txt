@@ -1,0 +1,57 @@
+# mcp/api/main.py
+# This file is the main entry point for the FastAPI application.
+# It initializes the FastAPI app, includes routers, sets up middleware,
+# and handles application lifespan events (startup/shutdown).
+# Environment variables from .env should be loaded here at the very beginning.
+
+# Example (conceptual):
+# from fastapi import FastAPI
+# from .routers import auth_routes, mcp_definition_routes # etc.
+# from mcp.core.config import settings
+# from mcp.core.pubsub.redis_pubsub import RedisPubSubManager # Example
+# from contextlib import asynccontextmanager
+
+# # --- Start: Environment Variable Loading (should be first) ---
+# import os
+# from pathlib import Path
+# from dotenv import load_dotenv
+# try:
+#     current_file = Path(__file__).resolve()
+#     project_root = current_file.parent.parent.parent 
+#     env_file_path = project_root / '.env'
+#     if env_file_path.exists():
+#         load_dotenv(dotenv_path=str(env_file_path), override=True)
+# except Exception as e:
+#     print(f"Error loading .env file from mcp/api/main.py: {e}")
+# # --- End: Environment Variable Loading ---
+
+
+# pubsub_manager = RedisPubSubManager(settings.REDIS_URL) # Assuming settings are loaded after .env
+
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     # Startup logic
+#     # await pubsub_manager.connect_publisher()
+#     print("MCP Backend starting up...")
+#     yield
+#     # Shutdown logic
+#     # if pubsub_manager.redis_publish_client:
+#     #     await pubsub_manager.redis_publish_client.close()
+#     print("MCP Backend shutting down...")
+
+# app = FastAPI(
+#     title=settings.PROJECT_NAME,
+#     openapi_url=f"{settings.API_V1_STR}/openapi.json",
+#     lifespan=lifespan # For startup/shutdown events
+# )
+
+# # Include routers
+# app.include_router(auth_routes.router, prefix=settings.API_V1_STR, tags=["auth"])
+# app.include_router(mcp_definition_routes.router, prefix=settings.API_V1_STR + "/mcp-definitions", tags=["mcp-definitions"])
+# # ... include other routers ...
+
+# if __name__ == "__main__":
+#     # This part is for running with `python mcp/api/main.py` which is not typical for uvicorn.
+#     # Usually, you run: `uvicorn mcp.api.main:app --reload` from the project root.
+#     import uvicorn
+#     uvicorn.run(app, host="0.0.0.0", port=8000)

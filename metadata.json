@@ -1,0 +1,5 @@
+{
+  "name": "AI Ops Console",
+  "description": "A console for managing AI operations, including component marketplace, workflow building, and execution monitoring.",
+  "requestFramePermissions": []
+}

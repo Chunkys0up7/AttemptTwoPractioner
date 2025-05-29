@@ -1,0 +1,85 @@
+# mcp/external_db/connector_manager.py
+# Manages the creation and potentially pooling of database connector instances.
+# Acts as a factory to get the correct connector based on ExternalDatabaseConfig.
+
+# from typing import Dict, Optional, Type
+# from .connectors.base_connector import BaseDBConnector
+# from .connectors.postgresql_connector import PostgreSQLConnector
+# from .connectors.bigquery_connector import BigQueryConnector
+# from mcp.db.models.external_db_config import ExternalDatabaseConfig # SQLAlchemy model
+# from mcp.core.config import settings # For any global connector settings
+
+# class ConnectorManager:
+#     def __init__(self):
+#         self._connector_map: Dict[str, Type[BaseDBConnector]] = {
+#             "postgresql": PostgreSQLConnector,
+#             "bigquery": BigQueryConnector,
+#             # Add other supported db_types and their connector classes here
+#         }
+#         self._active_connections: Dict[int, BaseDBConnector] = {} # Cache/pool by config_id
+
+#     async def get_connector(self, config: ExternalDatabaseConfig) -> BaseDBConnector:
+#         """
+#         Gets a connector instance for the given configuration.
+#         Handles creation and potential caching/pooling.
+#         """
+#         # Simple caching example (not true pooling, just reuse if config matches)
+#         # if config.id in self._active_connections:
+#         #     connector = self._active_connections[config.id]
+#         #     if await connector.is_connected(): # Check if connection is still valid
+#         #         return connector
+#         #     else: # Stale connection
+#         #         await connector.disconnect() # Attempt cleanup
+#         #         del self._active_connections[config.id]
+
+
+#         connector_class = self._connector_map.get(config.db_type.lower())
+#         if not connector_class:
+#             raise ValueError(f"Unsupported database type: {config.db_type}")
+
+#         # Extract connection parameters from the ExternalDatabaseConfig model
+#         # This needs to securely fetch/decode password_secret_ref if used.
+#         connection_params = {
+#             "db_type": config.db_type,
+#             "host": config.host,
+#             "port": config.port,
+#             "database_name": config.database_name,
+#             "username": config.username,
+#             "password_secret_ref": config.password_secret_ref, # Connector needs to handle this
+#             "additional_params": config.additional_params or {},
+#         }
+        
+#         # TODO: Securely resolve password_secret_ref here if it's a reference to a vault.
+#         # For now, the connector's __init__ might just receive the ref string.
+
+#         connector = connector_class(connection_params)
+#         await connector.connect() # Establish the connection
+        
+#         # self._active_connections[config.id] = connector # Cache the new connection
+#         return connector
+
+#     async def release_connector(self, connector: BaseDBConnector, config_id: Optional[int] = None):
+#         """Releases a connector, potentially returning it to a pool or closing it."""
+#         # For simple cache, remove or just disconnect
+#         # if config_id and config_id in self._active_connections:
+#         #     del self._active_connections[config_id]
+#         await connector.disconnect()
+
+#     async def close_all_connections(self):
+#         """Closes all managed connections, e.g., on application shutdown."""
+#         # for connector in list(self._active_connections.values()): # Iterate over a copy
+#         #     await connector.disconnect()
+#         # self._active_connections.clear()
+#         print("ConnectorManager: Simulating closure of all active connections.")
+
+
+# # Global instance (or manage via FastAPI dependency injection)
+# connector_manager = ConnectorManager()
+
+# # In main.py lifespan:
+# # @asynccontextmanager
+# # async def lifespan(app: FastAPI):
+# #     # Startup
+# #     yield
+# #     # Shutdown
+# #     await connector_manager.close_all_connections()

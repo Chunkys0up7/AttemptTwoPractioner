@@ -1,0 +1,21 @@
+# mcp/utils/data_converters.py
+# This file contains utility functions for converting data between different formats
+# or types, e.g., handling specific data types from database results,
+# formatting dates, or custom JSON serialization/deserialization helpers.
+
+# import json
+# from datetime import date, datetime
+# from decimal import Decimal
+
+# def json_serial(obj):
+#     """JSON serializer for objects not serializable by default json code"""
+#     if isinstance(obj, (datetime, date)):
+#         return obj.isoformat()
+#     if isinstance(obj, Decimal):
+#         return float(obj) # Or str(obj) for exact precision if needed by client
+#     raise TypeError (f"Type {type(obj)} not serializable")
+
+# def custom_json_dumps(data, **kwargs):
+#     return json.dumps(data, default=json_serial, **kwargs)
+
+# # Add other conversion functions as needed.

@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Ops Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--color-primary, #4A90E2)', // Default, can be overridden by CSS vars
+            secondary: 'var(--color-secondary, #17A2B8)',
+            accent: 'var(--color-accent, #FD7E14)',
+            neutral: {
+              light: 'var(--color-neutral-light, #F8F9FA)',
+              DEFAULT: 'var(--color-neutral-default, #6C757D)',
+              dark: 'var(--color-neutral-dark, #343A40)',
+            },
+            status: {
+              success: 'var(--color-status-success, #28A745)',
+              warning: 'var(--color-status-warning, #FFC107)',
+              error: 'var(--color-status-error, #DC3545)',
+              info: 'var(--color-status-info, #17A2B8)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif; /* Assuming Inter is available or falls back */
+      /* Define CSS variables for colors to be used by Tailwind's JIT if needed, or for dynamic theming */
+      --color-primary: #4A90E2; /* Trustworthy Blue */
+      --color-secondary: #50E3C2; /* Vibrant Teal/Green as secondary */
+      --color-accent: #F5A623; /* Warm Orange for accents */
+      --color-neutral-light: #F9FAFB; /* Light Grey for backgrounds */
+      --color-neutral-default: #6B7280; /* Default Grey for text/borders */
+      --color-neutral-dark: #1F2937; /* Dark Grey for primary text */
+      --color-status-success: #10B981;
+      --color-status-warning: #F59E0B;
+      --color-status-error: #EF4444;
+      --color-status-info: #3B82F6;
+    }
+    /* For scrollbar styling to match modern UIs */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-neutral-light);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1; /* A slightly darker grey for the thumb */
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a1a1a1; /* Darken on hover */
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.6.1",
+    "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
+  }
+}
+</script>
+</head>
+<body class="bg-neutral-light text-neutral-dark antialiased">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html><link rel="stylesheet" href="index.css">
+<script src="index.tsx" type="module"></script>
