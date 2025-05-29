@@ -1,3 +1,4 @@
+# TEST COMMENT FOR GIT STATUS
 """
 Main FastAPI application for the MCP Backend.
 
