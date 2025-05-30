@@ -6,7 +6,7 @@
 - [x] Implement full user authentication (OAuth 2.0, JWT issuance, refresh, and revocation)
 - [x] Add user registration endpoint
 - [ ] Integrate role-based access control (RBAC) with fine-grained permissions
-- [ ] Add user management endpoints (update, delete, list)
+- [x] Add user management endpoints (update, delete, list)
 - [ ] Enforce secure session management and audit trails
 
 ### 2. Advanced Workflow Orchestration
