@@ -26,7 +26,7 @@
 ## Frontend Outstanding Tasks
 
 ### 1. Build System & Environment
-- [ ] Migrate from ESM importmap to Vite for builds and environment variable management
+- [x] Migrate from ESM importmap to Vite for builds and environment variable management (already complete)
 - [x] Implement secure API key management (frontend uses env getter, README updated, .env.example referenced)
 
 ### 2. State Management
