@@ -556,4 +556,16 @@ As mentioned above, for the AI Coding Assistant in the "Submit Component" page t
 *   **Performance Optimization**: For larger datasets or more complex UIs, performance optimizations (e.g., memoization, code splitting if a bundler were used) might be needed.
 *   **Real-time Updates**: Features like the Execution Monitor would benefit from real-time updates via WebSockets in a production scenario.
 *   **Security**: As a frontend-only app with mock auth, security considerations for a real application (input sanitization, XSS prevention, secure API communication, proper authentication/authorization) are not addressed.
+
+## Frontend API Key Management
+
+- All API keys and secrets must be set via environment variables prefixed with `VITE_` in a `.env` file at the project root.
+- **Never commit real API keys or secrets to version control.**
+- Use the provided `.env.example` as a template for required variables.
+- The application will fail to build or run if required environment variables are missing or invalid.
+- Access API keys in code using the validated getter from `src/utils/env.ts` (e.g., `getApiKey()`).
+
+Example `.env` entry:
+```
+VITE_API_KEY=your-api-key-here
 ```

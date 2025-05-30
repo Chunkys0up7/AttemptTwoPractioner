@@ -4,10 +4,11 @@ import { PaperAirplaneIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, ChevronUpI
 import { ChatMessage, SpecificComponentType, AIComponent } from '../../types';
 import Button from '../common/Button';
 import Card from '../common/Card'; // Ensure this import is correct and Card.tsx is properly exporting
+import { getApiKey } from '../../src/utils/env';
 
 // Ensure API_KEY is handled by the environment as per guidelines.
 // The application MUST NOT provide a UI for entering it.
-const API_KEY = process.env.API_KEY;
+const API_KEY = getApiKey();
 
 interface ChatAssistantProps {
   selectedComponentType: SpecificComponentType | null;

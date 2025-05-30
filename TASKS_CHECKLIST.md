@@ -27,7 +27,7 @@
 
 ### 1. Build System & Environment
 - [ ] Migrate from ESM importmap to Vite for builds and environment variable management
-- [ ] Implement secure API key management
+- [x] Implement secure API key management (frontend uses env getter, README updated, .env.example referenced)
 
 ### 2. State Management
 - [ ] Replace or supplement Context API with Zustand for complex state
