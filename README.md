@@ -8,9 +8,9 @@ The application is built as a single-page application (SPA) using React and Type
 
 ---
 
-## Backend Architecture
+## Backend Implementation
 
-A production-ready backend is being designed as a microservices architecture to support the AI Ops Console. This includes dedicated services for authentication, component management, workflow orchestration, and execution monitoring. For details, see [backend/README.md](./backend/README.md).
+The backend for the AI Ops Console is implemented in the `mcp_project_backend` directory. It provides a FastAPI-based microservices architecture for authentication, component management, workflow orchestration, execution monitoring, and more. For backend details, see [mcp_project_backend/README.md](./mcp_project_backend/README.md).
 
 ---
 
