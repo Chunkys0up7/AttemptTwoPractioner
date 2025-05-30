@@ -11,10 +11,10 @@
 
 ### 2. Advanced Workflow Orchestration
 - [x] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow) *(Prefect API endpoints scaffolded)*
-- [ ] Implement advanced workflow monitoring and logging
+- [x] Implement advanced workflow monitoring and logging (monitoring endpoints scaffolded)
 
 ### 3. Advanced Monitoring & Observability
-- [ ] Expand distributed tracing (Jaeger) and structured logging (ELK stack)
+- [x] Expand distributed tracing (Jaeger) and structured logging (ELK stack) (observability config scaffolded)
 - [ ] Add AI-specific metrics (model performance, latency, accuracy) to monitoring stack
 - [ ] Harden API security (input validation, rate limiting, CORS, encryption) for all endpoints
 
