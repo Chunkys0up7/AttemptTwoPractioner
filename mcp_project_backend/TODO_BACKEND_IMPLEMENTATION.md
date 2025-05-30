@@ -177,3 +177,10 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Document integration points
 
 ### Task 4.4: API Key Management (Model, Service, API)
+- [x] Create `APIKey` model in `mcp/db/models/api_key.py`
+- [x] Add Alembic migration for `APIKey`
+- [x] Create `APIKeyService` in `mcp/core/services/api_key_service.py`
+- [x] Implement API endpoints in `mcp/api/routers/api_key_routes.py`
+- [x] Add API key authentication dependency
+- [x] Test API key functionality
+- [x] Document API key management
