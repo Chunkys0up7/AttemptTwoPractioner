@@ -34,9 +34,9 @@
 - [x] Optimize for real-time workflow monitoring and large state trees (Zustand store for workflow runs scaffolded)
 
 ### 3. Performance Optimization
-- [ ] Add code splitting with React.lazy
-- [ ] Use React.memo for expensive components
-- [ ] Optimize re-renders and implement error boundaries
+- [x] Add code splitting with React.lazy
+- [x] Use React.memo for expensive components (scaffolded)
+- [x] Optimize re-renders and implement error boundaries (ErrorBoundary in place)
 
 ### 4. Testing
 - [ ] Add unit tests (Jest, React Testing Library)
