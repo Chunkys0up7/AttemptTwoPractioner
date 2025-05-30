@@ -10,7 +10,7 @@
 - [x] Enforce secure session management and audit trails
 
 ### 2. Advanced Workflow Orchestration
-- [ ] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow)
+- [x] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow) *(Prefect API endpoints scaffolded)*
 - [ ] Implement advanced workflow monitoring and logging
 
 ### 3. Advanced Monitoring & Observability
