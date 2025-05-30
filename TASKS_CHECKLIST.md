@@ -3,14 +3,15 @@
 ## Backend Outstanding Tasks
 
 ### 1. Security & Authentication
-- [ ] Implement full user authentication (OAuth 2.0, JWT issuance, refresh, and revocation)
+- [x] Implement full user authentication (OAuth 2.0, JWT issuance, refresh, and revocation)
+- [x] Add user registration endpoint
 - [ ] Integrate role-based access control (RBAC) with fine-grained permissions
-- [ ] Add user registration and management endpoints
+- [ ] Add user management endpoints (update, delete, list)
 - [ ] Enforce secure session management and audit trails
 
 ### 2. Advanced Workflow Orchestration
 - [ ] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow)
-- [ ] Implement advanced workflow execution features (error handling, retries, scheduling)
+- [ ] Implement advanced workflow monitoring and logging
 
 ### 3. Advanced Monitoring & Observability
 - [ ] Expand distributed tracing (Jaeger) and structured logging (ELK stack)
@@ -46,6 +47,11 @@
 ### 5. Security & Accessibility
 - [ ] Harden frontend against XSS and CSRF
 - [ ] Improve accessibility (ARIA, keyboard navigation)
+
+### 6. Backend Integration
+- [ ] Integrate with backend authentication endpoints
+- [ ] Implement user management UI
+- [ ] Add advanced workflow monitoring UI
 
 ---
 
