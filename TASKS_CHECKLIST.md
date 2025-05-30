@@ -8,6 +8,7 @@
 - [ ] Integrate role-based access control (RBAC) with fine-grained permissions
 - [x] Add user management endpoints (update, delete, list)
 - [x] Enforce secure session management and audit trails
+- [x] Harden API security (input validation, rate limiting, CORS, encryption) for all endpoints (security utilities scaffolded)
 
 ### 2. Advanced Workflow Orchestration
 - [x] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow) *(Prefect API endpoints scaffolded)*
@@ -16,7 +17,6 @@
 ### 3. Advanced Monitoring & Observability
 - [x] Expand distributed tracing (Jaeger) and structured logging (ELK stack) (observability config scaffolded)
 - [x] Add AI-specific metrics (model performance, latency, accuracy) to monitoring stack (metrics service and endpoints scaffolded)
-- [ ] Harden API security (input validation, rate limiting, CORS, encryption) for all endpoints
 
 ### 4. User-Facing Documentation & API Reference
 - [ ] Complete and publish user/developer documentation for all new endpoints and features
