@@ -7,7 +7,7 @@
 - [x] Add user registration endpoint
 - [ ] Integrate role-based access control (RBAC) with fine-grained permissions
 - [x] Add user management endpoints (update, delete, list)
-- [ ] Enforce secure session management and audit trails
+- [x] Enforce secure session management and audit trails
 
 ### 2. Advanced Workflow Orchestration
 - [ ] Integrate a production-grade orchestration engine (Temporal, Prefect, or Airflow)
