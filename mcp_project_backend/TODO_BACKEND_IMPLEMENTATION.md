@@ -168,8 +168,8 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Add Alembic migration for `ActionLog`.
 - [x] Create `mcp/core/services/auditing_service.py`.
 - [x] Implement `AuditingService` with `create_action_log_entry` method.
-- [ ] Test model creation and service method.
-- [ ] Document created files.
+- [x] Test model creation and service method.
+- [x] Document created files.
 
 ### Task 4.3: Integrate Action Logging into CRUD operations and Workflow Engine
 - [x] Modify API endpoint handlers (e.g., MCP CRUD, Workflow execution start) to call `AuditingService.create_action_log_entry` (via service layer).
