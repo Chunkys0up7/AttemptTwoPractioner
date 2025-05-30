@@ -129,8 +129,8 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Format messages as SSE events (`event: <type>`, `data: <json_payload>`).
 - [x] Handle client disconnects gracefully.
 - [x] Add router to `main.py`.
-- [ ] Test the SSE endpoint (e.g., with a simple client or `httpx`).
-- [ ] Document `streaming_routes.py`.
+- [x] Test the SSE endpoint (e.g., with a simple client or `httpx`).
+- [x] Document `streaming_routes.py`.
 
 ### Task 3.3: Integrate Workflow Engine with Pub/Sub for Real-time Events
 - [x] Modify `WorkflowEngineService` (from Task 1.5).
