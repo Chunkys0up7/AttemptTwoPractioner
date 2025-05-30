@@ -19,7 +19,7 @@
 - [x] Add AI-specific metrics (model performance, latency, accuracy) to monitoring stack (metrics service and endpoints scaffolded)
 
 ### 4. User-Facing Documentation & API Reference
-- [ ] Complete and publish user/developer documentation for all new endpoints and features
+- [ ] Complete and publish user/developer documentation for all new endpoints and features (backend API docs scaffolded in README.md)
 
 ---
 
