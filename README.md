@@ -1,4 +1,3 @@
-
 # AI Ops Console
 
 ## 1. Overview
@@ -6,6 +5,14 @@
 The AI Ops Console is a frontend application designed to provide a comprehensive interface for managing AI operations. It aims to offer a modular, intuitive, and data-driven platform for users to discover AI components, build complex workflows, monitor their execution, and submit new components with the help of an AI-powered coding assistant.
 
 The application is built as a single-page application (SPA) using React and TypeScript, leveraging modern JavaScript features and direct browser ESM module imports for dependencies.
+
+---
+
+## Backend Architecture
+
+A production-ready backend is being designed as a microservices architecture to support the AI Ops Console. This includes dedicated services for authentication, component management, workflow orchestration, and execution monitoring. For details, see [backend/README.md](./backend/README.md).
+
+---
 
 ## 2. Features
 
