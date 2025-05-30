@@ -145,7 +145,7 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Create dashboard routes for summary data
 - [x] Implement dashboard service for data aggregation
 - [x] Test dashboard API endpoints
-- [ ] Document created files.
+- [x] Document created files.
 
 ### Task 3.5: Heterogeneous Entity Details Endpoint
 - [x] Create `mcp/api/routers/entity_routes.py`.
