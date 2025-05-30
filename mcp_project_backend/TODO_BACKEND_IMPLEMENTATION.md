@@ -153,8 +153,8 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Based on `entity_type` (e.g., "mcp_version", "workflow_run"), fetch and return details for the specified entity.
     - [x] May require a mapping of `entity_type` strings to SQLAlchemy models and service methods. (Implemented with if/else and service calls)
 - [x] Add router to `main.py`.
-- [ ] Test endpoint with different entity types.
-- [ ] Document `entity_routes.py`.
+- [x] Test endpoint with different entity types.
+- [x] Document `entity_routes.py`.
 
 ---
 
