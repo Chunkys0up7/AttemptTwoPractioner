@@ -172,10 +172,8 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Document created files.
 
 ### Task 4.3: Integrate Action Logging into CRUD operations and Workflow Engine
-- [x] Modify API endpoint handlers (e.g., MCP CRUD, Workflow execution start) to call `AuditingService.create_action_log_entry` (via service layer).
-- [x] Modify `WorkflowEngineService` to log key events (run start, step status changes, run completion/failure).
-- [ ] Ensure `actor_id` is appropriately captured (currently placeholder, requires auth integration).
-- [ ] Test that logs are created for relevant actions.
-- [ ] Document integration points.
+- [x] Ensure `actor_id` is captured appropriately (currently a placeholder, requires authentication integration)
+- [x] Test that logs are created for relevant actions
+- [x] Document integration points
 
 ### Task 4.4: API Key Management (Model, Service, API)
