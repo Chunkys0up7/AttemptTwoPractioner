@@ -138,15 +138,13 @@ This document tracks the progress of implementing the backend features outlined 
     - [x] Channel: `workflow_run_events:{run_id}`
     - [x] Payload: `{"event_type": "log/status_change/result_preview", "payload": {...}}`
 - [x] This makes the actual execution logic drive the SSE updates.
-- [ ] Test that events from the engine are received by the SSE endpoint.
-- [ ] Document changes in `WorkflowEngineService`.
+- [x] Test that events from the engine are received by the SSE endpoint.
+- [x] Document changes in `WorkflowEngineService`.
 
 ### Task 3.4: Dashboard-Oriented API Endpoints
-- [x] Create `mcp/api/routers/dashboard_routes.py`.
-- [x] Implement API endpoints for dashboard data (e.g., `/summary` with counts of runs, components, etc.).
-- [x] Create a `mcp/core/services/dashboard_service.py` to encapsulate logic for fetching dashboard data from DB.
-- [x] Add router to `main.py`.
-- [ ] Test dashboard API endpoints.
+- [x] Create dashboard routes for summary data
+- [x] Implement dashboard service for data aggregation
+- [x] Test dashboard API endpoints
 - [ ] Document created files.
 
 ### Task 3.5: Heterogeneous Entity Details Endpoint
