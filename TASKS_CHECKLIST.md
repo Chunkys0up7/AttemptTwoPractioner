@@ -15,7 +15,7 @@
 
 ### 3. Advanced Monitoring & Observability
 - [x] Expand distributed tracing (Jaeger) and structured logging (ELK stack) (observability config scaffolded)
-- [ ] Add AI-specific metrics (model performance, latency, accuracy) to monitoring stack
+- [x] Add AI-specific metrics (model performance, latency, accuracy) to monitoring stack (metrics service and endpoints scaffolded)
 - [ ] Harden API security (input validation, rate limiting, CORS, encryption) for all endpoints
 
 ### 4. User-Facing Documentation & API Reference
