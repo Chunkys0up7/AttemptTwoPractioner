@@ -119,8 +119,8 @@ This document tracks the progress of implementing the backend features outlined 
 - [x] Create `mcp/core/pubsub/redis_pubsub.py`.
 - [x] Implement `RedisPubSubManager` class with `connect_publisher`, `publish`, and `subscribe_to_channel` methods (async, using `aioredis`).
 - [x] Integrate `RedisPubSubManager` into FastAPI app lifespan (connect publisher on startup, close on shutdown) in `mcp/api/main.py`.
-- [ ] Basic tests for publish/subscribe (can be more involved, possibly integration tests).
-- [ ] Document `redis_pubsub.py`.
+- [x] Basic tests for publish/subscribe (can be more involved, possibly integration tests).
+- [x] Document `redis_pubsub.py`.
 
 ### Task 3.2: SSE Endpoint for Workflow Monitoring
 - [x] Create `mcp/api/routers/streaming_routes.py`.

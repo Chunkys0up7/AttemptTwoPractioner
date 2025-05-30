@@ -1,5 +1,17 @@
 """
 Redis Pub/Sub Manager for handling real-time event streaming.
+
+This module provides a `RedisPubSubManager` class to abstract Redis publish/subscribe
+functionality, allowing other parts of the application to send and receive messages
+over Redis channels without directly dealing with `aioredis` specifics for common
+operations.
+
+Key functionalities:
+- Connect and disconnect a shared publisher client.
+- Publish messages (dictionaries) to specified Redis channels.
+- Subscribe to Redis channels and receive messages as an asynchronous generator.
+
+Error handling is included for connection issues and message processing.
 """
 import asyncio
 import json
@@ -12,13 +24,35 @@ from aioredis import Redis  # For type hinting
 
 
 class RedisPubSubManager:
+    """
+    Manages Redis connections for publishing and subscribing to channels.
+
+    Attributes:
+        redis_url (str): The URL for the Redis instance.
+        _publisher_client (Optional[Redis]): The `aioredis.Redis` client instance for publishing messages.
+                                            This client is intended to be long-lived.
+    """
     def __init__(self, redis_url: str):
+        """
+        Initializes the RedisPubSubManager with the given Redis URL.
+
+        Args:
+            redis_url: The connection URL for the Redis server (e.g., "redis://localhost:6379").
+        """
         self.redis_url = redis_url
         self._publisher_client: Optional[Redis] = None
         # Subscriber clients are created per subscription typically
 
     async def connect_publisher(self) -> None:
-        """Connects the publisher client to Redis."""
+        """
+        Connects the shared publisher client to the Redis server.
+
+        If a connection already exists and is open, this method does nothing.
+        If the connection attempt fails, it prints an error and raises a ConnectionError.
+
+        Raises:
+            ConnectionError: If the connection to Redis fails.
+        """
         if not self._publisher_client or self._publisher_client.closed:
             try:
                 self._publisher_client = await aioredis.from_url(self.redis_url)
@@ -36,14 +70,28 @@ class RedisPubSubManager:
                     f"Failed to connect Redis publisher: {e}") from e
 
     async def disconnect_publisher(self) -> None:
-        """Closes the publisher client connection."""
+        """
+        Closes the shared publisher client's connection to Redis.
+
+        If the client is not connected or already closed, this method does nothing.
+        """
         if self._publisher_client and not self._publisher_client.closed:
             await self._publisher_client.close()
             self._publisher_client = None
             print("Redis Pub/Sub Manager: Publisher disconnected.")
 
     async def publish(self, channel: str, message: Dict[str, Any]) -> None:
-        """Publishes a message to a specific Redis channel."""
+        """
+        Publishes a JSON-serialized message to the specified Redis channel.
+
+        Args:
+            channel: The Redis channel name to publish to.
+            message: A dictionary payload to be serialized to JSON and published.
+
+        Raises:
+            ConnectionError: If the publisher client is not connected.
+            Exception: If any other error occurs during publishing (e.g., `aioredis` exceptions).
+        """
         if not self._publisher_client or self._publisher_client.closed:
             # Option 1: Try to reconnect automatically
             # print("Redis Pub/Sub Manager: Publisher not connected. Attempting to reconnect...")
@@ -64,7 +112,22 @@ class RedisPubSubManager:
     async def subscribe_to_channel(self, channel: str) -> AsyncGenerator[Dict[str, Any], None]:
         """
         Subscribes to a Redis channel and yields messages as they are received.
-        This method creates its own Redis connection for the subscription.
+
+        This method establishes a new, dedicated Redis connection for the subscription.
+        It handles connection management, message parsing (JSON), and graceful
+        disconnection.
+
+        Args:
+            channel: The Redis channel name to subscribe to.
+
+        Yields:
+            A dictionary representing the JSON-decoded message received from the channel.
+
+        Raises:
+            asyncio.CancelledError: If the calling task is cancelled (e.g., client disconnects).
+                                    This is re-raised to allow proper cleanup by the caller.
+            Exception: For other unhandled errors during subscription or message processing.
+                       These are printed to stderr and the subscription is terminated.
         """
         subscriber_client: Optional[Redis] = None
         pubsub: Optional[aioredis.client.PubSub] = None
