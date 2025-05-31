@@ -129,6 +129,7 @@ class Settings(BaseSettings):
 Security features are tested in:
 
 1. `tests/core/test_security_middleware.py`:
+
    - Security headers
    - Rate limiting
    - Middleware setup
@@ -141,18 +142,21 @@ Security features are tested in:
 ## Best Practices
 
 1. **Configuration**
+
    - Use environment variables for sensitive settings
    - Restrict CORS origins in production
    - Set appropriate rate limits
    - Use strong secret keys
 
 2. **API Keys**
+
    - Rotate keys regularly
    - Use key scopes for fine-grained access
    - Monitor key usage
    - Implement key revocation
 
 3. **Headers**
+
    - Keep security headers up to date
    - Customize CSP for your needs
    - Use appropriate HSTS settings
@@ -167,12 +171,14 @@ Security features are tested in:
 ## Future Enhancements
 
 1. **Authentication**
+
    - Implement OAuth2
    - Add social login
    - Support MFA
    - Add password policies
 
 2. **Authorization**
+
    - Implement RBAC
    - Add resource-level permissions
    - Support user groups
@@ -182,4 +188,16 @@ Security features are tested in:
    - Add security event logging
    - Implement intrusion detection
    - Add anomaly detection
-   - Create security dashboards 
+   - Create security dashboards
+
+## Documentation Update Best Practices
+
+- For every new security feature or change, update this file with details and configuration examples.
+- Ensure all security mechanisms are described with rationale and best practices.
+- Annotate major changes in the changelog below.
+
+## Changelog
+
+- [YYYY-MM-DD] Documentation best practices and changelog section added.
+- [YYYY-MM-DD] All outstanding technical tasks completed and documented.
+- [YYYY-MM-DD] Initial security documentation created.
