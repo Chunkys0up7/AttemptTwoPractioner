@@ -47,10 +47,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Core workflow execution logic (step sequencing, executor invocation, streaming updates)
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **mcp_registry_service.py.txt** → `MCPRegistryService`
+- [x] **mcp_registry_service.py.txt** → `MCPRegistryService`
   - Purpose: Registry for MCPs (discovery, versioning)
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **auditing_service.py.txt** → `AuditingService`
   - Purpose: Audit logging for actions/events
   - .py exists: empty
