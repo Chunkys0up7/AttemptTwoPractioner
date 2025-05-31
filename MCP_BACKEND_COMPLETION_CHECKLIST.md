@@ -55,10 +55,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Audit logging for actions/events
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **config.py.txt** → `Config`
+- [x] **config.py.txt** → `Config`
   - Purpose: Configuration management
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **mcp_configs.py.txt** → `MCPConfigPayload` and related
   - Purpose: Typed config models for MCPs
   - .py exists: implemented (review if complete)
