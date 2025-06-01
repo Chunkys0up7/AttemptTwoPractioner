@@ -20,8 +20,9 @@ from fastapi import APIRouter, Request, HTTPException, Path, Depends
 from sse_starlette.sse import EventSourceResponse
 from typing import AsyncGenerator
 
-from mcp.api.main import redis_pubsub_manager # Import the global instance
+from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager
 from mcp.core.config import settings
+from mcp.core.pubsub.redis_pubsub import RedisPubSubManager
 
 router = APIRouter()
 

@@ -17,8 +17,8 @@ import asyncio
 import json
 from typing import AsyncGenerator, Dict, Any, Optional
 
-import aioredis
-from aioredis import Redis  # For type hinting
+import redis.asyncio as aioredis
+from redis.asyncio import Redis  # For type hinting
 
 # from mcp.core.config import settings  # Assuming REDIS_URL is in settings - Unused if global instance is commented out
 

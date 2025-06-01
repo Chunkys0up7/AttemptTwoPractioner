@@ -3,8 +3,8 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from mcp.db.base_class import Base
-from mcp.core.security import generate_api_key, hash_api_key
+from mcp.db.base import Base
+from mcp.core.core_security import generate_api_key, hash_api_key
 
 class APIKey(Base):
     """Model for storing API keys."""

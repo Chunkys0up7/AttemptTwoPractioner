@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional, Dict, Any
 
-from mcp.db.base_class import Base
+from mcp.db.base import Base
 from mcp.core.mcp_configs import MCPConfigPayload, parse_mcp_config
 
 

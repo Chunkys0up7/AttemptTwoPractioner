@@ -30,6 +30,7 @@ class Settings(BaseSettings):
         BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Restrict in production
         API_KEY_PREFIX: str = "mcp_"
         API_KEY_LENGTH: int = 32
+        API_V1_STR: str = "/api/v1"
     """
     APP_NAME: str = "MCP Backend"
     DEBUG: bool = False
@@ -48,6 +49,7 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = ["*"]  # Restrict in production
     API_KEY_PREFIX: str = "mcp_"
     API_KEY_LENGTH: int = 32
+    API_V1_STR: str = "/api/v1"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

@@ -7,7 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 # from sqlalchemy.orm import relationship # Unused
 
 # Assuming Base is defined in mcp.db.base_class
-from mcp.db.base_class import Base
+from mcp.db.base import Base
 
 
 class ActionLog(Base):

@@ -34,8 +34,7 @@ Base = declarative_base(metadata=metadata)
 
 # Import all the models, so that Base has them before being
 # imported by Alembic
-from mcp.db.base_class import Base  # noqa
 from mcp.db.models.mcp import MCPDefinition, MCPVersion  # noqa
-from mcp.db.models.workflow import WorkflowDefinition, WorkflowRun, WorkflowStepInstance  # noqa
+from mcp.db.models.workflow import WorkflowDefinition, WorkflowRun  # noqa
 from mcp.db.models.external_db_config import ExternalDatabaseConfig  # noqa
 from mcp.db.models.action_log import ActionLog  # noqa - Add ActionLog model

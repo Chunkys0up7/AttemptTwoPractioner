@@ -6,7 +6,7 @@ variables, and defines global application event handlers and basic health check 
 """
 # --- Start: Environment Variable Loading from .env ---
 # This section MUST be at the very top of the file
-from mcp.core.pubsub.redis_pubsub import RedisPubSubManager
+from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager
 # from mcp.db import base_class # For creating tables if needed, or use Alembic
 # Assuming SessionLocal and engine are setup
 # from mcp.db.session import get_db # SessionLocal, engine are unused, get_db also unused
@@ -53,13 +53,6 @@ try:
 except Exception as e:
     logger.error(f"MCP Backend: Error loading .env file: {e}")
 # --- End: Environment Variable Loading from .env ---
-
-
-# Import RedisPubSubManager
-
-# Create an instance of RedisPubSubManager
-# This requires REDIS_URL to be available in settings when main.py is loaded.
-redis_pubsub_manager = RedisPubSubManager(settings.REDIS_URL)
 
 
 @asynccontextmanager
