@@ -100,14 +100,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
 
 ### mcp/core/pubsub/
 
-- [ ] **base_pubsub.py.txt** → `BasePubSub`
-  - Purpose: Pub/Sub abstraction
-  - .py exists: empty
-  - Action: Implement
 - [x] **base_pubsub.py.txt** → `BasePubSub`
   - Purpose: Pub/Sub abstraction
   - .py exists: implemented and documented
-  - Action: Complete (.txt removed)
+  - Action: Complete
 - [x] **redis_pubsub.py.txt** → `RedisPubSub`
   - Purpose: Redis-based Pub/Sub
   - .py exists: implemented and documented
