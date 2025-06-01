@@ -227,10 +227,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: API endpoints for dashboard
   - .py exists: implemented (review if complete)
   - Action: Review/delete .txt if .py is complete
-- [ ] **auth_routes.py.txt** → Auth API
+- [x] **auth_routes.py.txt** → Auth API
   - Purpose: API endpoints for authentication
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
+  - .py exists: implemented and documented
+  - Action: Complete
 
 ### mcp/api/schemas/
 
