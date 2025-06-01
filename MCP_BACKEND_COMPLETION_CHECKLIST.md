@@ -169,18 +169,18 @@ This document provides a comprehensive, file-by-file checklist for completing th
 
 ### mcp/external_db/connectors/
 
-- [ ] **base_connector.py.txt** → `BaseDBConnector`
+- [x] **base_connector.py.txt** → `BaseDBConnector`
   - Purpose: Abstract base for DB connectors
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
-- [ ] **postgresql_connector.py.txt** → `PostgreSQLConnector`
+  - .py exists: implemented and documented
+  - Action: Complete
+- [x] **postgresql_connector.py.txt** → `PostgreSQLConnector`
   - Purpose: PostgreSQL DB connector
-  - .py exists: empty
-  - Action: Implement
-- [ ] **bigquery_connector.py.txt** → `BigQueryConnector`
+  - .py exists: implemented and documented
+  - Action: Complete
+- [x] **bigquery_connector.py.txt** → `BigQueryConnector`
   - Purpose: BigQuery DB connector
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
+  - .py exists: implemented and documented
+  - Action: Complete
 
 ### mcp/monitoring/
 
