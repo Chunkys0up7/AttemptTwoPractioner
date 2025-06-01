@@ -238,10 +238,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Pydantic schemas for workflow definitions
   - .py exists: empty
   - Action: Implement
-- [ ] **workflow_run_schemas.py.txt** → Workflow run schemas
+- [x] **workflow_run_schemas.py.txt** → Workflow run schemas
   - Purpose: Pydantic schemas for workflow runs
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **mcp_definition_schemas.py.txt** → MCP definition schemas
   - Purpose: Pydantic schemas for MCP definitions
   - .py exists: empty
