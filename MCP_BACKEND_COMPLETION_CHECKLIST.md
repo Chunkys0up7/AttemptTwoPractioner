@@ -258,10 +258,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Pydantic schemas for dashboard
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **entity_schemas.py.txt** → Entity schemas
+- [x] **entity_schemas.py.txt** → Entity schemas
   - Purpose: Pydantic schemas for entities
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **auth_schemas.py.txt** → Auth schemas
   - Purpose: Pydantic schemas for auth
   - .py exists: implemented (review if complete)
