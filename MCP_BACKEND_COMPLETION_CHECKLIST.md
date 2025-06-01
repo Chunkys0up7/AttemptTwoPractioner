@@ -138,10 +138,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
 
 ### mcp/db/crud/
 
-- [ ] **crud_workflow_run.py.txt** → CRUD for WorkflowRun
+- [x] **crud_workflow_run.py.txt** → CRUD for WorkflowRun
   - Purpose: CRUD logic for workflow runs
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **crud_workflow_definition.py.txt** → CRUD for WorkflowDefinition
   - Purpose: CRUD logic for workflow definitions
   - .py exists: empty
