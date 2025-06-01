@@ -1,4 +1,17 @@
-# PHASE 2: CORE FUNCTIONALITY CHECKLIST (🟠 High Priority)
+# PHASE 2: CORE FUNCTIONALITY CHECKLIST (�� High Priority)
+
+## Phase 2 Core Starter Structure: COMPLETE
+
+- [x] Created `services` directory in `mcp/api`
+- [x] Created `tests` directory in `mcp/api`
+- [x] Implemented stubs for `auth_service.py`, `data_service.py`, `data_visualization_service.py`
+- [x] Added `data_visualization.html` and `index.html`
+- [x] Updated `mcp/db/models/mcp.py` for `visualization_metadata`
+- [x] Added `test_auth_service.py`
+- [x] Updated routers to delegate to new services (where applicable)
+- [x] Created devlog entry
+
+---
 
 ## 2.1 Complete Workflow Builder Implementation
 
