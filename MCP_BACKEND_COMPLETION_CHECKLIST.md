@@ -111,10 +111,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
 
 ### mcp/db/models/
 
-- [ ] **workflow_run.py.txt** → `WorkflowRun`
+- [x] **workflow_run.py.txt** → `WorkflowRun`
   - Purpose: Workflow run DB model
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [x] **workflow_definition.py.txt** → `WorkflowDefinition`
   - Purpose: Workflow definition DB model
   - .py exists: implemented and documented
