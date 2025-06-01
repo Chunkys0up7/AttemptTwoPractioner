@@ -81,14 +81,14 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Base class for all executors
   - .py exists: empty
   - Action: Implement
-- [ ] **script_executor.py.txt** → `ScriptExecutor`
+- [x] **script_executor.py.txt** → `ScriptExecutor`
   - Purpose: Execute script MCPs
-  - .py exists: empty
-  - Action: Implement
-- [ ] **notebook_executor.py.txt** → `NotebookExecutor`
+  - .py exists: implemented and documented
+  - Action: Complete
+- [x] **notebook_executor.py.txt** → `NotebookExecutor`
   - Purpose: Execute notebook MCPs
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **llm_executor.py.txt** → `LLMExecutor`
   - Purpose: Execute LLM MCPs
   - .py exists: empty
