@@ -66,10 +66,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
 
 ### mcp/core/security/
 
-- [ ] **rbac_service.py.txt** → `RBACService`
+- [x] **rbac_service.py.txt** → `RBACService`
   - Purpose: Role-based access control
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **jwt_manager.py.txt** → `JWTManager`
   - Purpose: JWT token management
   - .py exists: empty
