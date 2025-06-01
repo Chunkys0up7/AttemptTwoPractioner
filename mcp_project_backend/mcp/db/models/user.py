@@ -4,11 +4,18 @@ from enum import Enum
 from mcp.db.base import Base
 
 class UserRoleEnum(str, Enum):
+    """
+    Enum for user roles in the system.
+    """
     ADMIN = "Admin"
     EDITOR = "Editor"
     VIEWER = "Viewer"
 
 class User(Base):
+    """
+    SQLAlchemy model for the User table.
+    Represents a user in the system with authentication and role information.
+    """
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -127,10 +127,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: MCP definition DB model
   - .py exists: empty
   - Action: Implement
-- [ ] **user.py.txt** → `User`
+- [x] **user.py.txt** → `User`
   - Purpose: User DB model
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
+  - .py exists: implemented and documented
+  - Action: Complete (.txt removed)
 - [ ] **external_db_config.py.txt** → `ExternalDatabaseConfig`
   - Purpose: External DB config DB model
   - .py exists: implemented (review if complete)
