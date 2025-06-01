@@ -158,11 +158,11 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: CRUD logic for action logs
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **crud_external_db_config.py.txt** → CRUD for ExternalDatabaseConfig
+- [x] **crud_external_db_config.py.txt** → CRUD for ExternalDatabaseConfig
   - Purpose: CRUD logic for external DB configs
-  - .py exists: empty
-  - Action: Implement
-- [x] **base_crud.py.txt** → Base CRUD class
+  - .py exists: implemented and documented
+  - Action: Complete
+- [ ] **base_crud.py.txt** → Base CRUD class
   - Purpose: Base class for CRUD logic
   - .py exists: implemented and documented
   - Action: Complete
