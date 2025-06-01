@@ -123,10 +123,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Workflow definition DB model
   - .py exists: implemented and documented
   - Action: Complete (.txt removed)
-- [ ] **mcp_definition.py.txt** → `MCPDefinition`
+- [x] **mcp_definition.py.txt** → `MCPDefinition`
   - Purpose: MCP definition DB model
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete (.txt removed)
 - [x] **user.py.txt** → `User`
   - Purpose: User DB model
   - .py exists: implemented and documented
