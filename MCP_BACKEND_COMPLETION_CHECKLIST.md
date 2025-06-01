@@ -104,6 +104,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Pub/Sub abstraction
   - .py exists: empty
   - Action: Implement
+- [x] **base_pubsub.py.txt** → `BasePubSub`
+  - Purpose: Pub/Sub abstraction
+  - .py exists: implemented and documented
+  - Action: Complete (.txt removed)
 - [ ] **redis_pubsub.py.txt** → `RedisPubSub`
   - Purpose: Redis-based Pub/Sub
   - .py exists: implemented (review if complete)
