@@ -58,3 +58,7 @@ async def get_dashboard_summary(
             status_code=500,
             detail=f"An error occurred while fetching the dashboard summary: {str(e)}"
         )
+
+# If this file previously contained direct data visualization logic, import and use the new data_visualization_service instead.
+# from mcp.api.services.data_visualization_service import router as data_visualization_router
+# router.include_router(data_visualization_router, prefix="/visualization", tags=["visualization"])

@@ -121,3 +121,7 @@ async def get_entity_details(
 # Note: The `get_entity_service` dependency is not used in the endpoint above as it became complex
 # to map service methods dynamically for this example. A direct if/else in the route is simpler for now.
 # A more robust solution for many entity types might involve a registry pattern for services and their methods.
+
+# If this file previously contained direct data retrieval logic, import and use the new data_service instead.
+# from mcp.api.services.data_service import router as data_service_router
+# router.include_router(data_service_router, prefix="/data", tags=["data"])

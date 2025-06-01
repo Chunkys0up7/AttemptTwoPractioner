@@ -2,7 +2,7 @@
 Database models for MCP Definitions and Versions.
 """
 import uuid
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func, JSON
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -40,6 +40,9 @@ class MCPVersion(Base):
 
     # New field to store a list of ExternalDatabaseConfig IDs
     external_db_config_ids = Column(JSONB, nullable=True, default=lambda: [])
+
+    # Add a field for data visualization metadata
+    visualization_metadata = Column(JSON, nullable=True, default=None)
 
     created_at = Column(DateTime(timezone=True), default=func.now())
     updated_at = Column(DateTime(timezone=True),
