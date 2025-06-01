@@ -162,10 +162,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: CRUD logic for external DB configs
   - .py exists: empty
   - Action: Implement
-- [ ] **base_crud.py.txt** → Base CRUD class
+- [x] **base_crud.py.txt** → Base CRUD class
   - Purpose: Base class for CRUD logic
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 
 ### mcp/external_db/connectors/
 
