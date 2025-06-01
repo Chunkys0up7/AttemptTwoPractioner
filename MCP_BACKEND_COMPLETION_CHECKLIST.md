@@ -146,10 +146,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: CRUD logic for workflow definitions
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **crud_mcp_definition.py.txt** → CRUD for MCPDefinition
+- [x] **crud_mcp_definition.py.txt** → CRUD for MCPDefinition
   - Purpose: CRUD logic for MCP definitions
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [x] **crud_user.py.txt** → CRUD for User
   - Purpose: CRUD logic for users
   - .py exists: implemented and documented
