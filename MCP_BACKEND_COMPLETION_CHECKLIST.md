@@ -131,10 +131,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: User DB model
   - .py exists: implemented and documented
   - Action: Complete (.txt removed)
-- [ ] **external_db_config.py.txt** → `ExternalDatabaseConfig`
+- [x] **external_db_config.py.txt** → `ExternalDatabaseConfig`
   - Purpose: External DB config DB model
-  - .py exists: implemented (review if complete)
-  - Action: Review/delete .txt if .py is complete
+  - .py exists: implemented and documented
+  - Action: Complete (.txt removed)
 - [ ] **action_log.py.txt** → `ActionLog`
   - Purpose: Action log DB model
   - .py exists: implemented (review if complete)
