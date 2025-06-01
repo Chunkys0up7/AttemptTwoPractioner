@@ -250,10 +250,10 @@ This document provides a comprehensive, file-by-file checklist for completing th
   - Purpose: Pydantic schemas for MCP versions
   - .py exists: implemented and documented
   - Action: Complete
-- [ ] **external_db_config_schemas.py.txt** → External DB config schemas
+- [x] **external_db_config_schemas.py.txt** → External DB config schemas
   - Purpose: Pydantic schemas for external DB configs
-  - .py exists: empty
-  - Action: Implement
+  - .py exists: implemented and documented
+  - Action: Complete
 - [ ] **dashboard_schemas.py.txt** → Dashboard schemas
   - Purpose: Pydantic schemas for dashboard
   - .py exists: empty
