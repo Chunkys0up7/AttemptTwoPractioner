@@ -1,0 +1,3 @@
+# This file makes the 'security' directory a Python sub-package.
+# Used for organizing security-related modules like JWT management,
+# password hashing, and Role-Based Access Control (RBAC).

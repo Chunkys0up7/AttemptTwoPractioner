@@ -1,0 +1,6 @@
+# This file makes the 'connectors' directory a Python sub-package.
+# It contains implementations of database connectors for various DB systems.
+# Example:
+# from .base_connector import BaseDBConnector
+# from .postgresql_connector import PostgreSQLConnector
+# from .bigquery_connector import BigQueryConnector

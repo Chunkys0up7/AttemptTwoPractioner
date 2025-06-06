@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Visualization</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        #chart { width: 400px; height: 300px; border: 1px solid #ccc; display: flex; align-items: flex-end; }
+        .bar { background: #4a90e2; margin: 0 5px; width: 40px; text-align: center; color: #fff; }
+    </style>
+</head>
+<body>
+    <h1>Data Visualization</h1>
+    <div id="chart"></div>
+    <script>
+        fetch('/api/visualization-data')
+            .then(response => response.json())
+            .then(data => {
+                const chart = document.getElementById('chart');
+                chart.innerHTML = '';
+                const max = Math.max(...data.values);
+                data.values.forEach((value, i) => {
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = (value / max * 250) + 'px';
+                    bar.textContent = data.labels[i];
+                    chart.appendChild(bar);
+                });
+            });
+    </script>
+</body>
+</html> 

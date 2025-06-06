@@ -1,0 +1,2 @@
+# This file makes the 'api' directory a Python sub-package.
+# It can be empty or define what's imported when 'from mcp.api import ...' is used.

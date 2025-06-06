@@ -1,0 +1,2 @@
+# This file makes the 'pubsub' directory a Python sub-package.
+# It will contain implementations for publish-subscribe mechanisms.
