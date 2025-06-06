@@ -12,7 +12,7 @@ class WorkflowTemplate(Base):
     name = Column(String(255), nullable=False)
     description = Column(String(1000))
     category = Column(String(100))
-    metadata = Column(JSON)
+    template_metadata = Column(JSON)
     is_public = Column(Boolean, default=False)
     created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)

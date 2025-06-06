@@ -8,9 +8,7 @@ Each class is documented with field-level and class-level docstrings for clarity
 from pydantic import BaseModel, Field
 from typing import Optional
 from mcp.core.mcp_configs import MCPConfigPayload
-
-# Note: SpecificComponentType is not defined in the codebase. For now, use str and document expected values.
-# In the future, this could be an Enum matching frontend types (e.g., "LLM Prompt Agent", "Jupyter Notebook", etc.)
+from .component_types import SpecificComponentType
 
 class MCPVersionBase(BaseModel):
     """
@@ -19,13 +17,17 @@ class MCPVersionBase(BaseModel):
     Attributes:
         version_string (str): Version string (e.g., "1.0.0", "1.0.1-alpha").
         description (Optional[str]): Optional description of the version.
-        mcp_type (str): Type of the MCP (should match the 'type' discriminator in MCPConfigPayload).
+        mcp_type (SpecificComponentType): Type of the MCP (must be one of the defined component types).
         config (MCPConfigPayload): Typed configuration payload for this version.
+        is_custom (bool): Whether this is a custom user-defined component.
+        visibility (str): Visibility level of the component (public/private).
     """
     version_string: str = Field(..., example="1.0.0", description="Version string (e.g., '1.0.0', '1.0.1-alpha').")
     description: Optional[str] = Field(None, description="Optional description of the MCP version.")
-    mcp_type: str = Field(..., description="Type of the MCP (should match the 'type' discriminator in MCPConfigPayload).")
+    mcp_type: SpecificComponentType = Field(..., description="Type of the MCP (must be one of the defined component types).")
     config: MCPConfigPayload = Field(..., description="Typed configuration payload for this MCP version.")
+    is_custom: bool = Field(False, description="Whether this is a custom user-defined component.")
+    visibility: str = Field("public", description="Visibility level of the component (public/private)")
 
 class MCPVersionCreate(MCPVersionBase):
     """

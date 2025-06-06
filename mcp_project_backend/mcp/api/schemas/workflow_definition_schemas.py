@@ -15,6 +15,7 @@ class WorkflowStepBase(BaseModel):
     Attributes:
         name (str): Name of the step.
         mcp_version_id (int): ID of the specific MCPVersion to use for this step.
+        mcp_type (SpecificComponentType): Type of the MCP component used in this step.
         description (Optional[str]): Optional description of the step.
         input_mappings (Optional[Dict[str, Any]]):
             How inputs are mapped to this step's MCP. Example:
@@ -26,12 +27,15 @@ class WorkflowStepBase(BaseModel):
                 "another_param": {"static_value": "some value"}
             }
         order (int): Execution order of the step within the workflow.
+        tags (Optional[List[str]]): Optional tags for categorizing the step.
     """
     name: str = Field(..., description="Name of the workflow step.")
     mcp_version_id: int = Field(..., description="ID of the MCPVersion to use for this step.")
+    mcp_type: SpecificComponentType = Field(..., description="Type of the MCP component used in this step.")
     description: Optional[str] = Field(None, description="Optional description of the step.")
     input_mappings: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Input mappings for this step.")
     order: int = Field(..., description="Execution order of the step within the workflow.")
+    tags: Optional[List[str]] = Field(default_factory=list, description="Optional tags for categorizing the step.")
 
 class WorkflowStepCreate(WorkflowStepBase):
     """

@@ -5,8 +5,8 @@ This router provides CRUD operations for WorkflowDefinitions and for managing Wo
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
-
+from typing import List, Optional, Dict, Any
+from pydantic import ValidationError
 from mcp.db.session import get_db
 from mcp.core.config import settings
 from mcp.api.schemas.workflow_definition_schemas import (
@@ -14,6 +14,27 @@ from mcp.api.schemas.workflow_definition_schemas import (
     WorkflowStepCreate, WorkflowStepRead
 )
 from mcp.db.crud.crud_workflow_definition import crud_workflow_definition, crud_workflow_step
+from mcp.core.exceptions import WorkflowDefinitionError, WorkflowStepError
+from mcp.core.logging import logger
+
+# Custom exception handlers
+async def handle_validation_error(request: Any, exc: ValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "detail": "Validation error",
+            "errors": exc.errors()
+        }
+    )
+
+async def handle_workflow_error(request: Any, exc: WorkflowDefinitionError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            "detail": "Workflow error",
+            "message": str(exc)
+        }
+    )
 
 router = APIRouter(
     prefix=f"{settings.API_V1_STR}/workflow-definitions",
@@ -27,24 +48,136 @@ def create_workflow_definition(
 ):
     """
     Create a new Workflow Definition, optionally with steps.
+
+    Args:
+        wf_def_in: Workflow definition data
+        db: Database session
+
+    Returns:
+        Created workflow definition
+
+    Raises:
+        HTTPException: If validation fails or creation fails
     """
     try:
+        # Validate input
+        if not wf_def_in.name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Workflow name is required"
+            )
+
+        if len(wf_def_in.steps or []) > 50:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Maximum 50 steps allowed per workflow"
+            )
+
+        # Create workflow
         wf_def = crud_workflow_definition.create_with_steps(db=db, obj_in=wf_def_in)
+        
+        # Log creation
+        logger.info(f"Workflow created: {wf_def.name} (ID: {wf_def.id})")
+        
         return wf_def
+
+    except ValidationError as e:
+        logger.error(f"Validation error creating workflow: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e)
+        )
+    except WorkflowDefinitionError as e:
+        logger.error(f"Workflow creation error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error creating workflow definition: {e}")
+        logger.error(f"Unexpected error creating workflow: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while creating the workflow"
+        )
 
 @router.get("/", response_model=List[WorkflowDefinitionRead])
 def list_workflow_definitions(
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(100, ge=1, le=200, description="Maximum number of items to return"),
+    search: Optional[str] = Query(None, description="Search term to filter workflows by name or description"),
+    mcp_type: Optional[str] = Query(None, description="Filter workflows containing steps of this MCP type"),
+    include_archived: bool = Query(False, description="Include archived workflows"),
     db: Session = Depends(get_db)
 ):
     """
-    List all Workflow Definitions (paginated).
+    List all Workflow Definitions with optional filtering.
+
+    Args:
+        skip: Number of items to skip
+        limit: Maximum number of items to return
+        search: Search term to filter workflows by name or description
+        mcp_type: Filter workflows containing steps of this MCP type
+        include_archived: Include archived workflows in results
+
+    Returns:
+        List of workflow definitions matching filters
+
+    Raises:
+        HTTPException: If database error occurs
     """
-    defs = crud_workflow_definition.get_multi(db, skip=skip, limit=limit)
-    return defs
+    try:
+        # Apply filters
+        if search or mcp_type or include_archived:
+            defs = crud_workflow_definition.get_filtered(
+                db,
+                skip=skip,
+                limit=limit,
+                search_term=search,
+                mcp_type=mcp_type,
+                include_archived=include_archived
+            )
+        else:
+            # No filters, get all
+            defs = crud_workflow_definition.get_multi(db, skip=skip, limit=limit)
+        
+        logger.info(f"Retrieved {len(defs)} workflows")
+        return defs
+
+    except Exception as e:
+        logger.error(f"Error fetching workflow definitions: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while fetching workflows"
+        )
+    """
+    List all Workflow Definitions with optional filtering.
+    
+    Args:
+        skip: Number of items to skip
+        limit: Maximum number of items to return
+        search: Search term to filter workflows by name or description
+        mcp_type: Filter workflows containing steps of this MCP type
+    """
+    try:
+        if search or mcp_type:
+            # Apply filters
+            defs = crud_workflow_definition.get_filtered(
+                db,
+                skip=skip,
+                limit=limit,
+                search_term=search,
+                mcp_type=mcp_type
+            )
+        else:
+            # No filters, get all
+            defs = crud_workflow_definition.get_multi(db, skip=skip, limit=limit)
+        
+        return defs
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching workflow definitions: {str(e)}"
+        )
 
 @router.get("/{wf_def_id}", response_model=WorkflowDefinitionRead)
 def get_workflow_definition(
