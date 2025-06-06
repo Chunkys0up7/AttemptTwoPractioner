@@ -15,13 +15,17 @@ from mcp.core.config import settings
 # Import relevant Pydantic Read schemas and Service classes
 from mcp.schemas.mcp import MCPVersionRead, MCPDefinitionRead, MCPDefinitionCreate, MCPDefinitionUpdate, MCPVersionCreate, MCPVersionUpdate
 # Renamed to avoid conflict
-from mcp.schemas.workflow import WorkflowRunRead, WorkflowDefinitionRead as WorkflowDefReadSchema
+from mcp.schemas.workflow import WorkflowRunRead, WorkflowDefinitionRead as WorkflowDefReadSchema, WorkflowDefinitionCreate, WorkflowRunCreate
 from mcp.schemas.external_db_config import ExternalDbConfigRead
 
 from mcp.core.services.mcp_service import MCPService
 # Assuming a WorkflowService exists or will be created
 # from mcp.core.services.workflow_service import WorkflowService # Unused and redefined later
 from mcp.core.services.external_db_config_service import ExternalDbConfigService
+
+from mcp.db.models.workflow import WorkflowDefinition, WorkflowRun
+from mcp.schemas.workflow import WorkflowDefinitionRead
+from sqlalchemy.exc import IntegrityError
 
 # Define an Enum for supported entity types
 
@@ -245,4 +249,103 @@ def delete_mcp_version(definition_id: uuid.UUID, version_id: uuid.UUID, db: Sess
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error during MCP Version deletion.")
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="MCPVersion not found or already deleted")
+    return
+
+# --- WorkflowDefinition CRUD ---
+
+@router.post("/workflow-definitions/", response_model=WorkflowDefinitionRead, status_code=status.HTTP_201_CREATED)
+def create_workflow_definition(wf_def_create: WorkflowDefinitionCreate = Body(...), db: Session = Depends(get_db)):
+    try:
+        wf_def = WorkflowDefinition(
+            name=wf_def_create.name,
+            description=wf_def_create.description,
+            graph_representation=wf_def_create.definition_dsl or {},
+        )
+        db.add(wf_def)
+        db.commit()
+        db.refresh(wf_def)
+        return WorkflowDefinitionRead.model_validate(wf_def)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="WorkflowDefinition with this name already exists.")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+@router.get("/workflow-definitions/", response_model=List[WorkflowDefinitionRead])
+def list_workflow_definitions(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    defs = db.query(WorkflowDefinition).offset(skip).limit(limit).all()
+    return [WorkflowDefinitionRead.model_validate(d) for d in defs]
+
+@router.get("/workflow-definitions/{definition_id}", response_model=WorkflowDefinitionRead)
+def get_workflow_definition(definition_id: uuid.UUID, db: Session = Depends(get_db)):
+    wf_def = db.query(WorkflowDefinition).filter(WorkflowDefinition.id == definition_id).first()
+    if not wf_def:
+        raise HTTPException(status_code=404, detail="WorkflowDefinition not found")
+    return WorkflowDefinitionRead.model_validate(wf_def)
+
+@router.put("/workflow-definitions/{definition_id}", response_model=WorkflowDefinitionRead)
+def update_workflow_definition(definition_id: uuid.UUID, wf_def_update: WorkflowDefinitionCreate = Body(...), db: Session = Depends(get_db)):
+    wf_def = db.query(WorkflowDefinition).filter(WorkflowDefinition.id == definition_id).first()
+    if not wf_def:
+        raise HTTPException(status_code=404, detail="WorkflowDefinition not found")
+    wf_def.name = wf_def_update.name
+    wf_def.description = wf_def_update.description
+    wf_def.graph_representation = wf_def_update.definition_dsl or {}
+    try:
+        db.commit()
+        db.refresh(wf_def)
+        return WorkflowDefinitionRead.model_validate(wf_def)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="WorkflowDefinition with this name already exists.")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Internal error: {e}")
+
+@router.delete("/workflow-definitions/{definition_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_workflow_definition(definition_id: uuid.UUID, db: Session = Depends(get_db)):
+    wf_def = db.query(WorkflowDefinition).filter(WorkflowDefinition.id == definition_id).first()
+    if not wf_def:
+        raise HTTPException(status_code=404, detail="WorkflowDefinition not found")
+    db.delete(wf_def)
+    db.commit()
+    return
+
+# --- WorkflowRun CRUD ---
+
+@router.post("/workflow-definitions/{definition_id}/runs/", response_model=WorkflowRunRead, status_code=status.HTTP_201_CREATED)
+def create_workflow_run(definition_id: uuid.UUID, run_create: WorkflowRunCreate = Body(...), db: Session = Depends(get_db)):
+    wf_def = db.query(WorkflowDefinition).filter(WorkflowDefinition.id == definition_id).first()
+    if not wf_def:
+        raise HTTPException(status_code=404, detail="WorkflowDefinition not found")
+    run = WorkflowRun(
+        workflow_definition_id=definition_id,
+        status="PENDING",
+        run_parameters=run_create.run_parameters or {},
+    )
+    db.add(run)
+    db.commit()
+    db.refresh(run)
+    return WorkflowRunRead.model_validate(run)
+
+@router.get("/workflow-definitions/{definition_id}/runs/", response_model=List[WorkflowRunRead])
+def list_workflow_runs(definition_id: uuid.UUID, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    runs = db.query(WorkflowRun).filter(WorkflowRun.workflow_definition_id == definition_id).offset(skip).limit(limit).all()
+    return [WorkflowRunRead.model_validate(r) for r in runs]
+
+@router.get("/workflow-runs/{run_id}", response_model=WorkflowRunRead)
+def get_workflow_run(run_id: uuid.UUID, db: Session = Depends(get_db)):
+    run = db.query(WorkflowRun).filter(WorkflowRun.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="WorkflowRun not found")
+    return WorkflowRunRead.model_validate(run)
+
+@router.delete("/workflow-runs/{run_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_workflow_run(run_id: uuid.UUID, db: Session = Depends(get_db)):
+    run = db.query(WorkflowRun).filter(WorkflowRun.id == run_id).first()
+    if not run:
+        raise HTTPException(status_code=404, detail="WorkflowRun not found")
+    db.delete(run)
+    db.commit()
     return
