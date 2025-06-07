@@ -1064,3 +1064,28 @@ Resets all in-memory performance metrics (admin only).
 **Notes:**
 - Use `/metrics/report` for dashboards, admin review, or troubleshooting.
 - Use `/metrics/reset` for manual cleanup/testing; metrics are also reset automatically every 24 hours.
+
+### Dashboard Visualization
+
+`GET /api/v1/metrics/dashboard`
+
+Returns a summary of key performance metrics and alerts for dashboard visualization.
+
+**Response Example:**
+```json
+{
+  "metrics": { ... },
+  "alerts": [ ... ],
+  "dashboard": {
+    "uptime": 12345,
+    "request_count": 100,
+    "error_count": 2,
+    "cache_hit_ratio": 0.85,
+    "active_alerts": 1
+  }
+}
+```
+
+**Notes:**
+- This endpoint is for use in admin dashboards or monitoring UIs.
+- Data is in-memory only; will be extended with historical data when DB support is added.
