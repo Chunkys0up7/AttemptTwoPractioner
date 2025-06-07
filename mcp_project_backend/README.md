@@ -235,3 +235,13 @@ For more details and example requests, see the code in `mcp/api/routers/` and `m
 - [YYYY-MM-DD] Documentation best practices and changelog section added.
 - [YYYY-MM-DD] All outstanding technical tasks completed and documented.
 - [YYYY-MM-DD] Initial backend documentation created.
+
+## Database Schema Updates (June 2025)
+
+- Added `template_shares` table for workflow template sharing and permissions.
+- Added `metrics` table for storing performance and usage metrics.
+- Added `alerts` table for threshold-based and manual alerts.
+- Added `workflow_step_executions` table for detailed workflow step tracking.
+- Updated `workflow_definitions` and `workflow_runs` schema to match models.
+
+The schema is now fully aligned with the backend models and supports advanced monitoring, alerting, and sharing features.

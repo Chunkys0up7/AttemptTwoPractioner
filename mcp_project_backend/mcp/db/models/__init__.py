@@ -17,6 +17,8 @@ from .user import User
 from .api_key import APIKey
 from .action_log import ActionLog
 from .workflow_template import WorkflowTemplate, WorkflowTemplateVersion, TemplateShare
+from .metrics import Metric, Alert
+from .workflow import WorkflowStepExecution
 
 __all__ = [
     "MCPDefinition",
@@ -30,5 +32,8 @@ __all__ = [
     "ActionLog",
     "WorkflowTemplate",
     "WorkflowTemplateVersion",
-    "TemplateShare"
+    "TemplateShare",
+    "Metric",
+    "Alert",
+    "WorkflowStepExecution"
 ]

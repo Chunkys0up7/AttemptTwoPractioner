@@ -1,16 +1,43 @@
 from functools import wraps
-from typing import Callable, Any, Optional
+from typing import Callable, Any, Optional, TypeVar, Generic
 from datetime import datetime, timedelta
 from mcp.core.config import settings
 import redis
+import pickle
+import logging
+from prometheus_client import Counter, Gauge
 
-# Initialize Redis client
-redis_client = redis.Redis(
+# Set up logging
+logger = logging.getLogger(__name__)
+
+# Prometheus metrics
+CACHE_HIT = Counter(
+    'cache_hits_total',
+    'Total number of cache hits'
+)
+
+CACHE_MISS = Counter(
+    'cache_misses_total',
+    'Total number of cache misses'
+)
+
+CACHE_SIZE = Gauge(
+    'cache_size_bytes',
+    'Current cache size in bytes'
+)
+
+# Initialize Redis client with connection pool
+redis_pool = redis.ConnectionPool(
     host=settings.REDIS_HOST,
     port=settings.REDIS_PORT,
     db=settings.REDIS_DB,
-    decode_responses=True
+    max_connections=settings.REDIS_MAX_CONNECTIONS,
+    socket_timeout=settings.REDIS_TIMEOUT
 )
+
+redis_client = redis.Redis(connection_pool=redis_pool, decode_responses=True)
+
+T = TypeVar('T')
 
 def cache_response(
     timeout: int,
@@ -22,29 +49,47 @@ def cache_response(
     Args:
         timeout: Cache timeout in seconds
         key_prefix: Prefix for cache keys
+    
+    Returns:
+        Decorated function with caching
     """
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
-        async def wrapper(*args: Any, **kwargs: Any) -> Any:
-            # Generate cache key based on function name and arguments
-            cache_key = f"{key_prefix}:{func.__name__}:{str(args)}:{str(kwargs)}"
-            
-            # Check cache first
-            cached_result = redis_client.get(cache_key)
-            if cached_result:
-                return eval(cached_result)  # Convert string back to object
+        async def wrapper(*args: Any, **kwargs: Any) -> T:
+            try:
+                # Generate cache key based on function name and arguments
+                cache_key = f"{key_prefix}:{func.__name__}:{str(args)}:{str(kwargs)}"
                 
-            # If not cached, execute function
-            result = await func(*args, **kwargs)
-            
-            # Cache the result
-            redis_client.setex(
-                cache_key,
-                timeout,
-                str(result)  # Convert object to string for storage
-            )
-            
-            return result
+                # Check cache first
+                cached_result = redis_client.get(cache_key)
+                if cached_result:
+                    CACHE_HIT.inc()
+                    return pickle.loads(cached_result)  # Use pickle for security
+                
+                CACHE_MISS.inc()
+                
+                # If not cached, execute function
+                result = await func(*args, **kwargs)
+                
+                # Cache the result using pickle for security
+                redis_client.setex(
+                    cache_key,
+                    timeout,
+                    pickle.dumps(result)
+                )
+                
+                # Update cache size metric
+                cache_size = redis_client.info('memory')['used_memory']
+                CACHE_SIZE.set(cache_size)
+                
+                return result
+                
+            except redis.exceptions.RedisError as e:
+                logger.error(f"Redis error in cache operation: {str(e)}")
+                raise
+            except Exception as e:
+                logger.error(f"Cache error: {str(e)}")
+                raise
         
         return wrapper
     
@@ -57,9 +102,14 @@ def invalidate_cache(key_prefix: str = "workflow") -> None:
     Args:
         key_prefix: Prefix of cache keys to invalidate
     """
-    keys = redis_client.keys(f"{key_prefix}:*")
-    if keys:
-        redis_client.delete(*keys)
+    try:
+        keys = redis_client.keys(f"{key_prefix}:*")
+        if keys:
+            redis_client.delete(*keys)
+            logger.info(f"Invalidated {len(keys)} cache entries with prefix {key_prefix}")
+    except redis.exceptions.RedisError as e:
+        logger.error(f"Redis error while invalidating cache: {str(e)}")
+        raise
 
 def cache_key_exists(key: str) -> bool:
     """

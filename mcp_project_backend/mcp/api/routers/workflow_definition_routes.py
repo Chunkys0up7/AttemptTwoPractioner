@@ -6,6 +6,11 @@ Includes monitoring, caching, and circuit breaker integration.
 """
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Query, Request
+from fastapi.security import HTTPBearer
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional, Dict, Any, TypeVar, Generic, Type
 from pydantic import ValidationError
@@ -107,9 +112,38 @@ router = APIRouter(
     dependencies=[Depends(jwt_bearer)]
 )
 
+# Add security middleware
+router.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+router.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=settings.ALLOWED_HOSTS
+)
+
+router.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000
+)
+
+# Add rate limiting
+@router.on_event("startup")
+def startup_event():
+    workflow_rate_limiter.init()
+    workflow_steps_rate_limiter.init()
+
 @router.post("/", response_model=WorkflowDefinitionRead, status_code=status.HTTP_201_CREATED)
-def create_workflow_definition(
+@workflow_circuit_breaker
+@workflow_rate_limiter
+@cache_response(timeout=definition_cache_timeout)
+async def create_workflow_definition(
     wf_def_in: WorkflowDefinitionCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
@@ -270,13 +304,16 @@ def create_workflow_definition(
         )
 
 @router.get("/", response_model=List[WorkflowDefinitionRead])
+@workflow_circuit_breaker
+@workflow_rate_limiter
 @cache_response(timeout=definition_cache_timeout)
 async def list_workflow_definitions(
-    skip: int = Query(0, ge=0, description="Number of items to skip"),
-    limit: int = Query(100, ge=1, le=200, description="Maximum number of items to return"),
-    search: Optional[str] = Query(None, description="Search term to filter workflows by name or description"),
-    mcp_type: Optional[str] = Query(None, description="Filter workflows containing steps of this MCP type"),
-    include_archived: bool = Query(False, description="Include archived workflows"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    search: Optional[str] = Query(None, min_length=1),
+    mcp_type: Optional[str] = Query(None),
+    include_archived: bool = Query(False),
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -513,9 +550,12 @@ async def list_workflow_definitions(
         )
 
 @router.get("/{wf_def_id}", response_model=WorkflowDefinitionRead)
+@workflow_circuit_breaker
+@workflow_rate_limiter
 @cache_response(timeout=definition_cache_timeout)
 async def get_workflow_definition(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -579,9 +619,13 @@ async def get_workflow_definition(
     return wf_def
 
 @router.put("/{wf_def_id}", response_model=WorkflowDefinitionRead)
-def update_workflow_definition(
+@workflow_circuit_breaker
+@workflow_rate_limiter
+@cache_response(timeout=definition_cache_timeout)
+async def update_workflow_definition(
     wf_def_id: int,
     wf_def_update: WorkflowDefinitionUpdate,
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -618,8 +662,12 @@ def update_workflow_definition(
         )
 
 @router.delete("/{wf_def_id}", response_model=WorkflowDefinitionRead)
-def delete_workflow_definition(
+@workflow_circuit_breaker
+@workflow_rate_limiter
+@cache_response(timeout=definition_cache_timeout)
+async def delete_workflow_definition(
     wf_def_id: int,
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -654,10 +702,14 @@ def delete_workflow_definition(
 # --- Workflow Step Endpoints ---
 
 @router.post("/{wf_def_id}/steps", response_model=WorkflowStepRead, status_code=status.HTTP_201_CREATED)
-def add_workflow_step(
+@workflow_circuit_breaker
+@workflow_rate_limiter
+@cache_response(timeout=steps_cache_timeout)
+async def add_workflow_step(
     wf_def_id: int,
     step_in: WorkflowStepCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request
 ):
     """
     Add a new step to a Workflow Definition.

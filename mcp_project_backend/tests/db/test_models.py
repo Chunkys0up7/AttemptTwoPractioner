@@ -8,8 +8,9 @@ Session management and database interaction would typically be handled by fixtur
 import pytest
 import uuid
 from datetime import datetime
-
-# Assuming your models are accessible via mcp.db.models
+import sqlalchemy
+from sqlalchemy.orm import sessionmaker
+from mcp.db.base import Base
 from mcp.db.models import MCPDefinition, MCPVersion, WorkflowDefinition, WorkflowRun, WorkflowRunStatus
 
 # Placeholder for a SQLAlchemy session fixture (to be defined in conftest.py or similar)
@@ -104,4 +105,38 @@ def test_workflow_run_status_enum():
     assert WorkflowRunStatus.RUNNING.value == "RUNNING"
     assert WorkflowRunStatus.SUCCESS.value == "SUCCESS"
     assert WorkflowRunStatus.FAILED.value == "FAILED"
-    assert WorkflowRunStatus.CANCELLED.value == "CANCELLED" 
+    assert WorkflowRunStatus.CANCELLED.value == "CANCELLED"
+
+def test_workflow_definition_and_run_relationship():
+    # Set up in-memory SQLite DB
+    engine = sqlalchemy.create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # Create a workflow definition
+    wf_def = WorkflowDefinition(
+        name="DB Test Workflow",
+        description="A workflow for DB relationship test.",
+        graph_representation={"nodes": [], "edges": []}
+    )
+    session.add(wf_def)
+    session.commit()
+
+    # Create a workflow run linked to the definition
+    wf_run = WorkflowRun(
+        workflow_definition_id=wf_def.id,
+        status=WorkflowRunStatus.PENDING,
+        run_parameters={"input": "value"}
+    )
+    session.add(wf_run)
+    session.commit()
+
+    # Query and assert relationship
+    queried_run = session.query(WorkflowRun).filter_by(id=wf_run.id).first()
+    assert queried_run.workflow_definition_id == wf_def.id
+    queried_def = session.query(WorkflowDefinition).filter_by(id=wf_def.id).first()
+    assert queried_def.id == wf_def.id
+    # Clean up
+    session.close()
+    engine.dispose() 

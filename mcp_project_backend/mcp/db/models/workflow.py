@@ -94,20 +94,19 @@ class WorkflowRun(Base):
     def __repr__(self):
         return f"<WorkflowRun(id={self.id}, definition_id={self.workflow_definition_id}, status='{self.status.value}')>"
 
-# If you decide to model WorkflowStepExecution explicitly for detailed step tracking:
-# class WorkflowStepExecution(Base):
-#     __tablename__ = "workflow_step_executions"
-#     id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     workflow_run_id = Column(PG_UUID(as_uuid=True), ForeignKey("workflow_runs.id"), nullable=False, index=True)
-#     step_id_in_graph = Column(String, nullable=False) # Identifier of the step in the WorkflowDefinition.graph_representation
-#     mcp_version_id = Column(PG_UUID(as_uuid=True), ForeignKey("mcp_versions.id"), nullable=True) # Which MCPVersion was executed
-#     status = Column(String(50), nullable=False) # e.g., PENDING, RUNNING, SUCCESS, FAILED
-#     inputs = Column(JSONB, nullable=True)
-#     outputs = Column(JSONB, nullable=True)
-#     logs = Column(Text, nullable=True)
-#     started_at = Column(DateTime, nullable=True)
-#     ended_at = Column(DateTime, nullable=True)
-#     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-#     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
-#     workflow_run = relationship("WorkflowRun", back_populates="workflow_steps_executions")
-#     executed_mcp_version = relationship("MCPVersion")
+class WorkflowStepExecution(Base):
+    __tablename__ = "workflow_step_executions"
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    workflow_run_id = Column(PG_UUID(as_uuid=True), ForeignKey("workflow_runs.id"), nullable=False, index=True)
+    step_id_in_graph = Column(String, nullable=False) # Identifier of the step in the WorkflowDefinition.graph_representation
+    mcp_version_id = Column(PG_UUID(as_uuid=True), ForeignKey("mcp_versions.id"), nullable=True) # Which MCPVersion was executed
+    status = Column(String(50), nullable=False) # e.g., PENDING, RUNNING, SUCCESS, FAILED
+    inputs = Column(JSONB, nullable=True)
+    outputs = Column(JSONB, nullable=True)
+    logs = Column(Text, nullable=True)
+    started_at = Column(DateTime, nullable=True)
+    ended_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    workflow_run = relationship("WorkflowRun", backref="workflow_steps_executions")
+    executed_mcp_version = relationship("MCPVersion")

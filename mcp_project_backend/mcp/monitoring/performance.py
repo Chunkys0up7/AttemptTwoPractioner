@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import time
 from sqlalchemy import text
 import psutil
+import inspect
 
 T = TypeVar('T')
 
@@ -170,9 +171,14 @@ class PerformanceMonitor:
         # Initialize system metrics
         self.last_update = datetime.utcnow()
         self.update_system_metrics()
-        
-        # Start periodic updates
-        asyncio.create_task(self._periodic_updates())
+        # Start periodic updates only if an event loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            if loop and loop.is_running():
+                asyncio.create_task(self._periodic_updates())
+        except RuntimeError:
+            # No running event loop (e.g., during Alembic migration)
+            pass
 
     async def _periodic_updates(self):
         """Periodically update system metrics."""
@@ -593,8 +599,6 @@ class PerformanceMonitor:
                     operation: self.cache_latency.labels(operation=operation).collect()[0].samples[0].value
                     for operation in self.cache_latency._metrics.keys()
                 },
-
-
                 'hit_rate': total_hits / total_operations if total_operations > 0 else 0,
                 'total_operations': total_operations
             }
@@ -680,35 +684,6 @@ if __name__ == "__main__":
     print("DB Metrics:", monitor.get_db_metrics())
     print("Cache Metrics:", monitor.get_cache_metrics())
     print("Request Metrics:", monitor.get_request_metrics())
-
-# Create monitor instance
-performance_monitor = PerformanceMonitor()
-            hit: Whether the operation was a cache hit
-            size: Cache size in bytes (optional)
-        """
-        if hit:
-            self.cache_hits.inc()
-        else:
-            self.cache_misses.inc()
-        
-        if size is not None:
-            self.cache_size.set(size)
-
-    def monitor_workflow_execution(self, workflow_id: str, status: str, duration: float):
-        """
-        Record workflow execution metrics.
-        
-        Args:
-            workflow_id: ID of the workflow
-            status: Execution status
-            return health
-        except Exception as e:
-            logger.error(f"Error calculating health status: {e}")
-            self.increment_error("health_status", str(e))
-            return {
-                'status': 'error',
-                'error': str(e)
-            }
 
 # Create monitor instance
 performance_monitor = PerformanceMonitor()
