@@ -8,7 +8,7 @@ import { Select } from '@components/common/Select';
 import { TextArea } from '@components/common/TextArea';
 import { UploadIcon, CheckCircleIcon, XCircleIcon, PlusCircleIcon, TrashIcon } from '@components/icons';
 import ChatAssistant from '@components/submit_component/ChatAssistant';
-import CodeEditor from '@components/workflow/CodeEditor';
+import CodeEditor from '@components/common/CodeEditor';
 import { useComponents } from '@context/ComponentContext';
 import { AIComponent, SpecificComponentType, NotebookCell, AIComponentCostTier } from '../types';
 import { SUBMITTABLE_COMPONENT_TYPES, COMPONENT_COMPLIANCE_OPTIONS, COMPONENT_COST_TIERS, COMPONENT_VISIBILITY_OPTIONS, LLM_MODELS, getIconForComponentType } from '../constants';
@@ -104,11 +104,11 @@ const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
                 height="150px"
               />
             ) : (
-              <TextArea
+              <CodeEditor
                 value={cell.content}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateCellContent(cell.id, e.target.value)}
-                rows={3}
-                placeholder="Enter markdown content..."
+                language="markdown"
+                onChange={(value: string | undefined) => updateCellContent(cell.id, value || '')}
+                height="150px"
               />
             )}
           </div>
@@ -129,49 +129,54 @@ const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
 };
 
 const LLMAgentEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, errors }) => {
-  const llmData = data?.llmPrompt || {};
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const val = type === 'number' ? parseFloat(value) : value;
-    onChange('llmPrompt', { ...llmData, [name]: val });
+  const llmData = data?.llmAgentData || {};
+  const handleChange = (name: string, value: any) => {
+    onChange('llmAgentData', { ...llmData, [name]: value });
   };
 
   return (
     <div className="space-y-4">
       <FormRow label="LLM Model" htmlFor="model">
-        <select name="model" id="model" value={llmData.model || ''} onChange={handleChange}
+        <select name="model" id="model" value={llmData.model || ''} onChange={(e) => handleChange('model', e.target.value)}
                 className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm bg-white text-neutral-900 placeholder-neutral-500">
           <option value="">Select Model</option>
           {LLM_MODELS.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
       </FormRow>
       <FormRow label="System Prompt" htmlFor="systemPrompt">
-        <textarea name="systemPrompt" id="systemPrompt" value={llmData.systemPrompt || ''} onChange={handleChange} rows={3}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm bg-white text-neutral-900 placeholder-neutral-500" />
+        <CodeEditor
+          value={llmData.systemPrompt || ''}
+          language="markdown"
+          onChange={(value) => handleChange('systemPrompt', value || '')}
+          height="300px"
+        />
       </FormRow>
       <FormRow label="User Prompt Template" htmlFor="userPromptTemplate">
-        <textarea name="userPromptTemplate" id="userPromptTemplate" value={llmData.userPromptTemplate || ''} onChange={handleChange} rows={3}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm bg-white text-neutral-900 placeholder-neutral-500" placeholder="e.g., Summarize this: {{inputText}}" />
+        <CodeEditor
+          value={llmData.userPromptTemplate || ''}
+          language="markdown"
+          onChange={(value) => handleChange('userPromptTemplate', value || '')}
+          height="300px"
+        />
       </FormRow>
       <div className="grid grid-cols-2 gap-4">
         <FormRow label="Temperature" htmlFor="temperature">
-          <input type="number" name="temperature" id="temperature" value={llmData.temperature || ''} onChange={handleChange} step="0.1" min="0" max="2"
+          <input type="number" name="temperature" id="temperature" value={llmData.temperature || ''} onChange={(e) => handleChange('temperature', parseFloat(e.target.value))} step="0.1" min="0" max="2"
                  className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm bg-white text-neutral-900 placeholder-neutral-500" />
         </FormRow>
         <FormRow label="Max Tokens" htmlFor="maxTokens">
-          <input type="number" name="maxTokens" id="maxTokens" value={llmData.maxTokens || ''} onChange={handleChange} step="1" min="1"
+          <input type="number" name="maxTokens" id="maxTokens" value={llmData.maxTokens || ''} onChange={(e) => handleChange('maxTokens', parseInt(e.target.value))} step="1" min="1"
                  className="w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm bg-white text-neutral-900 placeholder-neutral-500" />
         </FormRow>
       </div>
-       {errors?.llmPrompt && <p className="mt-1 text-xs text-red-500">{errors.llmPrompt as string}</p>}
+       {errors?.llmAgentData && <p className="mt-1 text-xs text-red-500">{errors.llmAgentData as string}</p>}
     </div>
   );
 };
 
 const StreamlitAppEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, errors }) => {
   const streamlitData = data?.streamlitAppData || {};
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const handleChange = (name: string, value: any) => {
     onChange('streamlitAppData', { ...streamlitData, [name]: value });
   };
   return (
@@ -182,7 +187,7 @@ const StreamlitAppEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChang
           name="gitRepoUrl"
           id="gitRepoUrl"
           value={streamlitData.gitRepoUrl || ''}
-          onChange={handleChange}
+          onChange={(e) => handleChange('gitRepoUrl', e.target.value)}
           placeholder="https://github.com/user/repo.git"
         />
       </FormRow>
@@ -192,18 +197,16 @@ const StreamlitAppEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChang
           name="mainScriptPath"
           id="mainScriptPath"
           value={streamlitData.mainScriptPath || ''}
-          onChange={handleChange}
+          onChange={(e) => handleChange('mainScriptPath', e.target.value)}
           placeholder="app.py"
         />
       </FormRow>
       <FormRow label="Requirements (content of requirements.txt)" htmlFor="requirements">
-        <TextArea
-          name="requirements"
-          id="requirements"
+        <CodeEditor
           value={streamlitData.requirements || ''}
-          onChange={handleChange}
-          rows={5}
-          placeholder="streamlit\npandas\n..."
+          language="plaintext"
+          onChange={(value) => handleChange('requirements', value || '')}
+          height="300px"
         />
       </FormRow>
       {errors?.streamlitAppData && <p className="mt-1 text-xs text-red-500">{errors.streamlitAppData as string}</p>}
@@ -256,7 +259,7 @@ const SubmitComponentPage: React.FC = () => {
     inputSchema: '', outputSchema: '', compliance: [], costTier: 'Free', visibility: 'Private',
   });
   const [typeSpecificData, setTypeSpecificData] = useState<TypeSpecificData>({
-    llmPrompt: '',
+    llmAgentData: {},
     codeContent: '',
   });
   
@@ -298,7 +301,7 @@ const SubmitComponentPage: React.FC = () => {
   useEffect(() => {
     // Reset typeSpecificData and related errors when type changes
     setTypeSpecificData({
-      llmPrompt: '',
+      llmAgentData: {},
       codeContent: '',
     });
     setErrors(prev => {

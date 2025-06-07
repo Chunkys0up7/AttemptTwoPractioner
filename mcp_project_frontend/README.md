@@ -585,3 +585,15 @@ VITE_API_KEY=your-api-key-here
 - [YYYY-MM-DD] Documentation best practices and changelog section added.
 - [YYYY-MM-DD] All outstanding technical tasks completed and documented.
 - [YYYY-MM-DD] Initial project documentation created.
+
+## Code Editor Integration
+
+The project uses a reusable Monaco-based `CodeEditor` component (`src/components/common/CodeEditor.tsx`) for all code, script, and markdown editing areas. This editor supports:
+- Multiple languages (Python, TypeScript, SQL, Markdown, etc.)
+- Syntax highlighting
+- Inline error/warning display (linting)
+- Auto-completion and code snippets
+- Auto-format on save
+- File upload (drag-and-drop and file picker)
+
+All previous `<textarea>` and `<TextArea>` code/script inputs have been replaced with this editor. To add support for new languages or features, extend the `CodeEditor` component as needed.
