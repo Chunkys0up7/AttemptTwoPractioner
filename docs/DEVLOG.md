@@ -2716,6 +2716,6 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 
 ---
 ## [YYYY-MM-DD] Authentication Enhancements (Backend)
-- Implemented and pushed secure password hashing and password change endpoint.
-- Next: Add or update tests for the password change flow as required by the checklist.
+- Added and pushed tests for password change endpoint (success and failure cases).
+- Next: Update API documentation for the password change endpoint as required by the checklist.
 ---

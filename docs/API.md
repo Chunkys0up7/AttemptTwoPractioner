@@ -55,6 +55,34 @@ POST /api/auth/refresh
 }
 ```
 
+### 1.3 Change Password
+
+```http
+POST /api/v1/auth/change-password
+```
+
+#### Request Body
+```json
+{
+  "current_password": "string",
+  "new_password": "string"
+}
+```
+
+#### Response (Success)
+```json
+{
+  "message": "Password changed successfully"
+}
+```
+
+#### Response (Failure)
+```json
+{
+  "detail": "Current password is incorrect"
+}
+```
+
 ## 2. Components API
 
 ### 2.1 List Components
