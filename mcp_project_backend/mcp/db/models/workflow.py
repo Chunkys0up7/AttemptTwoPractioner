@@ -1,15 +1,18 @@
 """
-Database models for Workflow Definitions and Runs.
+Database models for Workflow Definitions and Runs with enhanced validation and monitoring.
 """
 import uuid
 import enum
-from sqlalchemy import Column, String, ForeignKey, DateTime, Text, Enum as SAEnum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, ForeignKey, DateTime, Text, Enum as SAEnum, Index, Boolean
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from datetime import datetime
+import logging
 
-from mcp.db.base import Base  # Use the Base from mcp.db.base
+from mcp.db.base import Base
+from mcp.monitoring.performance import performance_monitor
 
+logger = logging.getLogger(__name__)
 
 class WorkflowDefinition(Base):
     __tablename__ = "workflow_definitions"
@@ -17,20 +20,46 @@ class WorkflowDefinition(Base):
     id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String(255), nullable=False, index=True, unique=True)
     description = Column(Text, nullable=True)
-    # Structure of the workflow, e.g., a list of steps, connections between them.
-    # Could be a graph structure (nodes and edges) represented in JSON.
-    graph_representation = Column(JSONB, nullable=True)
+    graph_representation = Column(JSONB, nullable=False)
+    version = Column(String(50), nullable=False, default="1.0.0")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow,
                         onupdate=datetime.utcnow, nullable=False)
-
+    created_by = Column(String(255), nullable=False, default="system")
+    updated_by = Column(String(255), nullable=False, default="system")
+    is_active = Column(Boolean, default=True, nullable=False)
+    
     # Relationships
     runs = relationship(
-        "WorkflowRun", back_populates="definition", cascade="all, delete-orphan")
+        "WorkflowRun", back_populates="definition", cascade="all, delete-orphan",
+        order_by="desc(WorkflowRun.created_at)"
+    )
+
+    # Indexes
+    __table_args__ = (
+        Index('idx_workflow_name_version', 'name', 'version'),
+        Index('idx_workflow_created_by', 'created_by'),
+        Index('idx_workflow_updated_by', 'updated_by'),
+    )
+
+    @validates('graph_representation')
+    def validate_graph(self, key, value):
+        """Validate workflow graph structure."""
+        try:
+            # Basic validation - ensure we have nodes and edges
+            if not isinstance(value, dict):
+                raise ValueError("Graph representation must be a dictionary")
+            if 'nodes' not in value or 'edges' not in value:
+                raise ValueError("Graph must contain nodes and edges")
+            
+            return value
+        except Exception as e:
+            logger.error(f"Invalid workflow graph: {e}")
+            performance_monitor.increment_error("workflow_graph_validation", str(e))
+            raise
 
     def __repr__(self):
-        return f"<WorkflowDefinition(id={self.id}, name='{self.name}')>"
-
+        return f"<WorkflowDefinition(id={self.id}, name='{self.name}', version='{self.version}')>"
 
 class WorkflowRunStatus(enum.Enum):
     PENDING = "PENDING"
@@ -38,7 +67,8 @@ class WorkflowRunStatus(enum.Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     CANCELLED = "CANCELLED"
-
+    TIMED_OUT = "TIMED_OUT"
+    SUSPENDED = "SUSPENDED"
 
 class WorkflowRun(Base):
     __tablename__ = "workflow_runs"
@@ -48,13 +78,10 @@ class WorkflowRun(Base):
         "workflow_definitions.id"), nullable=False, index=True)
     status = Column(SAEnum(WorkflowRunStatus, name="workflow_run_status_enum", create_type=False),
                     nullable=False, default=WorkflowRunStatus.PENDING, index=True)
-    # Parameters used for this specific run
-    run_parameters = Column(JSONB, nullable=True)
-    # Results or outputs of the workflow run
+    parameters = Column(JSONB, nullable=True)
     results = Column(JSONB, nullable=True)
-    # Logs specific to this run, could be detailed JSON or reference to a log store
-    logs = Column(Text, nullable=True)  # Or JSONB for structured logs
-    started_at = Column(DateTime, nullable=True)
+    error_message = Column(Text, nullable=True)
+    started_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     ended_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow,

@@ -1000,6 +1000,31 @@ GET /api/templates/stats
 }
 ```
 
+## Template Endpoints
+
+### List Template Categories
+
+`GET /api/v1/templates/categories`
+
+Returns a list of available template categories (in-memory, stub).
+
+**Response Example:**
+```json
+[
+  "Data Processing",
+  "Machine Learning",
+  "ETL",
+  "Visualization",
+  "Reporting",
+  "Automation",
+  "Custom"
+]
+```
+
+**Notes:**
+- This endpoint currently returns a static list of categories for frontend use.
+- Will be replaced with a dynamic version when category management is implemented in the database.
+
 ## Performance Monitoring Endpoints
 
 ### Get Performance Report
