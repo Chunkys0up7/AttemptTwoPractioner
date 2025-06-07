@@ -46,7 +46,7 @@ async def request_id_middleware(request: Request, call_next):
     return response
 
 # Custom exception handlers
-async def handle_validation_error(request: Request, exc: ValidationError):
+async def handle_validation_error(exc: ValidationError, request: Request):
     logger.error(f"[Request {request.state.request_id}] Validation error: {str(exc)}")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -57,7 +57,7 @@ async def handle_validation_error(request: Request, exc: ValidationError):
         }
     )
 
-async def handle_workflow_error(request: Request, exc: WorkflowDefinitionError):
+async def handle_workflow_error(exc: WorkflowDefinitionError, request: Request):
     logger.error(f"[Request {request.state.request_id}] Workflow error: {str(exc)}")
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
@@ -558,9 +558,9 @@ async def get_workflow_definition(
 
 @router.put("/{wf_def_id}", response_model=WorkflowDefinitionRead)
 def update_workflow_definition(
+    db: Session = Depends(get_db),
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    wf_def_update: WorkflowDefinitionUpdate,
-    db: Session = Depends(get_db)
+    wf_def_update: WorkflowDefinitionUpdate
 ):
     """
     Update a Workflow Definition.

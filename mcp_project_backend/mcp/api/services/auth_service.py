@@ -2,6 +2,10 @@ from fastapi import APIRouter, HTTPException, status, Depends, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from mcp.core.security.jwt_manager import JWTManager
 from mcp.core.config import settings
+from mcp.core.core_security import hash_password, verify_password
+from mcp.db.session import get_db
+from mcp.db.models.user import User
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -30,4 +34,19 @@ def refresh_token(refresh_token: str = Body(..., embed=True)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token payload")
     # Issue new access token
     access_token = JWTManager.create_access_token({"sub": user_id})
-    return {"access_token": access_token, "token_type": "bearer"} 
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@router.post("/change-password")
+def change_password(
+    current_password: str = Body(...),
+    new_password: str = Body(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(lambda: db.query(User).first())  # Replace with real user auth
+):
+    # Verify current password
+    if not verify_password(current_password, current_user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Current password is incorrect")
+    # Hash and store new password
+    current_user.hashed_password = hash_password(new_password)
+    db.commit()
+    return {"message": "Password changed successfully"} 

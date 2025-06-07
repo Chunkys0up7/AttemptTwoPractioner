@@ -1,6 +1,7 @@
 import secrets
 import hashlib
 from typing import Optional
+from passlib.context import CryptContext
 
 def generate_api_key(prefix: str = "mcp_", length: int = 32) -> str:
     """Generate a secure API key.
@@ -40,4 +41,14 @@ def verify_api_key(provided_key: str, stored_hash: str) -> bool:
     Returns:
         True if the key matches the hash, False otherwise
     """
-    return hash_api_key(provided_key) == stored_hash 
+    return hash_api_key(provided_key) == stored_hash
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    """Hash a password using bcrypt."""
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify a password against a hash using bcrypt."""
+    return pwd_context.verify(plain_password, hashed_password) 
