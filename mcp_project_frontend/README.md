@@ -624,3 +624,46 @@ Example:
   }}
 />
 ```
+
+### Code Snippets/Templates
+
+The `CodeEditor` component supports a `snippets` prop, which allows you to provide custom code snippets/templates for the selected language. These appear in the IntelliSense/completion menu as snippet suggestions.
+
+Example:
+
+```tsx
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  snippets={[
+    {
+      label: 'def',
+      documentation: 'Python function definition',
+      body: 'def ${1:function_name}(${2:args}):\n    ${0:pass}',
+    },
+    {
+      label: 'ifmain',
+      documentation: 'if __name__ == "__main__" block',
+      body: 'if __name__ == "__main__":\n    ${0:main()}',
+    },
+  ]}
+/>
+```
+
+For TypeScript:
+
+```tsx
+<CodeEditor
+  value={code}
+  language="typescript"
+  onChange={setCode}
+  snippets={[
+    {
+      label: 'fc',
+      documentation: 'React functional component',
+      body: 'const ${1:ComponentName}: React.FC = () => {\n  return <div>${0}</div>;\n};',
+    },
+  ]}
+/>
+```

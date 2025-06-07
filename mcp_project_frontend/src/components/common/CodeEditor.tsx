@@ -2,6 +2,12 @@ import React, { useRef } from 'react';
 import MonacoEditor, { OnChange, OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 
+interface CodeSnippet {
+  label: string;
+  documentation: string;
+  body: string;
+}
+
 interface CodeEditorProps {
   value: string;
   language: string;
@@ -14,6 +20,10 @@ interface CodeEditorProps {
    * These will be shown as inline errors/warnings in the editor.
    */
   validate?: (value: string) => monaco.editor.IMarkerData[];
+  /**
+   * Optional array of code snippets/templates to register for the language.
+   */
+  snippets?: CodeSnippet[];
 }
 
 const defaultOptions = {
@@ -21,11 +31,11 @@ const defaultOptions = {
   minimap: { enabled: false },
   fontSize: 14,
   scrollBeyondLastLine: false,
-  wordWrap: 'on',
+  wordWrap: 'on' as const,
   automaticLayout: true,
   formatOnPaste: true,
   formatOnType: true,
-  lineNumbers: 'on',
+  lineNumbers: 'on' as const,
   theme: 'vs-dark',
 };
 
@@ -37,6 +47,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   options = {},
   onFileUpload,
   validate,
+  snippets = [],
 }) => {
   const editorRef = useRef<any>(null);
 
@@ -44,21 +55,45 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     editorRef.current = editor;
     // Run custom validation if provided
     if (validate && value) {
-      const markers = validate(value);
-      monacoInstance.editor.setModelMarkers(editor.getModel(), 'owner', markers);
+      const model = editor.getModel();
+      if (model) {
+        const markers = validate(value);
+        monacoInstance.editor.setModelMarkers(model, 'owner', markers);
+      }
     }
   };
 
   // Run validation on value change
   React.useEffect(() => {
     if (validate && editorRef.current && value !== undefined) {
-      const model = editorRef.current.getModel();
+      const model = editorRef.current.getModel?.();
       if (model) {
         const markers = validate(value);
         monaco.editor.setModelMarkers(model, 'owner', markers);
       }
     }
   }, [value, validate]);
+
+  // Register snippets on mount or language/snippets change
+  React.useEffect(() => {
+    if (snippets.length > 0 && monaco.languages && monaco.languages.registerCompletionItemProvider) {
+      const disposable = monaco.languages.registerCompletionItemProvider(language, {
+        provideCompletionItems: (model, position) => {
+          const suggestions = snippets.map((snippet, i) => ({
+            label: snippet.label,
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            documentation: snippet.documentation,
+            insertText: snippet.body,
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            sortText: 'zzz' + i,
+            range: new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column),
+          }));
+          return { suggestions };
+        },
+      });
+      return () => disposable.dispose();
+    }
+  }, [language, JSON.stringify(snippets)]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

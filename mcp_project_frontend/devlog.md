@@ -8,3 +8,7 @@
 - CodeEditor now provides inline error/warning display (diagnostics/linting)
 - Custom validation supported via validate prop
 - Updated README, checklist, and CHANGES.md 
+
+### [DATE] Monaco Editor Advanced Completion & Snippets
+- CodeEditor now provides custom code snippets/templates and advanced completions via the snippets prop
+- Updated README and checklist 
