@@ -12,3 +12,7 @@
 ### [DATE] Monaco Editor Advanced Completion & Snippets
 - CodeEditor now provides custom code snippets/templates and advanced completions via the snippets prop
 - Updated README and checklist 
+
+### [DATE] Monaco Editor Auto-format on Save
+- CodeEditor now supports auto-formatting code on save (Ctrl+S/Cmd+S) for supported languages
+- Updated README and checklist 

@@ -598,72 +598,23 @@ The project uses a reusable Monaco-based `CodeEditor` component (`src/components
 
 All previous `<textarea>` and `<TextArea>` code/script inputs have been replaced with this editor. To add support for new languages or features, extend the `CodeEditor` component as needed.
 
-### Custom Validation/Diagnostics
+### Auto-format on Save
 
-The `CodeEditor` component supports a `validate` prop, which allows you to provide custom validation logic. This function receives the code value and returns an array of Monaco `IMarkerData` objects, which are shown as inline errors/warnings in the editor.
-
-Example:
-
-```tsx
-<CodeEditor
-  value={code}
-  language="python"
-  onChange={setCode}
-  validate={(value) => {
-    if (!value.includes('def ')) {
-      return [{
-        startLineNumber: 1,
-        startColumn: 1,
-        endLineNumber: 1,
-        endColumn: 5,
-        message: 'Function definition required',
-        severity: monaco.MarkerSeverity.Error,
-      }];
-    }
-    return [];
-  }}
-/>
-```
-
-### Code Snippets/Templates
-
-The `CodeEditor` component supports a `snippets` prop, which allows you to provide custom code snippets/templates for the selected language. These appear in the IntelliSense/completion menu as snippet suggestions.
+The `CodeEditor` component supports auto-formatting code on save (Ctrl+S/Cmd+S) using Monaco's built-in formatting providers for supported languages (e.g., TypeScript, JavaScript, JSON). This is enabled by default. To disable, set `formatOnSave={false}`.
 
 Example:
-
-```tsx
-<CodeEditor
-  value={code}
-  language="python"
-  onChange={setCode}
-  snippets={[
-    {
-      label: 'def',
-      documentation: 'Python function definition',
-      body: 'def ${1:function_name}(${2:args}):\n    ${0:pass}',
-    },
-    {
-      label: 'ifmain',
-      documentation: 'if __name__ == "__main__" block',
-      body: 'if __name__ == "__main__":\n    ${0:main()}',
-    },
-  ]}
-/>
-```
-
-For TypeScript:
 
 ```tsx
 <CodeEditor
   value={code}
   language="typescript"
   onChange={setCode}
-  snippets={[
-    {
-      label: 'fc',
-      documentation: 'React functional component',
-      body: 'const ${1:ComponentName}: React.FC = () => {\n  return <div>${0}</div>;\n};',
-    },
-  ]}
+  formatOnSave={true} // enabled by default
 />
 ```
+
+**Note:** Formatting support depends on Monaco's built-in providers for the selected language. For Python and other languages, you may need to add a custom formatter or use a Monaco extension.
+
+### Custom Validation/Diagnostics
+
+The `CodeEditor`

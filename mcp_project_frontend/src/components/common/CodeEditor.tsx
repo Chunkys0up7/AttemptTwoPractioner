@@ -24,6 +24,10 @@ interface CodeEditorProps {
    * Optional array of code snippets/templates to register for the language.
    */
   snippets?: CodeSnippet[];
+  /**
+   * Enable auto-format on save (Ctrl+S/Cmd+S). Default: true.
+   */
+  formatOnSave?: boolean;
 }
 
 const defaultOptions = {
@@ -48,6 +52,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onFileUpload,
   validate,
   snippets = [],
+  formatOnSave = true,
 }) => {
   const editorRef = useRef<any>(null);
 
@@ -94,6 +99,24 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       return () => disposable.dispose();
     }
   }, [language, JSON.stringify(snippets)]);
+
+  // Register format on save
+  React.useEffect(() => {
+    if (!formatOnSave) return;
+    const editor = editorRef.current;
+    if (!editor) return;
+    const model = editor.getModel?.();
+    if (!model) return;
+    const disposable = editor.addCommand(
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
+      () => {
+        editor.getAction('editor.action.formatDocument').run();
+      }
+    );
+    return () => {
+      if (disposable && disposable.dispose) disposable.dispose();
+    };
+  }, [formatOnSave, language]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
