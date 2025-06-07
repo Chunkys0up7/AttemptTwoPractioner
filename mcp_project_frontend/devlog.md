@@ -20,3 +20,7 @@
 ### [DATE] Monaco Editor File Upload
 - CodeEditor now supports drag-and-drop and file picker for code/script uploads
 - Updated README and checklist 
+
+### [DATE] Monaco Editor Code Templates/Snippets
+- CodeEditor now supports custom code templates and snippets for common tasks via the snippets prop
+- Updated README and checklist
