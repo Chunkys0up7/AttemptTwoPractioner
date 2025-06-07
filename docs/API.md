@@ -769,3 +769,205 @@ interface NotificationAnalytics {
   alertsByMetric: Record<string, number>;
 }
 ```
+
+## Workflow Templates API
+
+### Create Workflow Template
+
+```http
+POST /api/templates
+```
+
+#### Request Body
+```json
+{
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "content": {"workflow": "definition"}
+}
+```
+
+#### Response
+```json
+{
+  "id": 1,
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "created_by": "uuid-string",
+  "created_at": "timestamp",
+  "updated_at": "timestamp"
+}
+```
+
+### List Workflow Templates
+
+```http
+GET /api/templates
+```
+
+#### Query Parameters
+- `category`: Filter by category
+- `search`: Search by name or description
+- `public_only`: Boolean to list only public templates
+
+#### Response
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "string",
+      "description": "string",
+      "category": "string",
+      "template_metadata": {"key": "value"},
+      "is_public": true,
+      "created_by": "uuid-string",
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    }
+  ],
+  "total": 1
+}
+```
+
+### Get Workflow Template by ID
+
+```http
+GET /api/templates/{id}
+```
+
+#### Response
+```json
+{
+  "id": 1,
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "created_by": "uuid-string",
+  "created_at": "timestamp",
+  "updated_at": "timestamp",
+  "versions": [
+    {"id": 1, "version": 1, "content": {"workflow": "definition"}, "created_at": "timestamp"}
+  ]
+}
+```
+
+### Update Workflow Template
+
+```http
+PUT /api/templates/{id}
+```
+
+#### Request Body
+```json
+{
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "content": {"workflow": "definition"},
+  "changes": "string"
+}
+```
+
+#### Response
+```json
+{
+  "id": 1,
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "created_by": "uuid-string",
+  "created_at": "timestamp",
+  "updated_at": "timestamp"
+}
+```
+
+### Delete Workflow Template
+
+```http
+DELETE /api/templates/{id}
+```
+
+#### Response
+```json
+{
+  "message": "Template deleted successfully"
+}
+```
+
+### List Template Versions
+
+```http
+GET /api/templates/{id}/versions
+```
+
+#### Response
+```json
+{
+  "versions": [
+    {"id": 1, "version": 1, "content": {"workflow": "definition"}, "created_at": "timestamp"}
+  ]
+}
+```
+
+### Get Specific Template Version
+
+```http
+GET /api/templates/{id}/versions/{version}
+```
+
+#### Response
+```json
+{
+  "id": 1,
+  "template_id": 1,
+  "version": 1,
+  "content": {"workflow": "definition"},
+  "changes": "string",
+  "created_by": "uuid-string",
+  "created_at": "timestamp"
+}
+```
+
+### Search Templates
+
+```http
+GET /api/templates/search?query=example
+```
+
+#### Response
+```json
+{
+  "items": [
+    {"id": 1, "name": "string", "description": "string"}
+  ],
+  "total": 1
+}
+```
+
+### Get Template Statistics
+
+```http
+GET /api/templates/stats
+```
+
+#### Response
+```json
+{
+  "total_templates": 10,
+  "public_templates": 5,
+  "categories": 3
+}
+```

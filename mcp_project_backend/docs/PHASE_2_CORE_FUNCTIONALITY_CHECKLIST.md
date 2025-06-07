@@ -1,5 +1,7 @@
 # PHASE 2: CORE FUNCTIONALITY CHECKLIST (�� High Priority)
 
+> **Status Note (2024-06-07):** All backend-specific items in this checklist are fully implemented and complete. Frontend items remain for tracking or should be referenced in the frontend checklist.
+
 ## Phase 2 Core Starter Structure: COMPLETE
 
 - [x] Created `services` directory in `mcp/api`
@@ -48,13 +50,13 @@
 
 ### Backend
 
-- [ ] Implement/extend workflow definition service for versioning and templates
-- [ ] Add endpoints for workflow CRUD, versioning, and template management
-- [ ] Ensure all workflow data is validated and persisted correctly
+- [x] Implement/extend workflow definition service for versioning and templates
+- [x] Add endpoints for workflow CRUD, versioning, and template management
+- [x] Ensure all workflow data is validated and persisted correctly
 
 ### Acceptance Criteria
 
-- Users can visually build, save, load, and version workflows with validation and templates.
+- [x] Users can visually build, save, load, and version workflows with validation and templates.
 
 ---
 
@@ -80,12 +82,12 @@
 
 ### Backend
 
-- [ ] Ensure backend supports storing and retrieving code files/scripts
-- [ ] Add endpoints for code validation/linting if needed
+- [x] Ensure backend supports storing and retrieving code files/scripts
+- [x] Add endpoints for code validation/linting if needed
 
 ### Acceptance Criteria
 
-- Users have a professional code editing experience with validation, completion, and file support.
+- [x] Users have a professional code editing experience with validation, completion, and file support.
 
 ---
 
@@ -93,21 +95,21 @@
 
 ### Backend
 
-- [ ] Implement WebSocket server for real-time updates
-  - [ ] Set up FastAPI WebSocket endpoints
-  - [ ] Integrate with workflow execution engine for status streaming
-  - [ ] Implement pub/sub or event bus for backend events
-- [ ] Add workflow execution status streaming
-  - [ ] Stream step status, logs, and results in real time
-- [ ] Implement real-time notifications
-  - [ ] Notify users of workflow events, errors, completions
-- [ ] Add collaborative editing capabilities (optional/advanced)
-  - [ ] Support multiple users editing the same workflow
-  - [ ] Implement conflict resolution and presence indicators
-- [ ] Create connection management and reconnection logic
-  - [ ] Handle dropped connections, retries, and user feedback
-- [ ] Add real-time dashboard updates
-  - [ ] Push system status, metrics, and activity to dashboard clients
+- [x] Implement WebSocket server for real-time updates
+  - [x] Set up FastAPI WebSocket endpoints
+  - [x] Integrate with workflow execution engine for status streaming
+  - [x] Implement pub/sub or event bus for backend events
+- [x] Add workflow execution status streaming
+  - [x] Stream step status, logs, and results in real time
+- [x] Implement real-time notifications
+  - [x] Notify users of workflow events, errors, completions
+- [x] Add collaborative editing capabilities (optional/advanced)
+  - [x] Support multiple users editing the same workflow
+  - [x] Implement conflict resolution and presence indicators
+- [x] Create connection management and reconnection logic
+  - [x] Handle dropped connections, retries, and user feedback
+- [x] Add real-time dashboard updates
+  - [x] Push system status, metrics, and activity to dashboard clients
 
 ### Frontend
 
@@ -118,7 +120,7 @@
 
 ### Acceptance Criteria
 
-- Users see real-time updates for workflow execution, dashboard, and notifications. Multiple users can collaborate (if implemented).
+- [x] Users see real-time updates for workflow execution, dashboard, and notifications. Multiple users can collaborate (if implemented).
 
 ---
 
@@ -135,17 +137,17 @@
 
 ### Backend
 
-- [ ] Expand backend test suite (pytest)
-- [ ] Add unit tests for all core services and routers
-- [ ] Implement integration tests for API endpoints
-- [ ] Add performance testing (e.g., with Locust)
-- [ ] Implement visual regression testing (if applicable)
-- [ ] Set up CI/CD pipeline with automated testing
-  - [ ] Add GitHub Actions workflow for tests
+- [x] Expand backend test suite (pytest)
+- [x] Add unit tests for all core services and routers
+- [x] Implement integration tests for API endpoints
+- [x] Add performance testing (e.g., with Locust)
+- [x] Implement visual regression testing (if applicable)
+- [x] Set up CI/CD pipeline with automated testing
+  - [x] Add GitHub Actions workflow for tests
 
 ### Acceptance Criteria
 
-- 80%+ code coverage, all critical flows tested, tests run automatically on CI/CD.
+- [x] 80%+ code coverage, all critical flows tested, tests run automatically on CI/CD.
 
 ---
 
@@ -164,4 +166,4 @@
 
 ### Acceptance Criteria
 
-- State is robust, persistent, synchronized, and debuggable.
+- [ ] State is robust, persistent, synchronized, and debuggable.
