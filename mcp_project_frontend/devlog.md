@@ -16,3 +16,7 @@
 ### [DATE] Monaco Editor Auto-format on Save
 - CodeEditor now supports auto-formatting code on save (Ctrl+S/Cmd+S) for supported languages
 - Updated README and checklist 
+
+### [DATE] Monaco Editor File Upload
+- CodeEditor now supports drag-and-drop and file picker for code/script uploads
+- Updated README and checklist 

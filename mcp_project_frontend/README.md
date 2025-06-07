@@ -617,4 +617,27 @@ Example:
 
 ### Custom Validation/Diagnostics
 
-The `CodeEditor`
+The `CodeEditor` component supports custom validation and diagnostics via the `validate` prop. This allows you to implement custom validation logic for your code/script inputs.
+
+### File Upload (Drag-and-Drop & File Picker)
+
+The `CodeEditor` component supports uploading code/scripts via drag-and-drop or a file picker. Supported file types include `.py`, `.ts`, `.js`, `.json`, `.sql`, `.txt`, and `.md`.
+
+- **Drag-and-drop:** Drop a file anywhere on the editor to load its contents.
+- **File picker:** Click the "Upload file" label below the editor to select a file.
+
+The uploaded file's contents will replace the current editor value. You can also provide a custom `onFileUpload` handler to process the file as needed.
+
+Example:
+
+```tsx
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  onFileUpload={(content, file) => {
+    // Custom logic, e.g., show a notification
+    setCode(content);
+  }}
+/>
+```
