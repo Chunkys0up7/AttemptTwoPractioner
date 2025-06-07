@@ -1,5 +1,82 @@
-# Set PYTHONPATH to include the project root
-$env:PYTHONPATH = "C:\projects\AttemptTwoPractioner\mcp_project_backend"
+#!/bin/powershell
 
-# Run pytest with the full path to the test file
-python -m pytest C:\projects\AttemptTwoPractioner\tests\api\middleware\test_security_middleware.py -v -s
+# Configuration
+$PROJECT_ROOT = (Get-Item $PSScriptRoot).Parent.FullName
+$BACKEND_DIR = Join-Path $PROJECT_ROOT "mcp_project_backend"
+$TEST_ENV = Join-Path $PROJECT_ROOT "test_env"
+
+# Function to log messages
+function Write-Log {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$Message,
+        
+        [Parameter(Mandatory=$false)]
+        [string]$Level = "INFO"
+    )
+    Write-Host "[$Level] $Message" -ForegroundColor Cyan
+}
+
+# Function to create virtual environment
+function Create-VirtualEnv {
+    Write-Log "Creating virtual environment..."
+    python -m venv $TEST_ENV
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Failed to create virtual environment" -Level "ERROR"
+        exit 1
+    }
+}
+
+# Function to install dependencies
+function Install-Dependencies {
+    Write-Log "Installing dependencies..."
+    
+    # Activate virtual environment
+    $activateScript = Join-Path $TEST_ENV "Scripts\activate.ps1"
+    if (Test-Path $activateScript) {
+        . $activateScript
+    }
+    
+    # Install requirements
+    pip install -r requirements.txt
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Failed to install requirements" -Level "ERROR"
+        exit 1
+    }
+    
+    # Install test dependencies
+    pip install pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Failed to install test dependencies" -Level "ERROR"
+        exit 1
+    }
+}
+
+# Function to run tests
+function Run-Tests {
+    Write-Log "Running tests..."
+    python -m pytest C:\projects\AttemptTwoPractioner\tests\api\middleware\test_security_middleware.py -v -s
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Tests failed" -Level "ERROR"
+        exit 1
+    }
+    Write-Log "All tests passed!" -Level "SUCCESS"
+}
+
+# Main execution
+try {
+    # Clean up existing virtual environment
+    if (Test-Path $TEST_ENV) {
+        Remove-Item -Recurse -Force $TEST_ENV
+    }
+    
+    # Create and set up environment
+    Create-VirtualEnv
+    Install-Dependencies
+    
+    # Run tests
+    Run-Tests
+} catch {
+    Write-Log "An error occurred: $_" -Level "ERROR"
+    exit 1
+}
