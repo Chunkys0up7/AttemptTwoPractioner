@@ -5,7 +5,7 @@ import ComponentDetailView from '../components/marketplace/ComponentDetailView';
 import { AIComponent } from '../types';
 import { SearchIcon } from '../icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useComponents } from '../contexts/ComponentContext'; // Import useComponents
+import { useComponents } from '@context/ComponentContext'; // Import useComponents
 
 
 const MarketplacePage: React.FC = () => {

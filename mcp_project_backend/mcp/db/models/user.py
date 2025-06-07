@@ -4,6 +4,8 @@ from enum import Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from mcp.db.base import Base
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+import uuid
 
 class UserRoleEnum(str, Enum):
     """
@@ -20,7 +22,7 @@ class User(Base):
     """
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     full_name = Column(String, index=True, nullable=True)
     hashed_password = Column(String, nullable=False)

@@ -5,7 +5,7 @@ export { AuthContext, AuthProvider } from './AuthContext';
 export type { AuthContextType } from './AuthContext';
 
 // Component Context
-export { ComponentContext, ComponentProvider } from './ComponentContext';
+export { ComponentContext, ComponentProvider, useComponents } from './ComponentContext';
 export type { ComponentContextType } from './ComponentContext';
 
 // Theme Context

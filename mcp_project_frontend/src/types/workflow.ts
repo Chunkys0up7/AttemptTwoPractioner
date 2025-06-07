@@ -1,80 +1,193 @@
+import { Node as ReactFlowNode, Edge as ReactFlowEdge, Connection } from 'reactflow';
+
 /**
  * Types for the workflow builder functionality
  */
 
+// Core Workflow Types
+export enum NodeType {
+  START = 'start',
+  END = 'end',
+  ACTION = 'action',
+  DECISION = 'decision',
+  DATA = 'data',
+  CUSTOM = 'custom'
+}
+
+export enum EdgeType {
+  DEFAULT = 'default',
+  SUCCESS = 'success',
+  FAILURE = 'failure',
+  CONDITIONAL = 'conditional'
+}
+
+export interface WorkflowNode extends ReactFlowNode {
+  type: NodeType;
+  data: {
+    config: Record<string, any>;
+    state: Record<string, any>;
+    metadata: Record<string, any>;
+    validation: {
+      isValid: boolean;
+      errors: string[];
+    };
+    performance: {
+      executionTime: number;
+      memoryUsage: number;
+    };
+  };
+}
+
+export interface WorkflowEdge extends ReactFlowEdge {
+  type: EdgeType;
+  data: {
+    metadata: Record<string, any>;
+    validation: {
+      isValid: boolean;
+      errors: string[];
+    };
+    conditions: Record<string, any>;
+  };
+}
+
+// Workflow State Types
 export interface WorkflowState {
-  /** List of nodes in the workflow */
-  nodes: Node[];
-  /** List of edges connecting nodes */
-  edges: Edge[];
-  /** Currently selected node in the workflow */
-  selectedNode: Node | null;
-  /** Instance of ReactFlow for canvas manipulation */
-  reactFlowInstance: any;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  selectedNode: WorkflowNode | null;
+  isLoading: boolean;
+  error: string | null;
+  executionState: {
+    current: string | null;
+    history: string[];
+    status: 'running' | 'completed' | 'failed' | 'idle';
+    progress: number;
+  };
+  validation: {
+    isValid: boolean;
+    errors: string[];
+  };
+}
+
+export interface WorkflowConfig {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  metadata: Record<string, any>;
+  validationRules: {
+    node: Record<NodeType, Record<string, any>>;
+    edge: Record<EdgeType, Record<string, any>>;
+  };
+  executionOptions: {
+    parallel: boolean;
+    timeout: number;
+    retry: {
+      maxAttempts: number;
+      delay: number;
+    };
+  };
+}
+
+// Workflow Execution Types
+export interface WorkflowExecution {
+  id: string;
+  workflowId: string;
+  status: 'running' | 'completed' | 'failed' | 'idle';
+  startTime: number;
+  endTime: number | null;
+  duration: number;
+  result: any;
+  error: string | null;
+  metadata: Record<string, any>;
+}
+
+// Workflow Validation Types
+export interface WorkflowValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  nodeErrors: Record<string, string[]>;
+  edgeErrors: Record<string, string[]>;
+}
+
+// Workflow Transformation Types
+export interface WorkflowTransformationOptions {
+  optimize: boolean;
+  validate: boolean;
+  components: AIComponent[];
+  metadata: Record<string, any>;
+}
+
+// AI Component Types
+export interface AIComponent {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  inputs: Record<string, any>;
+  outputs: Record<string, any>;
+  config: Record<string, any>;
+  metadata: Record<string, any>;
+  validation: {
+    rules: Record<string, any>;
+    constraints: Record<string, any>;
+  };
+}
+
+// Event Types
+export interface WorkflowEvent {
+  type: 'node' | 'edge' | 'workflow';
+  action: 'add' | 'remove' | 'update' | 'execute';
+  payload: any;
+  timestamp: number;
+  metadata: Record<string, any>;
+}
+
+// Error Types
+export interface WorkflowError {
+  code: string;
+  message: string;
+  type: 'validation' | 'execution' | 'configuration' | 'runtime';
+  node: WorkflowNode | null;
+  edge: WorkflowEdge | null;
+  metadata: Record<string, any>;
 }
 
 export interface WorkflowActions {
   /** Handler for node state changes */
-  onNodesChange: (nodes: Node[]) => void;
+  onNodesChange: (nodes: WorkflowNode[]) => void;
   /** Handler for edge state changes */
-  onEdgesChange: (edges: Edge[]) => void;
+  onEdgesChange: (edges: WorkflowEdge[]) => void;
   /** Handler for connecting nodes */
-  onConnect: (params: Edge | Connection) => void;
+  onConnect: (params: WorkflowEdge | Connection) => void;
   /** Handler for dropping components onto the canvas */
   onDrop: (event: React.DragEvent) => void;
   /** Handler for selecting a node */
-  setSelectedNode: (node: Node | null) => void;
+  setSelectedNode: (node: WorkflowNode | null) => void;
 }
 
 export interface WorkflowBuilderProps {
-  /** Initial nodes configuration */
-  initialNodes?: Node[];
+  /** Initial nodes to render */
+  initialNodes?: WorkflowNode[];
   /** Custom node change handler */
-  onNodesChange?: (nodes: Node[]) => void;
+  onNodesChange?: (nodes: WorkflowNode[]) => void;
   /** Custom edge change handler */
-  onEdgesChange?: (edges: Edge[]) => void;
+  onEdgesChange?: (edges: WorkflowEdge[]) => void;
   /** Custom node selection handler */
-  onNodeSelect?: (node: Node | null) => void;
+  onNodeSelect?: (node: WorkflowNode | null) => void;
 }
 
 export interface WorkflowContextType {
-  /** Current workflow state */
   state: WorkflowState;
-  /** Workflow actions */
   actions: WorkflowActions;
-  /** Save workflow function */
+  config: WorkflowConfig;
   saveWorkflow: () => Promise<void>;
-  /** Load workflow function */
   loadWorkflow: (id: string) => Promise<void>;
 }
 
 export type Node = {
   /** Unique identifier for the node */
-  id: string;
-  /** Type of the node */
-  type: string;
-  /** Position of the node on the canvas */
-  position: {
-    x: number;
-    y: number;
-  };
-  /** Data associated with the node */
-  data: {
-    name: string;
-    componentId: string;
-    config: Record<string, any>;
-  };
-};
-
-export type Edge = {
-  /** Unique identifier for the edge */
-  id: string;
-  /** Source node and port */
-  source: string;
-  /** Target node and port */
-  target: string;
-  /** Source handle */
-  sourceHandle?: string;
-  /** Target handle */
-  targetHandle?: string;
-};
+}

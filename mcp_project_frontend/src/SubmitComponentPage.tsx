@@ -9,7 +9,7 @@ import { TextArea } from '@components/common/TextArea';
 import { UploadIcon, CheckCircleIcon, XCircleIcon, PlusCircleIcon, TrashIcon } from '@components/icons';
 import ChatAssistant from '@components/submit_component/ChatAssistant';
 import CodeEditor from '@components/workflow/CodeEditor';
-import { useComponents } from '../contexts/ComponentContext';
+import { useComponents } from '@context/ComponentContext';
 import { AIComponent, SpecificComponentType, NotebookCell, AIComponentCostTier } from '../types';
 import { SUBMITTABLE_COMPONENT_TYPES, COMPONENT_COMPLIANCE_OPTIONS, COMPONENT_COST_TIERS, COMPONENT_VISIBILITY_OPTIONS, LLM_MODELS, getIconForComponentType } from '../constants';
 

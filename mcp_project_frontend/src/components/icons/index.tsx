@@ -29,6 +29,7 @@ export {
   StreamlitIcon,
   MCPIcon,
   LLMAgentIcon,
+  SearchIcon,
   DashboardIcon,
   MarketplaceIcon,
   WorkflowBuilderIcon,

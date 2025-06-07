@@ -4,37 +4,43 @@
 
 ### 1.1 Core Components
 
-The system supports several core component types:
+The system supports several core component types, each with specific capabilities and use cases:
 
-1. **Python Script**
-   - Executes Python code
-   - Supports dependencies
-   - Input/Output via JSON
+1. **LLM Prompt Agent**
+   - AI-powered component for natural language processing
+   - Uses Gemini API or other LLM providers
+   - Supports prompt engineering and response handling
+   - Ideal for chatbots, text generation, and analysis
 
-2. **TypeScript Script**
-   - Executes TypeScript code
-   - Supports TypeScript features
-   - Strong typing support
+2. **Python Script**
+   - Executes Python code in a controlled environment
+   - Supports package dependencies via requirements.txt
+   - Input/Output via JSON or custom formats
+   - Ideal for data processing and scientific computing
 
 3. **Jupyter Notebook**
-   - Executes notebook cells
-   - Supports code and markdown
-   - Visualization capabilities
+   - Executes notebook cells with code and markdown
+   - Supports visualization libraries (matplotlib, seaborn, etc.)
+   - Interactive data exploration
+   - Ideal for data analysis and visualization
 
-4. **LLM Prompt Agent**
-   - AI-powered component
-   - Uses Gemini API
-   - Handles natural language
+4. **Data Processor**
+   - Specialized component for data transformation
+   - Supports various data formats (CSV, JSON, Parquet)
+   - Built-in data cleaning and preprocessing
+   - Ideal for ETL operations
 
-5. **Streamlit App**
-   - Interactive web applications
-   - Data visualization
-   - User interface components
+5. **Model Trainer**
+   - Machine learning model training component
+   - Supports various ML frameworks (scikit-learn, TensorFlow, PyTorch)
+   - Hyperparameter optimization
+   - Model evaluation and metrics
 
-6. **MCP**
-   - Microservices component
-   - Containerized execution
-   - Service orchestration
+6. **Custom Component**
+   - User-defined components
+   - Can implement custom logic
+   - Supports any programming language
+   - Ideal for specialized use cases
 
 ### 1.2 Component Structure
 
@@ -51,9 +57,20 @@ interface AIComponent {
   compliance: Compliance[];
   costTier: CostTier;
   visibility: Visibility;
+  isCustom: boolean;
   typeSpecificData: TypeSpecificData;
   createdAt: Date;
   updatedAt: Date;
+  // Component metadata
+  author?: string;
+  documentation?: string;
+  exampleUsage?: string;
+  dependencies?: string[];
+  runtimeRequirements?: {
+    cpu?: number;
+    memory?: number;
+    gpu?: boolean;
+  };
 }
 ```
 
@@ -99,14 +116,75 @@ Components can be part of:
 
 ## 4. Component Validation
 
-### 4.1 Schema Validation
+### 4.1 Input Validation
+
+1. JSON Schema validation
+   - Validates input against component's inputSchema
+   - Checks required fields
+   - Validates data types and formats
+
+2. Type Checking
+   - Ensures correct data types
+   - Validates array structures
+   - Checks object properties
+
+3. Format Validation
+   - Validates file formats
+   - Checks data ranges
+   - Validates URLs and paths
+
+4. Security Checks
+   - Input sanitization
+   - XSS prevention
+   - SQL injection prevention
+
+### 4.2 Output Validation
+
+1. Result Format
+   - Validates against outputSchema
+   - Checks data completeness
+   - Verifies data consistency
+
+2. Error Handling
+   - Graceful error reporting
+   - Retry mechanisms
+   - Error logging
+
+3. Performance Metrics
+   - Execution time tracking
+   - Resource usage monitoring
+   - Performance alerts
+
+### 4.3 Compliance Validation
+
+1. Data Privacy
+   - PII handling
+   - Encryption requirements
+   - Access controls
+
+2. Security
+   - Code scanning
+   - Dependency checks
+   - Vulnerability assessment
+
+3. Legal
+   - License compliance
+   - Usage terms
+   - Export controls
+
+4. Operational
+   - SLA requirements
+   - Monitoring requirements
+   - Backup requirements
+
+### 4.4 Schema Validation
 
 - JSON Schema validation
 - TypeScript type checking
 - Input/output compatibility
 - Dependency resolution
 
-### 4.2 Security Validation
+### 4.5 Security Validation
 
 - Code analysis
 - Dependency scanning

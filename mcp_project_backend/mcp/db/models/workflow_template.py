@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from ..base import Base
 
 class WorkflowTemplate(Base):
@@ -14,7 +15,7 @@ class WorkflowTemplate(Base):
     category = Column(String(100))
     template_metadata = Column(JSON)
     is_public = Column(Boolean, default=False)
-    created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_by = Column(PG_UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -35,7 +36,7 @@ class WorkflowTemplateVersion(Base):
     version = Column(Integer, nullable=False)
     content = Column(JSON, nullable=False)
     changes = Column(String(1000))
-    created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_by = Column(PG_UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

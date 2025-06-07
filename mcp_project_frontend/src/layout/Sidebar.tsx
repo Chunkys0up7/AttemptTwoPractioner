@@ -32,13 +32,13 @@ const Sidebar: React.FC = () => {
                     }`.trim(),
                   }
                 )}
-                <span className="text-sm font-medium">{item.name}</span>
+                <span className="text-base font-medium">{item.name}</span>
               </>
             )}
           </NavLink>
         ))}
       </nav>
-      <div className="p-4 border-t border-neutral-700 dark:border-neutral-800 text-xs text-neutral-500 dark:text-neutral-400">
+      <div className="p-4 border-t border-neutral-700 dark:border-neutral-800 text-sm text-neutral-500 dark:text-neutral-400">
         © {new Date().getFullYear()} AI Ops Console
       </div>
     </div>

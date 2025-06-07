@@ -1,22 +1,60 @@
-import { Node, Edge, WorkflowState } from '../../types/workflow';
-import { v4 as uuidv4 } from 'uuid';
+import { EventEmitter } from 'events';
+import { WorkflowNode, WorkflowEdge } from '../../types/workflow';
 
-/**
- * Workflow cache utility functions
- */
-export interface WorkflowCache {
-  nodes: Record<string, Node>;
-  edges: Record<string, Edge>;
-  metadata: Record<string, any>;
-  timestamp: number;
+// Cache types
+interface CacheEntry {
+  nodes: WorkflowNode[];
+  edges: WorkflowEdge[];
+  metadata: {
+    timestamp: number;
+    size: number;
+    ttl: number;
+    [key: string]: any;
+  };
 }
 
-export class WorkflowCacheManager {
-  private static instance: WorkflowCacheManager;
-  private cache: Record<string, WorkflowCache> = {};
-  private cacheTimeout: number = 5 * 60 * 1000; // 5 minutes
+interface CacheConfig {
+  timeout: number;
+  maxSize: number;
+  cleanupInterval: number;
+  maxSizeMB: number;
+}
 
-  private constructor() {}
+interface CacheStats {
+  totalEntries: number;
+  totalSize: number;
+  hitRate: number;
+  missRate: number;
+  averageTTL: number;
+  maxEntrySize: number;
+  minEntrySize: number;
+}
+
+export class WorkflowCacheManager extends EventEmitter {
+  private static instance: WorkflowCacheManager;
+  private cache: Record<string, CacheEntry> = {};
+  private config: CacheConfig = {
+    timeout: 5 * 60 * 1000, // 5 minutes
+    maxSize: 100,
+    cleanupInterval: 60000, // 1 minute
+    maxSizeMB: 50
+  };
+  private stats: CacheStats = {
+    totalEntries: 0,
+    totalSize: 0,
+    hitRate: 0,
+    missRate: 0,
+    averageTTL: 0,
+    maxEntrySize: 0,
+    minEntrySize: Infinity
+  };
+  private hits: number = 0;
+  private misses: number = 0;
+
+  private constructor() {
+    super();
+    this.initializeCleanup();
+  }
 
   public static getInstance(): WorkflowCacheManager {
     if (!WorkflowCacheManager.instance) {
@@ -25,120 +63,168 @@ export class WorkflowCacheManager {
     return WorkflowCacheManager.instance;
   }
 
-  /**
-   * Store workflow data in cache
-   * @param workflowId - Unique identifier for the workflow
-   * @param nodes - Array of workflow nodes
-   * @param edges - Array of workflow edges
-   * @param metadata - Additional workflow metadata
-   */
-  public store(workflowId: string, nodes: Node[], edges: Edge[], metadata: any = {}): void {
-    this.cache[workflowId] = {
-      nodes: nodes.reduce((acc, node) => ({ ...acc, [node.id]: node }), {}),
-      edges: edges.reduce((acc, edge) => ({ ...acc, [edge.id]: edge }), {}),
-      metadata,
-      timestamp: Date.now(),
-    };
+  public configure(config: Partial<CacheConfig>): void {
+    this.config = { ...this.config, ...config };
   }
 
-  /**
-   * Retrieve workflow data from cache
-   * @param workflowId - Unique identifier for the workflow
-   * @returns Cached workflow data or null if expired
-   */
-  public retrieve(workflowId: string): WorkflowCache | null {
-    const cachedData = this.cache[workflowId];
-    if (!cachedData) return null;
+  public store(workflowId: string, nodes: WorkflowNode[], edges: WorkflowEdge[], metadata: Record<string, any> = {}): void {
+    // Remove existing entry if it exists
+    if (this.cache[workflowId]) {
+      this.remove(workflowId);
+    }
 
-    // Check if cache is expired
-    if (Date.now() - cachedData.timestamp > this.cacheTimeout) {
-      delete this.cache[workflowId];
+    const entry: CacheEntry = {
+      nodes,
+      edges,
+      metadata: {
+        timestamp: Date.now(),
+        size: this.calculateSize(nodes, edges),
+        ttl: this.config.timeout,
+        ...metadata
+      }
+    };
+
+    // Check size limits
+    if (entry.metadata.size > this.config.maxSizeMB * 1024 * 1024) {
+      this.emit('error', {
+        type: 'size_limit',
+        error: new Error('Entry exceeds maximum size limit'),
+        entry
+      });
+      return;
+    }
+
+    // Add to cache
+    this.cache[workflowId] = entry;
+    this.stats.totalEntries++;
+    this.stats.totalSize += entry.metadata.size;
+
+    // Update statistics
+    this.updateStats();
+
+    this.emit('store', { workflowId, entry });
+  }
+
+  public retrieve(workflowId: string): CacheEntry | null {
+    const entry = this.cache[workflowId];
+    if (!entry) {
+      this.misses++;
+      this.updateStats();
+      this.emit('retrieve', { workflowId, found: false });
       return null;
     }
 
-    return cachedData;
+    // Check if entry is expired
+    if (Date.now() - entry.metadata.timestamp > entry.metadata.ttl) {
+      this.remove(workflowId);
+      return null;
+    }
+
+    this.hits++;
+    this.updateStats();
+    this.emit('retrieve', { workflowId, found: true });
+
+    return entry;
   }
 
-  /**
-   * Clear cache for a specific workflow
-   * @param workflowId - Unique identifier for the workflow
-   */
-  public clear(workflowId: string): void {
-    delete this.cache[workflowId];
-  }
-
-  /**
-   * Clear all caches
-   */
-  public clearAll(): void {
-    this.cache = {};
-  }
-
-  /**
-   * Generate a unique workflow ID
-   * @returns Unique workflow ID
-   */
-  public generateWorkflowId(): string {
-    return uuidv4();
-  }
-
-  /**
-   * Get all cached workflow IDs
-   * @returns Array of workflow IDs
-   */
-  public getCachedWorkflows(): string[] {
-    return Object.keys(this.cache);
-  }
-
-  /**
-   * Get workflow metadata
-   * @param workflowId - Unique identifier for the workflow
-   * @returns Workflow metadata or null
-   */
-  public getMetadata(workflowId: string): any | null {
-    const cachedData = this.retrieve(workflowId);
-    return cachedData ? cachedData.metadata : null;
-  }
-
-  /**
-   * Update workflow metadata
-   * @param workflowId - Unique identifier for the workflow
-   * @param metadata - New metadata to store
-   */
-  public updateMetadata(workflowId: string, metadata: any): void {
-    const cachedData = this.retrieve(workflowId);
-    if (cachedData) {
-      this.store(workflowId, Object.values(cachedData.nodes), Object.values(cachedData.edges), metadata);
+  public remove(workflowId: string): void {
+    const entry = this.cache[workflowId];
+    if (entry) {
+      this.stats.totalEntries--;
+      this.stats.totalSize -= entry.metadata.size;
+      delete this.cache[workflowId];
+      this.emit('remove', { workflowId, entry });
     }
   }
 
-  /**
-   * Check if workflow exists in cache
-   * @param workflowId - Unique identifier for the workflow
-   * @returns boolean indicating if workflow exists
-   */
-  public hasWorkflow(workflowId: string): boolean {
+  public clear(): void {
+    this.cache = {};
+    this.stats.totalEntries = 0;
+    this.stats.totalSize = 0;
+    this.hits = 0;
+    this.misses = 0;
+    this.updateStats();
+    this.emit('clear');
+  }
+
+  public has(workflowId: string): boolean {
     return this.cache[workflowId] !== undefined;
   }
 
-  /**
-   * Get cache size in bytes
-   * @returns Size of cache in bytes
-   */
-  public getCacheSize(): number {
-    return Object.values(this.cache).reduce((acc, cache) => {
-      return acc + 
-        JSON.stringify(cache.nodes).length +
-        JSON.stringify(cache.edges).length +
-        JSON.stringify(cache.metadata).length;
-    }, 0);
+  public getAll(): Record<string, CacheEntry> {
+    return { ...this.cache };
   }
 
-  /**
-   * Get number of cached workflows
-   * @returns Number of cached workflows
-   */
+  public getStats(): CacheStats {
+    return { ...this.stats };
+  }
+
   public getCachedCount(): number {
     return Object.keys(this.cache).length;
+  }
+
+  private initializeCleanup(): void {
+    setInterval(() => {
+      this.cleanupExpired();
+    }, this.config.cleanupInterval);
+  }
+
+  private cleanupExpired(): void {
+    const now = Date.now();
+    const expired: string[] = [];
+
+    for (const [id, entry] of Object.entries(this.cache)) {
+      if (now - entry.metadata.timestamp > entry.metadata.ttl) {
+        expired.push(id);
+      }
+    }
+
+    for (const id of expired) {
+      this.remove(id);
+    }
+
+    if (expired.length > 0) {
+      this.emit('cleanup', { expired });
+    }
+  }
+
+  private calculateSize(nodes: WorkflowNode[], edges: WorkflowEdge[]): number {
+    let size = 0;
+    for (const node of nodes) {
+      size += JSON.stringify(node).length;
+    }
+    for (const edge of edges) {
+      size += JSON.stringify(edge).length;
+    }
+    return size;
+  }
+
+  private updateStats(): void {
+    if (this.stats.totalEntries === 0) {
+      this.stats.hitRate = 0;
+      this.stats.missRate = 0;
+      this.stats.averageTTL = 0;
+      this.stats.maxEntrySize = 0;
+      this.stats.minEntrySize = Infinity;
+      return;
+    }
+
+    const totalRequests = this.hits + this.misses;
+    this.stats.hitRate = (this.hits / totalRequests) * 100;
+    this.stats.missRate = (this.misses / totalRequests) * 100;
+
+    let totalTTL = 0;
+    let maxSize = 0;
+    let minSize = Infinity;
+
+    for (const entry of Object.values(this.cache)) {
+      totalTTL += entry.metadata.ttl;
+      maxSize = Math.max(maxSize, entry.metadata.size);
+      minSize = Math.min(minSize, entry.metadata.size);
+    }
+
+    this.stats.averageTTL = totalTTL / this.stats.totalEntries;
+    this.stats.maxEntrySize = maxSize;
+    this.stats.minEntrySize = minSize;
   }
 }

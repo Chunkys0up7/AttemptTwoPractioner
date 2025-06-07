@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './src/contexts/AuthContext';
-import { ComponentProvider } from './src/contexts/ComponentContext'; // Import ComponentProvider
+import { AuthProvider } from '@context/AuthContext';
+import { ComponentProvider } from '@context/ComponentContext'; // Import ComponentProvider
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

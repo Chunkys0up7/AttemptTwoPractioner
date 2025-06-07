@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
     },
     optimizeDeps: {
       include: ['react', 'react-dom', 'react-router-dom'],
-      exclude: ['@types/*'],
+      exclude: [],
     },
     server: {
       port: 3003,

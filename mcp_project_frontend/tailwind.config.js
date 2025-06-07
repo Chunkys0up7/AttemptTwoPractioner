@@ -7,6 +7,14 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter var', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'base': ['1rem', { lineHeight: '1.5' }],
+        'sm': ['0.875rem', { lineHeight: '1.5715' }],
+        'xl': ['1.25rem', { lineHeight: '1.6' }],
+      },
       colors: {
         primary: {
           50: '#f0f9ff',

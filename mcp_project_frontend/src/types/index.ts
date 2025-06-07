@@ -1,4 +1,13 @@
-import { ReactNode } from 'react';
+import type { JSONSchema7 } from 'json-schema';
+
+export interface Compliance {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  requirements: string[];
+  status: 'pending' | 'approved' | 'rejected';
+};
 
 export interface NavItem {
   name: string;
@@ -7,13 +16,13 @@ export interface NavItem {
 }
 
 export enum SpecificComponentType {
-  Python = 'python',
-  TypeScript = 'typescript',
-  Notebook = 'notebook',
-  Streamlit = 'streamlit',
-  LLM = 'llm',
-  Data = 'data'
-}
+  LLM_PROMPT_AGENT = 'LLM Prompt Agent',
+  PYTHON_SCRIPT = 'Python Script',
+  JUPYTER_NOTEBOOK = 'Jupyter Notebook',
+  DATA_PROCESSOR = 'Data Processor',
+  MODEL_TRAINER = 'Model Trainer',
+  CUSTOM = 'Custom Component'
+};
 
 export enum AIComponentCostTier {
   Low = 'low',
@@ -25,25 +34,37 @@ export interface TypeSpecificData {
   python?: {
     requirements?: string[];
     dependencies?: string[];
-  };
-  typescript?: {
-    dependencies?: string[];
-    devDependencies?: string[];
-  };
-  notebook?: {
-    cells?: NotebookCell[];
-  };
-  streamlit?: {
-    requirements?: string[];
+    entryPoint?: string;
+    environment?: string;
   };
   llm?: {
+    provider?: string;
     model?: string;
     temperature?: number;
     maxTokens?: number;
+    systemPrompt?: string;
+  };
+  notebook?: {
+    cells: NotebookCell[];
+    kernel?: string;
+    language?: string;
   };
   data?: {
     format?: string;
     schema?: Record<string, any>;
+    preprocessing?: string[];
+    validation?: string[];
+  };
+  model?: {
+    framework?: string;
+    architecture?: string;
+    hyperparameters?: Record<string, any>;
+    metrics?: Record<string, any>;
+  };
+  custom?: {
+    language?: string;
+    runtime?: string;
+    entryPoint?: string;
   };
 }
 
@@ -57,19 +78,33 @@ export interface NotebookCell {
 export interface AIComponent {
   id: string;
   name: string;
-  description: string;
   type: SpecificComponentType;
-  typeSpecificData: TypeSpecificData;
-  costTier: AIComponentCostTier;
-  visibility: 'public' | 'private' | 'shared';
+  description: string;
+  version: string;
   tags: string[];
+  inputSchema: JSONSchema7;
+  outputSchema: JSONSchema7;
+  compliance: Compliance[];
+  costTier: AIComponentCostTier;
+  visibility: 'public' | 'private';
+  isCustom: boolean;
+  typeSpecificData: TypeSpecificData;
   createdAt: Date;
   updatedAt: Date;
-  inputs: Record<string, { type: string; description: string }>;
-  outputs: Record<string, { type: string; description: string }>;
-  configSchema: Record<string, any>;
-  icon?: ReactNode;
-  isCustom?: boolean;
+  // Optional metadata
+  author?: string;
+  documentation?: string;
+  exampleUsage?: string;
+  dependencies?: string[];
+  runtimeRequirements?: {
+    cpu?: number;
+    memory?: number;
+    gpu?: boolean;
+  };
+  // Component state
+  isSelected?: boolean;
+  isLoading?: boolean;
+  error?: string;
 }
 
 export interface Workflow {
