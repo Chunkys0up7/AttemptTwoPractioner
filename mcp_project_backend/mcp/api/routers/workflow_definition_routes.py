@@ -44,8 +44,8 @@ router = APIRouter(
 
 @router.post("/", response_model=WorkflowDefinitionRead, status_code=status.HTTP_201_CREATED)
 def create_workflow_definition(
-    db: Session = Depends(get_db),
-    wf_def_in: WorkflowDefinitionCreate
+    wf_def_in: WorkflowDefinitionCreate,
+    db: Session = Depends(get_db)
 ):
     """
     Create a new Workflow Definition, optionally with steps.
@@ -103,12 +103,12 @@ def create_workflow_definition(
 
 @router.get("/", response_model=List[WorkflowDefinitionRead])
 def list_workflow_definitions(
-    db: Session = Depends(get_db),
     skip: int = Query(0, ge=0, description="Number of items to skip"),
     limit: int = Query(100, ge=1, le=200, description="Maximum number of items to return"),
     search: Optional[str] = Query(None, description="Search term to filter workflows by name or description"),
     mcp_type: Optional[str] = Query(None, description="Filter workflows containing steps of this MCP type"),
-    include_archived: bool = Query(False, description="Include archived workflows")
+    include_archived: bool = Query(False, description="Include archived workflows"),
+    db: Session = Depends(get_db)
 ):
     """
     List all Workflow Definitions with optional filtering.
@@ -292,9 +292,9 @@ def add_workflow_step(
 
 @router.delete("/{wf_def_id}/steps/{step_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_workflow_step(
-    db: Session = Depends(get_db),
     wf_def_id: int,
-    step_id: int
+    step_id: int,
+    db: Session = Depends(get_db)
 ):
     """
     Delete a step from a Workflow Definition.
@@ -323,8 +323,8 @@ def update_workflow_step(
 
 @router.get("/{wf_def_id}/steps/", response_model=List[WorkflowStepRead])
 def list_workflow_steps(
-    db: Session = Depends(get_db),
-    wf_def_id: int
+    wf_def_id: int,
+    db: Session = Depends(get_db)
 ):
     """
     List all steps for a Workflow Definition.

@@ -42,4 +42,9 @@ def get_sample_chart(db: Session = Depends(get_db)):
         values = [count for _, count in status_counts]
         return {"labels": labels, "values": values}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error generating chart data: {e}") 
+        raise HTTPException(status_code=500, detail=f"Error generating chart data: {e}")
+
+@router.get("/visualization/realtime")
+def get_realtime_updates():
+    # TODO: Implement real-time updates using WebSockets or server-sent events
+    return {"message": "Real-time updates not yet implemented"} 

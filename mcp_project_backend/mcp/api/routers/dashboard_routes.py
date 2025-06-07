@@ -13,6 +13,8 @@ from mcp.core.config import settings  # For API prefix
 # Define a Pydantic model for the summary response for better OpenAPI documentation
 from pydantic import BaseModel
 from mcp.api.services.data_visualization_service import router as data_visualization_router
+from fastapi import WebSocket
+import asyncio
 
 
 class DashboardSummaryResponse(BaseModel):
@@ -90,11 +92,13 @@ def get_chart_config():
         raise HTTPException(status_code=500, detail=f"Error generating chart config: {e}")
 
 # Placeholder for real-time updates (to be implemented with WebSocket in a later phase)
-# from fastapi import WebSocket
-# @router.websocket("/ws/dashboard-updates")
-# async def dashboard_updates(websocket: WebSocket):
-#     await websocket.accept()
-#     while True:
-#         # Send updates (e.g., summary, chart data) in real time
-#         await websocket.send_json({"type": "update", "data": ...})
-#         await asyncio.sleep(2)
+@router.websocket("/ws/dashboard-updates")
+async def dashboard_updates(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        for i in range(3):  # Send 3 example updates, then close
+            # TODO: Replace with real dashboard update logic
+            await websocket.send_json({"type": "update", "data": {"message": f"Update {i+1}"}})
+            await asyncio.sleep(2)
+    finally:
+        await websocket.close()

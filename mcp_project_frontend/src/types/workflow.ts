@@ -4,6 +4,14 @@ import { Node as ReactFlowNode, Edge as ReactFlowEdge, Connection } from 'reactf
  * Types for the workflow builder functionality
  */
 
+// Constraint type for validation rules
+export interface Constraint {
+  type?: string;
+  min?: number;
+  max?: number;
+  enum?: string[];
+}
+
 // Core Workflow Types
 export enum NodeType {
   START = 'start',
@@ -69,6 +77,7 @@ export interface WorkflowState {
   };
 }
 
+// Workflow Config Types
 export interface WorkflowConfig {
   id: string;
   name: string;
@@ -113,12 +122,19 @@ export interface WorkflowValidationResult {
   edgeErrors: Record<string, string[]>;
 }
 
-// Workflow Transformation Types
 export interface WorkflowTransformationOptions {
   optimize: boolean;
   validate: boolean;
   components: AIComponent[];
   metadata: Record<string, any>;
+  errorHandler?: (error: any) => void;
+}
+
+export class WorkflowError extends Error {
+  constructor(message: string, public details?: any) {
+    super(message);
+    this.name = 'WorkflowError';
+  }
 }
 
 // AI Component Types
@@ -127,13 +143,18 @@ export interface AIComponent {
   name: string;
   type: string;
   description: string;
-  inputs: Record<string, any>;
-  outputs: Record<string, any>;
+  inputs: string[];
+  outputs: string[];
   config: Record<string, any>;
   metadata: Record<string, any>;
   validation: {
-    rules: Record<string, any>;
-    constraints: Record<string, any>;
+    rules: {
+      required: Record<string, any>;
+    };
+    constraints: Record<string, Constraint>;
+  };
+  compatibility: {
+    canConnectTo: string[];
   };
 }
 
