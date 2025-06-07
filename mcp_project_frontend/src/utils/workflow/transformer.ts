@@ -51,109 +51,31 @@ export class WorkflowTransformer extends EventEmitter {
           edges,
           opts.components
         );
-        if (validation.errors.length > 0) {
-          const error = new WorkflowError('Workflow validation failed', validation.errors);
+        if (!validation.isValid) {
           if (opts.errorHandler) {
-            opts.errorHandler(error);
+            opts.errorHandler(validation.errors);
           }
-          throw error;
+          throw new WorkflowError('Workflow validation failed', validation.errors);
         }
       }
 
-      let transformedNodes = nodes;
-      let transformedEdges = edges;
+      const optimizedNodes = await this.optimizeNodes(nodes);
+      const optimizedEdges = await this.optimizeEdges(edges);
 
-      if (opts.optimize) {
-        transformedNodes = await this.optimizeNodes(nodes);
-        transformedEdges = await this.optimizeEdges(edges);
-      }
+      await this.cacheManager.store(key, { nodes: optimizedNodes, edges: optimizedEdges });
 
-      await this.cacheManager.store(key, { nodes: transformedNodes, edges: transformedEdges });
-      return { nodes: transformedNodes, edges: transformedEdges };
+      return { nodes: optimizedNodes, edges: optimizedEdges };
     } catch (error) {
-      const workflowError = error instanceof WorkflowError 
-        ? error 
-        : new WorkflowError('Workflow transformation failed', error instanceof Error ? error.message : String(error));
-      
       if (this.options.errorHandler) {
-        this.options.errorHandler(workflowError);
+        this.options.errorHandler(error);
       }
-      throw workflowError;
+      throw error;
     }
   }
 
   private async optimizeNodes(nodes: WorkflowNode[]): Promise<WorkflowNode[]> {
-    const optimizedNodes = [...nodes];
-    for (const node of optimizedNodes) {
-      if (node.data?.metadata) {
-        node.data.metadata = await this.optimizeMetadata(node.data.metadata);
-      }
-      if (node.data?.validation) {
-        node.data.validation = await this.optimizeValidation(node.data.validation);
-      }
-      if (node.data?.config) {
-        node.data.config = await this.optimizeComponentConfig(node.data.config);
-      }
-    }
-    return optimizedNodes;
-  }
-
-  private async optimizeEdges(edges: WorkflowEdge[]): Promise<WorkflowEdge[]> {
-    const optimizedEdges = [...edges];
-    for (const edge of optimizedEdges) {
-      if (edge.data?.conditions) {
-        edge.data.conditions = await this.optimizeConditions(edge.data.conditions);
-      }
-    }
-    return optimizedEdges;
-  }
-
-  private async optimizeMetadata(metadata: Record<string, any>): Promise<Record<string, any>> {
-    if (!metadata) return {};
-    
-    const optimizedMetadata = { ...metadata };
-    Object.keys(optimizedMetadata).forEach(key => {
-      if (optimizedMetadata[key] === undefined || optimizedMetadata[key] === null) {
-        delete optimizedMetadata[key];
-      }
-    });
-    return optimizedMetadata;
-  }
-
-  private async optimizeValidation(validation: Record<string, any>): Promise<Record<string, any>> {
-    if (!validation) return {};
-    
-    const optimizedValidation = { ...validation };
-    Object.keys(optimizedValidation).forEach(key => {
-      if (optimizedValidation[key] === undefined || optimizedValidation[key] === null) {
-        delete optimizedValidation[key];
-      }
-    });
-    return optimizedValidation;
-  }
-
-  private async optimizeConditions(conditions: Record<string, any>): Promise<Record<string, any>> {
-    if (!conditions) return {};
-    
-    const optimizedConditions = { ...conditions };
-    Object.keys(optimizedConditions).forEach(key => {
-      if (!optimizedConditions[key] || Object.keys(optimizedConditions[key]).length === 0) {
-        delete optimizedConditions[key];
-      }
-    });
-    return optimizedConditions;
-  }
-
-  private async optimizeComponentConfig(config: Record<string, any>): Promise<Record<string, any>> {
-    if (!config) return {};
-    
-    const optimizedConfig = { ...config };
-    Object.keys(optimizedConfig).forEach(key => {
-      if (optimizedConfig[key] === undefined || optimizedConfig[key] === null) {
-        delete optimizedConfig[key];
-      }
-    });
-    return optimizedConfig;
+    return Promise.all(nodes.map(async (node) => {
+      const optimizedNode = {
   }
 
   private generateCacheKey(nodes: WorkflowNode[], edges: WorkflowEdge[]): string {

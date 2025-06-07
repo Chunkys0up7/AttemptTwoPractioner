@@ -1,5 +1,7 @@
 # API Documentation
 
+> **Note:** All user IDs are now UUIDs (universally unique identifiers, e.g., "id": "b3b7c2e2-8c2a-4e2a-9c2a-8c2a4e2a9c2a").
+
 ## 1. Authentication API
 
 ### 1.1 Login
@@ -24,7 +26,7 @@ POST /api/auth/login
   "token_type": "bearer",
   "expires_in": 3600,
   "user": {
-    "id": "string",
+    "id": "uuid-string",
     "username": "string",
     "roles": ["string"]
   }
@@ -73,7 +75,7 @@ GET /api/components
 {
   "items": [
     {
-      "id": "string",
+      "id": "uuid-string",
       "name": "string",
       "type": "string",
       "description": "string",
@@ -132,12 +134,12 @@ GET /api/workflows
 {
   "items": [
     {
-      "id": "string",
+      "id": "uuid-string",
       "name": "string",
       "description": "string",
       "version": "string",
-      "components": ["string"],
-      "connections": ["string"],
+      "components": ["uuid-string"],
+      "connections": ["uuid-string"],
       "created_at": "timestamp",
       "updated_at": "timestamp"
     }
@@ -159,8 +161,8 @@ POST /api/workflows
 {
   "name": "string",
   "description": "string",
-  "components": ["string"],
-  "connections": ["string"],
+  "components": ["uuid-string"],
+  "connections": ["uuid-string"],
   "version": "string"
 }
 ```
@@ -176,7 +178,7 @@ POST /api/executions
 #### Request Body
 ```json
 {
-  "workflow_id": "string",
+  "workflow_id": "uuid-string",
   "inputs": {
     "component_id": {
       "input_name": "value"
@@ -188,7 +190,7 @@ POST /api/executions
 #### Response
 ```json
 {
-  "execution_id": "string",
+  "execution_id": "uuid-string",
   "status": "string",
   "started_at": "timestamp"
 }
@@ -203,7 +205,7 @@ GET /api/executions/{execution_id}
 #### Response
 ```json
 {
-  "execution_id": "string",
+  "execution_id": "uuid-string",
   "status": "string",
   "started_at": "timestamp",
   "completed_at": "timestamp",
@@ -535,7 +537,7 @@ You can subscribe to preference change events by registering a webhook URL. The 
 {
   "event": "preferences.updated",
   "data": {
-    "user_id": "123",
+    "user_id": "uuid-string",
     "preferences": {
       // Updated preferences object
     },
@@ -662,7 +664,7 @@ GET /api/notifications
 {
   "data": [
     {
-      "id": "string",
+      "id": "uuid-string",
       "metricName": "string",
       "severity": "high" | "medium" | "low",
       "message": "string",
@@ -689,7 +691,7 @@ POST /api/notifications/{id}/acknowledge
 ```json
 {
   "data": {
-    "id": "string",
+    "id": "uuid-string",
     "acknowledged": true
   },
   "error": "string"
