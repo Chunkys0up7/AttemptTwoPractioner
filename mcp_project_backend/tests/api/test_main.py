@@ -85,4 +85,14 @@ def test_get_template_categories(client):
     categories = response.json()
     assert isinstance(categories, list)
     assert "Data Processing" in categories
-    assert "Custom" in categories 
+    assert "Custom" in categories
+
+def test_performance_dashboard(client):
+    response = client.get("/api/v1/metrics/dashboard")
+    assert response.status_code == 200
+    data = response.json()
+    assert "metrics" in data
+    assert "alerts" in data
+    assert "dashboard" in data
+    assert "request_count" in data["dashboard"]
+    assert "cache_hit_ratio" in data["dashboard"] 
