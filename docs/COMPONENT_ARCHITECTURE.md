@@ -42,6 +42,49 @@ The system supports several core component types, each with specific capabilitie
    - Supports any programming language
    - Ideal for specialized use cases
 
+### 1.3 Security Components
+
+1. **Security Middleware**
+   - Comprehensive security layer for API endpoints
+   - Features:
+     - Host header validation
+     - XSS protection
+     - Content Security Policy enforcement
+     - Rate limiting
+     - IP blacklisting/whitelisting
+     - Input sanitization
+     - Security headers
+   - Security headers added:
+     - X-Content-Type-Options: nosniff
+     - X-Frame-Options: DENY
+     - X-XSS-Protection: 1; mode=block
+     - Strict-Transport-Security: max-age=31536000
+     - Content-Security-Policy: configurable
+     - Referrer-Policy: strict-origin-when-cross-origin
+     - Cache-Control: no-store, no-cache
+     - Pragma: no-cache
+     - Expires: 0
+     - X-Request-ID: unique identifier
+
+2. **Auditing Service**
+   - Centralized logging and monitoring for security events
+   - Features:
+     - Event tracking with severity levels (INFO, WARNING, ERROR)
+     - Request ID tracking
+     - In-memory buffer for audit events
+     - Query capabilities with filtering
+     - Export functionality (JSON format)
+     - Integration with monitoring system
+   - Event fields:
+     - Timestamp
+     - Actor ID
+     - Action type
+     - Entity type
+     - Entity ID
+     - Details (context)
+     - Severity
+     - Request ID
+
 ### 1.2 Component Structure
 
 ```typescript

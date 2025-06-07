@@ -188,17 +188,105 @@ The performance monitoring system is tested in `tests/core/test_performance_moni
 
 ## Alerting
 
-- Threshold-based alerting is implemented for:
-  - Request latency (default: >1.0s)
-  - Cache hit ratio (default: <0.8)
-  - Error rate (default: >0.05)
-- Alerts are included in the health check, performance report, and dashboard endpoints.
-- Alerts are triggered and logged if thresholds are exceeded.
+The system implements threshold-based alerting for key performance metrics:
+
+### Threshold Settings
+
+1. **System Performance**
+   - **Request Latency**: >1.0s (configurable via `settings.REQUEST_LATENCY_THRESHOLD`)
+   - **Error Rate**: >5% (configurable via `settings.ERROR_RATE_THRESHOLD`)
+   - **Memory Usage**: >80% (configurable via `settings.MEMORY_THRESHOLD`)
+   - **CPU Usage**: >80% (configurable via `settings.CPU_THRESHOLD`)
+
+2. **Resource Utilization**
+   - **Cache Hit Ratio**: <80% (configurable via `settings.CACHE_HIT_RATIO_THRESHOLD`)
+   - **Database Connection Pool**: >90% utilization (configurable via `settings.DB_POOL_THRESHOLD`)
+
+### Alert Types
+
+1. **Performance Alerts**
+   - High request latency
+   - High error rate
+   - High memory usage
+   - High CPU usage
+
+2. **Resource Alerts**
+   - Low cache hit ratio
+   - High database connection pool utilization
+   - High system load
+
+### Alert Handling
+
+- Alerts are generated when thresholds are exceeded
+- Alerts include:
+  - Alert type
+  - Current value
+  - Threshold value
+  - Timestamp
+  - Affected components
+- Alerts are logged and exposed via API endpoints
 
 ## Dashboard Endpoint
 
-- `GET /api/v1/metrics/dashboard`: Returns a summary of key metrics and alerts for dashboard visualization.
-- Includes: uptime, request count, error count, cache hit ratio, and active alerts.
+The `/api/v1/metrics/dashboard` endpoint provides a comprehensive overview of system performance and health:
+
+### Available Metrics
+
+1. **System Health**
+   - Uptime
+   - Request count
+   - Error count
+   - Response times
+   - Active workflows
+
+2. **Resource Usage**
+   - Memory usage
+   - CPU usage
+   - Cache metrics
+   - Database metrics
+
+3. **Workflow Performance**
+   - Active workflows
+   - Workflow completion rate
+   - Workflow execution time
+   - Workflow error rate
+
+4. **Alerts**
+   - Active alerts
+   - Alert history
+   - Alert severity levels
+   - Affected components
+
+### Response Format
+
+```json
+{
+  "system": {
+    "uptime": "12h 34m",
+    "requests": {
+      "total": 12345,
+      "errors": 12,
+      "average_latency": "123ms"
+    },
+    "resources": {
+      "memory": "65%",
+      "cpu": "45%",
+      "cache_hit_ratio": "85%"
+    }
+  },
+  "alerts": {
+    "active": [
+      {
+        "type": "HIGH_CPU_USAGE",
+        "current_value": "85%",
+        "threshold": "80%",
+        "timestamp": "2025-06-07T15:57:04-04:00"
+      }
+    ],
+    "history": [...]
+  }
+}
+```
 
 ## Retention/Cleanup
 

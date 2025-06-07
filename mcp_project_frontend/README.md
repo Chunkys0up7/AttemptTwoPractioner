@@ -407,6 +407,16 @@ Components for the Execution Monitor page.
     - Right: `PropertiesPanel` for configuring selected nodes/workflow.
   - The drag-and-drop logic (commented out) demonstrates how component data would be transferred from the palette to the canvas to create new nodes.
 
+## Workflow Builder Canvas (React Flow)
+
+The workflow builder UI uses [React Flow](https://reactflow.dev/) for the canvas. Features include:
+- Drag-and-drop from palette to canvas for node creation
+- Node movement and edge creation (drag-to-connect) supported via React Flow
+- Zoom, pan, and fit-to-view controls
+- MiniMap and background grid
+
+See `src/WorkflowBuilderPage.tsx` for implementation details.
+
 ---
 
 ### `pages/ExecutionMonitorPage.tsx`

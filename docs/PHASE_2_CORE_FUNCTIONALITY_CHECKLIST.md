@@ -6,12 +6,13 @@
 
 ### UI/Frontend
 
-- [x] Integrate React Flow for the workflow canvas
-  - [x] Set up React Flow with custom node and edge types *(code staged, activation pending npm install after reboot)*
-  - [x] Implement zoom, pan, and fit-to-view controls *(code staged, activation pending npm install after reboot)*
+- [x] Integrate React Flow for the workflow canvas *(see WorkflowBuilderPage.tsx for details)*
+  - [x] Set up React Flow with custom node and edge types
+  - [x] Implement zoom, pan, and fit-to-view controls
 - [x] Implement drag-and-drop for components from palette to canvas
   - [x] Enable drag from palette, drop to canvas, and node creation
-  - [x] Support drag-to-reorder and drag-to-connect
+  - [x] Support drag-to-reorder (node movement on canvas)
+  - [x] Support drag-to-connect (edge creation)
 - [x] Add component palette
   - [x] Display all available MCP components
   - [x] Implement search and filter for palette
@@ -51,18 +52,16 @@
 
 ### UI/Frontend
 
-- [x] Replace all code textareas with Monaco Editor
-  - [x] Integrate Monaco Editor in all relevant forms/pages
-  - [x] Support multiple languages (Python, TypeScript, SQL, etc.)
+- [x] Replace all code textareas with Monaco Editor *(fully implemented, see README for details)*
 - [x] Add syntax highlighting for all supported languages
 - [x] Implement code validation and linting
   - [x] Show errors/warnings inline
   - [x] Support custom linting rules for MCP scripts
-- [x] Add auto-completion and IntelliSense
+- [x] Add auto-completion and IntelliSense *(Monaco Editor now supports advanced completions and custom snippets, see README)*
   - [x] Provide language server integration if possible
-  - [x] Support code snippets and templates
-- [x] Implement code formatting (auto-format on save)
-- [x] Add file upload capabilities for code/scripts
+  - [x] Support code snippets and templates *(see README for usage)*
+- [x] Implement code formatting (auto-format on save) *(Monaco Editor now supports auto-format on save, see README)*
+- [x] Add file upload capabilities for code/scripts *(Monaco Editor now supports drag-and-drop and file picker, see README)*
   - [x] Support drag-and-drop and file picker
   - [x] Parse and display uploaded code in editor
 - [x] Create code templates and snippets for common tasks

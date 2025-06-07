@@ -2729,3 +2729,9 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 - Implemented, tested, and documented /metrics/report endpoint for alerting logic (high latency triggers alert).
 - Next: Review and update API and technical documentation for performance monitoring endpoints and alerting as required by the checklist.
 ---
+
+---
+## [YYYY-MM-DD] Backend Recovery Checklist
+- Added and committed a real database-backed test for model creation and relationships using in-memory SQLite.
+- All actionable backend testing checklist items are now complete.
+---

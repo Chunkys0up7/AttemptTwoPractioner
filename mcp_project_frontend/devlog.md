@@ -24,3 +24,13 @@
 ### [DATE] Monaco Editor Code Templates/Snippets
 - CodeEditor now supports custom code templates and snippets for common tasks via the snippets prop
 - Updated README and checklist
+
+### [DATE] React Flow Integration Complete
+- Implemented React Flow in WorkflowBuilderPage.tsx
+- Canvas supports drag-and-drop, custom node/edge types, zoom, pan, fit-to-view
+- Updated checklist and documentation
+
+### [DATE] Drag-and-Drop & Connection Features Complete
+- Drag-and-drop from palette to canvas implemented
+- Node movement and edge creation supported via React Flow
+- Updated checklist and documentation
