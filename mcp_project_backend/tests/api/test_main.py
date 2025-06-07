@@ -77,4 +77,12 @@ def test_change_password_success_and_failure(client, db_session):
     # Test failure with wrong current password
     response = client.post("/api/v1/auth/change-password", json={"current_password": "wrongpass", "new_password": "newpass2"})
     assert response.status_code == 401
-    assert response.json()["detail"] == "Current password is incorrect" 
+    assert response.json()["detail"] == "Current password is incorrect"
+
+def test_get_template_categories(client):
+    response = client.get("/api/v1/templates/categories")
+    assert response.status_code == 200
+    categories = response.json()
+    assert isinstance(categories, list)
+    assert "Data Processing" in categories
+    assert "Custom" in categories 
