@@ -4,6 +4,7 @@
 $PROJECT_ROOT = (Get-Item $PSScriptRoot).Parent.FullName
 $BACKEND_DIR = Join-Path $PROJECT_ROOT "mcp_project_backend"
 $TEST_ENV = Join-Path $PROJECT_ROOT "test_env"
+$TEST_SCRIPT = Join-Path $PROJECT_ROOT "test_runner.py"
 
 # Function to log messages
 function Write-Log {
@@ -54,10 +55,10 @@ function Install-Dependencies {
 
 # Function to run tests
 function Run-Tests {
-    Write-Log "Running tests..."
-    python -m pytest C:\projects\AttemptTwoPractioner\tests\api\middleware\test_security_middleware.py -v -s
+    Write-Log "Running test runner script..."
+    python $TEST_SCRIPT
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Tests failed" -Level "ERROR"
+        Write-Log "Test execution failed" -Level "ERROR"
         exit 1
     }
     Write-Log "All tests passed!" -Level "SUCCESS"
