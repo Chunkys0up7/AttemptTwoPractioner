@@ -591,9 +591,36 @@ VITE_API_KEY=your-api-key-here
 The project uses a reusable Monaco-based `CodeEditor` component (`src/components/common/CodeEditor.tsx`) for all code, script, and markdown editing areas. This editor supports:
 - Multiple languages (Python, TypeScript, SQL, Markdown, etc.)
 - Syntax highlighting
-- Inline error/warning display (linting)
+- Inline error/warning display (linting, diagnostics, custom validation via `validate` prop)
 - Auto-completion and code snippets
 - Auto-format on save
 - File upload (drag-and-drop and file picker)
 
 All previous `<textarea>` and `<TextArea>` code/script inputs have been replaced with this editor. To add support for new languages or features, extend the `CodeEditor` component as needed.
+
+### Custom Validation/Diagnostics
+
+The `CodeEditor` component supports a `validate` prop, which allows you to provide custom validation logic. This function receives the code value and returns an array of Monaco `IMarkerData` objects, which are shown as inline errors/warnings in the editor.
+
+Example:
+
+```tsx
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  validate={(value) => {
+    if (!value.includes('def ')) {
+      return [{
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: 1,
+        endColumn: 5,
+        message: 'Function definition required',
+        severity: monaco.MarkerSeverity.Error,
+      }];
+    }
+    return [];
+  }}
+/>
+```

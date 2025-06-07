@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import MonacoEditor, { OnChange, OnMount } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 
 interface CodeEditorProps {
   value: string;
@@ -8,6 +9,11 @@ interface CodeEditorProps {
   height?: string;
   options?: Record<string, any>;
   onFileUpload?: (content: string, file: File) => void;
+  /**
+   * Optional custom validation function. Receives the code value and returns an array of Monaco IMarkerData.
+   * These will be shown as inline errors/warnings in the editor.
+   */
+  validate?: (value: string) => monaco.editor.IMarkerData[];
 }
 
 const defaultOptions = {
@@ -30,12 +36,29 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   height = '300px',
   options = {},
   onFileUpload,
+  validate,
 }) => {
   const editorRef = useRef<any>(null);
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
+    // Run custom validation if provided
+    if (validate && value) {
+      const markers = validate(value);
+      monacoInstance.editor.setModelMarkers(editor.getModel(), 'owner', markers);
+    }
   };
+
+  // Run validation on value change
+  React.useEffect(() => {
+    if (validate && editorRef.current && value !== undefined) {
+      const model = editorRef.current.getModel();
+      if (model) {
+        const markers = validate(value);
+        monaco.editor.setModelMarkers(model, 'owner', markers);
+      }
+    }
+  }, [value, validate]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
