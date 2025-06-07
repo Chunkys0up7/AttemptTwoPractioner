@@ -5,3 +5,12 @@ test-results/
 .cache/
 *.pyc
 __pycache__/
+venv/
+.tox/
+*.egg-info/
+.env
+test_env/
+
+
+
+

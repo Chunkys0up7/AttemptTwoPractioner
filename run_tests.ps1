@@ -38,19 +38,39 @@ function Install-Dependencies {
         . $activateScript
     }
     
-    # Install requirements
+    # Install test dependencies first
+    Write-Log "Installing test dependencies..."
+    pip install pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "Failed to install test dependencies" -Level "ERROR"
+        exit 1
+    }
+    
+    # Install project requirements
+    Write-Log "Installing project requirements..."
     pip install -r requirements.txt
     if ($LASTEXITCODE -ne 0) {
         Write-Log "Failed to install requirements" -Level "ERROR"
         exit 1
     }
     
-    # Install test dependencies
-    pip install pytest pytest-asyncio pytest-cov pytest-mock pytest-xdist
+    # Install project in development mode
+    Write-Log "Installing project in development mode..."
+    pip install -e .
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "Failed to install test dependencies" -Level "ERROR"
+        Write-Log "Failed to install project in development mode" -Level "ERROR"
         exit 1
     }
+    
+    # Verify installations
+    Write-Log "Verifying installations..."
+    python -m pytest --version
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log "pytest installation verification failed" -Level "ERROR"
+        exit 1
+    }
+    
+    Write-Log "All dependencies installed successfully"
 }
 
 # Function to run tests

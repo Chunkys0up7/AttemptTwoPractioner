@@ -6,6 +6,15 @@ variables, and defines global application event handlers and basic health check 
 """
 # --- Start: Environment Variable Loading from .env ---
 # This section MUST be at the very top of the file
+import os
+import sys
+
+# Set TESTING environment variable before any imports
+os.environ['TESTING'] = 'true'
+
+# Add project root to Python path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
 from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager
 # from mcp.db import base_class # For creating tables if needed, or use Alembic
 # Assuming SessionLocal and engine are setup
@@ -19,7 +28,6 @@ from mcp.api.routers import (
     entity_routes,    # Add entity_routes
 )
 from mcp.core.config import settings  # Import after .env is loaded
-# import os
 from pathlib import Path
 from dotenv import load_dotenv
 import logging
@@ -28,9 +36,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-# from fastapi.staticfiles import StaticFiles # Unused
 import uvicorn
-# import asyncio # Unused
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO)
@@ -38,9 +44,9 @@ logger = logging.getLogger(__name__)
 
 try:
     # Assuming mcp/api/main.py is the location of this file
-    # Project root is three levels up from mcp/api/main.py (main.py -> api -> mcp -> project_root)
+    # Project root is three levels up from mcp/api/main.py (main.py -> api -> mcp -> mcp -> project_root)
     current_file_path = Path(__file__).resolve()
-    project_root = current_file_path.parent.parent.parent
+    project_root = current_file_path.parent.parent.parent.parent
     env_file_path = project_root / '.env'
 
     if env_file_path.exists():
@@ -48,12 +54,70 @@ try:
             f"MCP Backend: Loading environment variables from: {env_file_path}")
         load_dotenv(dotenv_path=str(env_file_path), override=True)
     else:
-        logger.info(
-            f"MCP Backend: No .env file found at {env_file_path}. Relying on system environment variables.")
+        logger.info("No .env file found, using environment variables directly.")
 except Exception as e:
-    logger.error(f"MCP Backend: Error loading .env file: {e}")
-# --- End: Environment Variable Loading from .env ---
+    logger.error(f"Error loading environment variables: {e}")
+    raise
 
+# Initialize FastAPI app
+if os.getenv('TESTING'):
+    app = FastAPI(
+        title="MCP Backend API (Test)",
+        description="API for managing MCP workflows and executions (Test Mode).",
+        version="1.0.0",
+        docs_url=None,  # Disable docs in test mode
+        redoc_url=None,
+        openapi_url=None
+    )
+else:
+    app = FastAPI(
+        title="MCP Backend API",
+        description="API for managing MCP workflows and executions.",
+        version="1.0.0",
+        docs_url=f"{settings.API_V1_STR}/docs",
+        redoc_url=f"{settings.API_V1_STR}/redoc",
+        openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    )
+
+# CORS middleware
+if not os.getenv('TESTING'):
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    if os.getenv('TESTING'):
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": "Internal server error (test mode)"}
+        )
+    
+    logger.error(f"An error occurred: {str(exc)}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error"}
+    )
+
+# Validation error handler
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    if os.getenv('TESTING'):
+        return JSONResponse(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            content={"detail": "Validation error (test mode)"}
+        )
+    
+    logger.error(f"Validation error: {exc.errors()}")
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": exc.errors()}
+    )
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

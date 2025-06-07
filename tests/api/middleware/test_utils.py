@@ -1,10 +1,17 @@
 """
 Test utility functions and helpers for security middleware tests.
 """
+import os
 from typing import Dict, Optional
 from fastapi.testclient import TestClient
 from starlette.datastructures import Headers
+from fastapi import FastAPI
+from mcp.api.middleware.security import SecurityMiddleware
 
+# Set TESTING environment variable before any imports
+os.environ['TESTING'] = 'true'
+
+# Import after setting TESTING
 class TestRequest:
     """Helper class for creating test requests."""
     def __init__(self, client: TestClient):
@@ -59,14 +66,19 @@ def assert_rate_limit_headers(response: dict):
 
 def create_test_client(app) -> TestClient:
     """Create a test client with security middleware."""
-    from mcp.api.middleware.security import SecurityMiddleware
     middleware = SecurityMiddleware(app)
     return TestClient(middleware)
 
 def create_test_app() -> FastAPI:
     """Create a test FastAPI app with test endpoints."""
-    from fastapi import FastAPI
-    app = FastAPI()
+    app = FastAPI(
+        title="MCP Backend API (Test)",
+        description="API for managing MCP workflows and executions (Test Mode).",
+        version="1.0.0",
+        docs_url=None,  # Disable docs in test mode
+        redoc_url=None,
+        openapi_url=None
+    )
     
     @app.get("/test")
     async def test_endpoint():

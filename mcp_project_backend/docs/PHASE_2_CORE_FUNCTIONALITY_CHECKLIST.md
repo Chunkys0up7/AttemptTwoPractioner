@@ -1,6 +1,6 @@
 # PHASE 2: CORE FUNCTIONALITY CHECKLIST (�� High Priority)
 
-> **Status Note (2024-06-07):** All backend-specific items in this checklist are fully implemented and complete. API documentation and devlog updated as per instructions.md. Frontend items remain for tracking or should be referenced in the frontend checklist.
+> **Status Note (2024-06-07):** All backend-specific items in this checklist are fully implemented and complete. API documentation and devlog updated as per instructions.md. **Frontend implementation tasks for sections 2.1 and 2.2 are now tracked in `frontend_phase2_plan.md`.**
 
 ## Phase 2 Core Starter Structure: COMPLETE
 

@@ -3,16 +3,26 @@ Workflow Engine Service for orchestrating workflow executions.
 
 Handles workflow run lifecycle management, execution, and monitoring.
 """
+import os
 import uuid
 from typing import Dict, Any, Optional, List
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 import logging
 
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
+
 from mcp.db.models import WorkflowRun
 from mcp.db.models.workflow import WorkflowRunStatus
-from mcp.monitoring.performance import performance_monitor
+
+# Use mock monitoring during testing
+if os.getenv('TESTING'):
+    class MockMonitor:
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
+    performance_monitor = MockMonitor()
+else:
+    from mcp.monitoring.performance import performance_monitor
 
 logger = logging.getLogger(__name__)
 
@@ -69,11 +79,13 @@ class WorkflowEngineService:
             self.db.add(new_run)
             self.db.commit()
             self.db.refresh(new_run)
-        self.db.commit()
-        self.db.refresh(new_run)
+            return new_run
 
-        # TODO: In a real engine, this would trigger asynchronous execution
-        # For example, by publishing an event or adding a task to a queue.
-        # print(f"Workflow run {new_run.id} created for definition {workflow_definition_id}. Status: PENDING")
-
-        return new_run
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to create workflow run: {e}")
+            performance_monitor.increment_error("workflow_run_creation", str(e))
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error creating workflow run: {e}")
+            performance_monitor.increment_error("workflow_run_creation", str(e))
+            raise

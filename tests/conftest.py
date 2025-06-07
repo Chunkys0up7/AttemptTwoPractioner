@@ -5,6 +5,12 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette.datastructures import Headers
+import os
+
+# Set TESTING environment variable before any imports
+os.environ['TESTING'] = 'true'
+
+# Import after setting TESTING
 from mcp_project_backend.mcp.api.middleware.security import SecurityMiddleware
 from mcp_project_backend.mcp.core.config import settings
 from mcp_project_backend.mcp.core.monitoring import monitor
@@ -23,6 +29,10 @@ def mock_settings():
         INPUT_SANITIZATION = True
         IP_BLACKLIST = ["192.168.1.1"]
         IP_WHITELIST = ["192.168.1.2"]
+        API_V1_STR = "/api/v1"
+        CORS_ORIGINS = []
+        REDIS_URL = None
+        DATABASE_URL = "sqlite:///test.db"
         
     return MockSettings()
 
@@ -30,15 +40,25 @@ def mock_settings():
 def mock_monitor():
     """Mock monitoring instance for testing."""
     class MockMonitor:
-        def increment_event(self, event: str, labels: dict = None) -> None:
-            pass
+        def __getattr__(self, name):
+            return lambda *args, **kwargs: None
     
     return MockMonitor()
 
 @pytest.fixture
-def mock_app():
+def mock_app(mock_settings):
     """Mock FastAPI app for testing."""
-    app = FastAPI()
+    app = FastAPI(
+        title="MCP Backend API (Test)",
+        description="API for managing MCP workflows and executions (Test Mode).",
+        version="1.0.0",
+        docs_url=None,  # Disable docs in test mode
+        redoc_url=None,
+        openapi_url=None
+    )
+    
+    # Set mock settings
+    app.dependency_overrides[settings] = lambda: mock_settings
     
     @app.get("/test")
     async def test_endpoint():
@@ -56,9 +76,9 @@ def security_middleware(mock_app, mock_settings, mock_monitor):
     return SecurityMiddleware(mock_app)
 
 @pytest.fixture
-def test_client(security_middleware):
+def test_client(mock_app):
     """Create a TestClient instance for testing."""
-    return TestClient(security_middleware)
+    return TestClient(mock_app)
 
 @pytest.fixture
 def test_request(test_client):

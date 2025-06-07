@@ -6,128 +6,176 @@ It covers all security features including host validation, XSS protection,
 rate limiting, IP blacklisting/whitelisting, and monitoring integration.
 """
 import pytest
+import os
+
+# Set TESTING environment variable before any imports
+os.environ['TESTING'] = 'true'
+
+# Import after setting TESTING
 from mcp.api.middleware.security import SecurityMiddleware
 from mcp.core.config import settings
 from mcp.core.monitoring import monitor
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from starlette.datastructures import Headers
-from typing import Generator
-import time
-from unittest.mock import Mock, patch
+from .test_utils import (
+    TestRequest,
+    create_test_headers,
+    assert_security_headers,
+    assert_rate_limit_headers,
+    create_test_client,
+    create_test_app,
+    create_test_settings
+)
 
 @pytest.fixture
-def test_client() -> Generator[TestClient, None, None]:
+def test_client() -> TestClient:
     """Create a test client with security middleware."""
-    app = FastAPI()
+    app = create_test_app()
+    return create_test_client(app)
+
+@pytest.fixture
+def test_request(test_client: TestClient) -> TestRequest:
+    """Create a test request helper."""
+    return TestRequest(test_client)
+
+@pytest.fixture
+def test_settings() -> dict:
+    """Test settings fixture."""
+    return create_test_settings()
+
+@pytest.mark.unit
+@pytest.mark.security
+def test_valid_host_header(test_request: TestRequest, test_settings: dict):
+    """Test valid host header.
     
-    @app.get("/test")
-    async def test_endpoint():
-        return {"message": "Test successful"}
+    This test verifies that requests with valid host headers are allowed through.
+    """
+    headers = create_test_headers(host="localhost")
+    response = test_request.get("/", headers=headers)
+    assert response["status_code"] == 200
+    assert response["json"] == {"message": "Test successful"}
+
+@pytest.mark.unit
+@pytest.mark.security
+def test_invalid_host_header(test_request: TestRequest, test_settings: dict):
+    """Test invalid host header.
     
-    @app.post("/test")
-    async def test_post_endpoint(data: dict):
-        return {"received": data}
+    This test verifies that requests with invalid host headers are blocked.
+    """
+    headers = create_test_headers(host="malicious.com")
+    response = test_request.get("/", headers=headers)
+    assert response["status_code"] == 400
+    assert "invalid host" in str(response["content"]).lower()
+
+@pytest.mark.unit
+@pytest.mark.security
+def test_csp_headers(test_request: TestRequest, test_settings: dict):
+    """Test CSP headers.
     
-    middleware = SecurityMiddleware(app)
-    client = TestClient(middleware)
-    yield client
-    # Cleanup if needed
+    This test verifies that Content Security Policy headers are properly set.
+    """
+    response = test_request.get("/")
+    expected_headers = {
+        "Content-Security-Policy": test_settings["CSP_POLICY"]
+    }
+    assert_security_headers(response, expected_headers)
 
-@pytest.fixture
-def mock_settings():
-    """Mock settings for testing."""
-    class MockSettings:
-        ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-        CSP_POLICY = "default-src 'self'; frame-ancestors 'none';"
-        XSS_PROTECTION = "1; mode=block"
-        RATE_LIMIT_WINDOW = 60
-        RATE_LIMIT_MAX_REQUESTS = 10
-        IP_BLACKLIST = ["192.168.1.100"]
-        IP_WHITELIST = ["127.0.0.1"]
-        
-    return MockSettings()
-
-@pytest.fixture
-def mock_monitor():
-    """Mock monitor fixture."""
-    return Mock()
-
-@pytest.fixture
-def app():
-    """FastAPI app fixture."""
-    return FastAPI()
-
-@pytest.fixture
-def middleware(app, mock_settings, mock_monitor):
-    """Security middleware fixture."""
-    return SecurityMiddleware(app, mock_settings, mock_monitor)
-
-@pytest.fixture
-def test_client(middleware):
-    """Test client fixture."""
-    return TestClient(middleware.app)
-
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_valid_host_header(mock_settings, test_client):
-    """Test valid host header."""
-    mock_settings.ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-    response = test_client.get('/', headers={'Host': 'localhost'})
-    assert response.status_code == 200
-
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_invalid_host_header(mock_settings, test_client):
-    """Test invalid host header."""
-    mock_settings.ALLOWED_HOSTS = ['localhost']
-    response = test_client.get('/', headers={'Host': 'malicious.com'})
-    assert response.status_code == 400
-
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_csp_headers(mock_settings, test_client):
-    """Test CSP headers."""
-    mock_settings.CSP_POLICY = 'default-src \'self\'; frame-ancestors \'none\';'
-    response = test_client.get('/')
-    assert 'Content-Security-Policy' in response.headers
-    assert response.headers['Content-Security-Policy'] == mock_settings.CSP_POLICY
-
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_xss_protection(mock_settings, test_client):
-    """Test XSS protection."""
-    mock_settings.XSS_PROTECTION = '1; mode=block'
-    response = test_client.get('/')
-    assert 'X-XSS-Protection' in response.headers
-    assert response.headers['X-XSS-Protection'] == mock_settings.XSS_PROTECTION
-
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_rate_limiting(mock_settings, test_client):
-    """Test rate limiting."""
-    mock_settings.RATE_LIMIT_WINDOW = 60
-    mock_settings.RATE_LIMIT_MAX_REQUESTS = 10
+@pytest.mark.unit
+@pytest.mark.security
+def test_xss_protection(test_request: TestRequest, test_settings: dict):
+    """Test XSS protection.
     
+    This test verifies that XSS protection headers are properly set.
+    """
+    response = test_request.get("/")
+    expected_headers = {
+        "X-XSS-Protection": test_settings["XSS_PROTECTION"]
+    }
+    assert_security_headers(response, expected_headers)
+
+@pytest.mark.unit
+@pytest.mark.security
+def test_rate_limiting(test_request: TestRequest, test_settings: dict):
+    """Test rate limiting.
+    
+    This test verifies that rate limiting is properly enforced.
+    """
     # Make 11 requests to trigger rate limiting
-    for _ in range(11):
-        response = test_client.get('/')
-        if response.status_code == 429:
+    for i in range(11):
+        response = test_request.get("/")
+        if response["status_code"] == 429:
             break
     
-    assert response.status_code == 429
+    assert response["status_code"] == 429
+    assert "rate limit" in str(response["content"]).lower()
+    assert_rate_limit_headers(response)
 
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_ip_blacklisting(mock_settings, test_client):
-    """Test IP blacklisting."""
-    mock_settings.IP_BLACKLIST = ['192.168.1.100']
-    headers = Headers({'X-Forwarded-For': '192.168.1.100'})
-    response = test_client.get('/', headers=headers)
-    assert response.status_code == 403
+@pytest.mark.unit
+@pytest.mark.security
+def test_ip_blacklisting(test_request: TestRequest, test_settings: dict):
+    """Test IP blacklisting.
+    
+    This test verifies that requests from blacklisted IPs are blocked.
+    """
+    headers = create_test_headers(ip="192.168.1.100")
+    response = test_request.get("/", headers=headers)
+    assert response["status_code"] == 403
+    assert "blacklisted" in str(response["content"]).lower()
 
-@patch('mcp.api.middleware.security.settings', new_callable=Mock)
-def test_ip_whitelisting(mock_settings, test_client):
-    """Test IP whitelisting."""
-    mock_settings.IP_WHITELIST = ['127.0.0.1']
-    headers = Headers({'X-Forwarded-For': '192.168.1.100'})
-    response = test_client.get('/', headers=headers)
-    assert response.status_code == 403
+@pytest.mark.unit
+@pytest.mark.security
+def test_ip_whitelisting(test_request: TestRequest, test_settings: dict):
+    """Test IP whitelisting.
+    
+    This test verifies that whitelisting works correctly.
+    """
+    # Blacklisted IP should be blocked
+    headers = create_test_headers(ip="192.168.1.100")
+    response = test_request.get("/", headers=headers)
+    assert response["status_code"] == 403
 
-    headers = Headers({'X-Forwarded-For': '127.0.0.1'})
-    response = test_client.get('/', headers=headers)
-    assert response.status_code == 200
+    # Whitelisted IP should be allowed
+    headers = create_test_headers(ip="127.0.0.1")
+    response = test_request.get("/", headers=headers)
+    assert response["status_code"] == 200
+
+@pytest.mark.unit
+@pytest.mark.security
+def test_input_sanitization(test_request: TestRequest, test_settings: dict):
+    """Test input sanitization.
+    
+    This test verifies that potentially malicious input is properly sanitized.
+    """
+    # Test with potentially malicious input
+    response = test_request.post("/test", data={"data": "<script>alert('xss')</script>"})
+    assert response["status_code"] == 200
+    assert "<script>" not in str(response["content"])
+
+@pytest.mark.integration
+@pytest.mark.security
+def test_monitoring_integration(test_request: TestRequest, test_settings: dict):
+    """Test monitoring integration.
+    
+    This test verifies that security events are properly monitored.
+    """
+    response = test_request.get("/")
+    assert response["status_code"] == 200
+    # Verify monitoring metrics are collected
+    assert monitor.metrics
+    assert "security" in str(monitor.metrics)
+
+@pytest.mark.performance
+def test_performance(test_request: TestRequest, test_settings: dict):
+    """Test performance characteristics.
+    
+    This test verifies that the middleware doesn't introduce significant latency.
+    """
+    import time
+    start = time.time()
+    response = test_request.get("/")
+    end = time.time()
+    assert response["status_code"] == 200
+    # Ensure response time is within acceptable limit
+    assert (end - start) < 0.1  # 100ms response time
+    # Verify response content
+    assert response["json"] == {"message": "Test successful"}
