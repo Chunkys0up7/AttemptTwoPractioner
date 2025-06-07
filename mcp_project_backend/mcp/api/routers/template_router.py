@@ -138,15 +138,19 @@ def search_templates(
     return templates
 
 @router.get("/categories", response_model=List[str])
-def list_categories(
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-):
-    """List all template categories."""
-    service = TemplateService(db)
-    templates = service.list_templates(current_user["id"])
-    categories = {t.category for t in templates if t.category}
-    return sorted(list(categories))
+def get_template_categories():
+    """
+    Get a list of available template categories (stub/in-memory).
+    """
+    return [
+        "Data Processing",
+        "Machine Learning",
+        "ETL",
+        "Visualization",
+        "Reporting",
+        "Automation",
+        "Custom"
+    ]
 
 @router.get("/stats", response_model=TemplateStats)
 def get_template_stats(
