@@ -95,4 +95,21 @@ def test_performance_dashboard(client):
     assert "alerts" in data
     assert "dashboard" in data
     assert "request_count" in data["dashboard"]
-    assert "cache_hit_ratio" in data["dashboard"] 
+    assert "cache_hit_ratio" in data["dashboard"]
+
+def test_metrics_report_alerts(client, monkeypatch):
+    # Patch monitor.get_metrics to simulate high latency
+    from mcp.core.monitoring import monitor
+    async def fake_get_metrics():
+        return {
+            "requests": {"count": 10, "latency": 2.5},  # Exceeds threshold
+            "cache": {"hits": 8, "misses": 2, "hit_ratio": 0.8},
+            "errors": {"total": 0},
+            "uptime": 1000
+        }
+    monkeypatch.setattr(monitor, "get_metrics", fake_get_metrics)
+
+    response = client.get("/api/v1/metrics/report")
+    assert response.status_code == 200
+    data = response.json()
+    assert any("High request latency" in alert for alert in data["alerts"]) 

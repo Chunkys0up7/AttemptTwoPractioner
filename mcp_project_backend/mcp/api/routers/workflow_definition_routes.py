@@ -580,7 +580,7 @@ async def get_workflow_definition(
 
 @router.put("/{wf_def_id}", response_model=WorkflowDefinitionRead)
 def update_workflow_definition(
-    wf_def_id: int = Path(..., description="Workflow Definition ID"),
+    wf_def_id: int,
     wf_def_update: WorkflowDefinitionUpdate,
     db: Session = Depends(get_db)
 ):
@@ -619,7 +619,7 @@ def update_workflow_definition(
 
 @router.delete("/{wf_def_id}", response_model=WorkflowDefinitionRead)
 def delete_workflow_definition(
-    wf_def_id: int = Path(..., description="Workflow Definition ID"),
+    wf_def_id: int,
     db: Session = Depends(get_db)
 ):
     """
@@ -655,7 +655,7 @@ def delete_workflow_definition(
 
 @router.post("/{wf_def_id}/steps", response_model=WorkflowStepRead, status_code=status.HTTP_201_CREATED)
 def add_workflow_step(
-    wf_def_id: int = Path(..., description="Workflow Definition ID"),
+    wf_def_id: int,
     step_in: WorkflowStepCreate,
     db: Session = Depends(get_db)
 ):

@@ -58,6 +58,8 @@ class Settings(BaseSettings):
     REQUEST_LATENCY_THRESHOLD: float = 1.0  # seconds
     CACHE_HIT_RATIO_THRESHOLD: float = 0.8  # 80%
     ERROR_RATE_THRESHOLD: float = 0.05  # 5%
+    MEMORY_THRESHOLD: float = 80.0  # 80% memory usage
+    CPU_THRESHOLD: float = 80.0  # 80% CPU usage
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

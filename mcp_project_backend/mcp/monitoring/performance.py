@@ -305,16 +305,107 @@ class PerformanceMonitor:
             self.workflow_step_executions.labels(workflow_id, step_id, status).inc()
             self.workflow_step_latency.labels(workflow_id, step_id, status).observe(duration)
 
-    def increment_error(self, error_type: str, source: str):
-        """
-        Increment error counter and update error rate.
+    def increment_error(self, error_type: str, error_message: str):
+        """Increment error counter for a specific error type."""
+        self.errors_total.labels(error_type, 'api').inc()
+        self.error_rate.labels(error_type, 'api').inc()
+
+    def check_rate_limit(self, key: str, limit: int, period: int) -> bool:
+        """Check if a rate limit has been exceeded."""
+        current_count = self.rate_limit_hits.labels(key).inc()
+        if current_count > limit:
+            self.rate_limit_exceeded.labels(key).inc()
+            return False
+        return True
+
+    def update_health_status(self, component: str, status: str):
+        """Update health status for a component."""
+        self.health_status.state(status)
+
+    async def get_metrics(self) -> Dict[str, Any]:
+        """Get all current metrics."""
+        metrics = {
+            "uptime": self.system_uptime._value.get(),
+            "requests": {
+                "count": self.request_count._value.get(),
+                "latency": self.request_latency._sum.get(),
+                "active": self.active_requests._value.get()
+            },
+            "errors": {
+                "total": self.errors_total._value.get(),
+                "rate": self.error_rate._value.get()
+            },
+            "cache": {
+                "hits": self.cache_hits._value.get(),
+                "misses": self.cache_misses._value.get(),
+                "hit_ratio": self.cache_hits._value.get() / max(1, self.cache_hits._value.get() + self.cache_misses._value.get())
+            },
+            "db": {
+                "queries": self.db_query_count._value.get(),
+                "latency": self.db_query_latency._sum.get(),
+                "errors": self.db_query_errors._value.get()
+            },
+            "system": {
+                "memory": self.memory_usage._value.get(),
+                "cpu": self.cpu_usage._value.get()
+            }
+        }
+        return metrics
+
+    async def check_thresholds(self) -> List[Dict[str, Any]]:
+        """Check if any metrics exceed configured thresholds."""
+        alerts = []
         
-        Args:
-            error_type: Type of error
-            source: Source of error
-        """
-        self.errors_total.labels(error_type, source).inc()
-        self.error_rate.labels(error_type, source).inc()
+        # Check error rate
+        error_rate = self.error_rate._value.get()
+        if error_rate > settings.error_rate_threshold:
+            alerts.append({
+                "type": "error_rate",
+                "severity": "high",
+                "message": f"Error rate ({error_rate:.2f}) exceeds threshold ({settings.error_rate_threshold})",
+                "value": error_rate,
+                "threshold": settings.error_rate_threshold
+            })
+        
+        # Check memory usage
+        memory_usage = self.memory_usage._value.get()
+        if memory_usage > settings.MEMORY_THRESHOLD:
+            alerts.append({
+                "type": "memory_usage",
+                "severity": "high",
+                "message": f"Memory usage ({memory_usage:.2f}%) exceeds threshold ({settings.MEMORY_THRESHOLD}%)",
+                "value": memory_usage,
+                "threshold": settings.memory_threshold
+            })
+        
+        # Check CPU usage
+        cpu_usage = self.cpu_usage._value.get()
+        if cpu_usage > settings.cpu_threshold:
+            alerts.append({
+                "type": "cpu_usage",
+                "severity": "high",
+                "message": f"CPU usage ({cpu_usage:.2f}%) exceeds threshold ({settings.cpu_threshold}%)",
+                "value": cpu_usage,
+                "threshold": settings.cpu_threshold
+            })
+        
+        return alerts
+
+    async def get_dashboard(self) -> Dict[str, Any]:
+        """Get a dashboard summary of key performance metrics and alerts."""
+        metrics = await self.get_metrics()
+        alerts = await self.check_thresholds()
+        return {
+            "metrics": metrics,
+            "alerts": alerts,
+            "dashboard": {
+                "uptime": metrics.get("uptime"),
+                "request_count": metrics["requests"]["count"],
+                "error_count": metrics["errors"]["total"],
+                "cache_hit_ratio": metrics["cache"]["hit_ratio"],
+                "active_alerts": len(alerts)
+            }
+        }
 
     def monitor_auth_attempt(self, status: str, method: str):
         """
@@ -502,6 +593,8 @@ class PerformanceMonitor:
                     operation: self.cache_latency.labels(operation=operation).collect()[0].samples[0].value
                     for operation in self.cache_latency._metrics.keys()
                 },
+
+
                 'hit_rate': total_hits / total_operations if total_operations > 0 else 0,
                 'total_operations': total_operations
             }
@@ -608,77 +701,6 @@ performance_monitor = PerformanceMonitor()
         Args:
             workflow_id: ID of the workflow
             status: Execution status
-            duration: Execution duration in seconds
-        """
-        self.workflow_executions.labels(workflow_id, status).inc()
-        self.workflow_execution_latency.labels(workflow_id).observe(duration)
-
-    def get_metrics(self) -> Dict[str, Any]:
-        """
-        Get all collected metrics.
-        
-        Returns:
-            Dictionary containing all metrics
-        """
-        return {
-            'requests': {
-                'count': self.request_count._value.get(),
-                'latency': self.request_latency._sum.get() / self.request_latency._count.get()
-            },
-            'database': {
-                'queries': self.db_query_count._value.get(),
-                'latency': self.db_query_latency._sum.get() / self.db_query_latency._count.get()
-            },
-            'cache': {
-                'hits': self.cache_hits._value.get(),
-                'misses': self.cache_misses._value.get(),
-                'size': self.cache_size._value.get(),
-                'hit_ratio': self.cache_hits._value.get() / 
-                (self.cache_hits._value.get() + self.cache_misses._value.get())
-            },
-            'workflows': {
-                'executions': self.workflow_executions._value.get(),
-                'latency': self.workflow_execution_latency._sum.get() / self.workflow_execution_latency._count.get()
-            }
-        }
-
-    def get_health_status(self) -> Dict[str, Any]:
-        """
-        Get system health status based on metrics.
-        
-        Returns:
-            Dictionary containing health metrics
-        """
-        try:
-            metrics = self.get_metrics()
-            
-            health = {
-                'status': 'healthy',
-                'details': {
-                    'request_latency': metrics['requests']['latency'],
-                    'db_latency': metrics['database']['latency'],
-                    'cache_hit_ratio': metrics['cache']['hit_ratio'],
-                    'workflow_latency': metrics['workflows']['latency']
-                }
-            }
-            
-            # Check thresholds
-            if metrics['requests']['latency'] > settings.REQUEST_LATENCY_THRESHOLD:
-                health['status'] = 'warning'
-                health['details']['request_latency_status'] = 'high'
-            
-            if metrics['database']['latency'] > settings.DB_LATENCY_THRESHOLD:
-                health['status'] = 'warning'
-                health['details']['db_latency_status'] = 'high'
-            
-            if metrics['cache']['hit_ratio'] < settings.CACHE_HIT_RATIO_THRESHOLD:
-                health['status'] = 'warning'
-                health['details']['cache_hit_ratio_status'] = 'low'
-            
-            if metrics['workflows']['latency'] > settings.WORKFLOW_LATENCY_THRESHOLD:
-                health['status'] = 'warning'
-                health['details']['workflow_latency_status'] = 'high'
-            
             return health
         except Exception as e:
             logger.error(f"Error calculating health status: {e}")
