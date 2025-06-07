@@ -1,59 +1,93 @@
 import logging
 import sys
+import json
 from typing import Any, Dict, Optional
 from datetime import datetime
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+from structlog import configure, get_logger, make_filtering_bound_logger
+from structlog.processors import JSONRenderer, TimeStamper
+from structlog.stdlib import add_log_level
 
-from mcp.core.errors import MCPError, handle_mcp_error
+from mcp.core.config import settings
+from mcp.core.exceptions import MCPException
 
-# Configure logging
+# Configure structlog
+configure(
+    processors=[
+        add_log_level,
+        TimeStamper(fmt="iso"),
+        JSONRenderer(sort_keys=True)
+    ],
+    context_class=dict,
+    logger_factory=get_logger,
+    wrapper_class=make_filtering_bound_logger(logging.INFO),
+    cache_logger_on_first_use=True,
+)
+
+# Configure standard logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format='%(message)s',
     handlers=[
         logging.StreamHandler(sys.stdout),
         logging.FileHandler('mcp.log')
     ]
 )
 
-logger = logging.getLogger('mcp')
+# Get structlog logger
+logger = get_logger("mcp")
 
+# Add custom logging middleware for FastAPI
 class LoggingMiddleware(BaseHTTPMiddleware):
     """Middleware for logging HTTP requests and responses."""
     
     async def dispatch(self, request: Request, call_next):
-        # Log request
-        start_time = datetime.utcnow()
-        request_id = request.headers.get('X-Request-ID', 'unknown')
-        
-        logger.info(
-            f"Request started: {request.method} {request.url.path}",
-            extra={
-                'request_id': request_id,
-                'method': request.method,
-                'path': request.url.path,
-                'client_ip': request.client.host if request.client else None
-            }
-        )
-        
         try:
+            # Log request
+            start_time = datetime.utcnow()
+            request_id = request.headers.get('X-Request-ID', 'unknown')
+            
+            logger.info(
+                "http.request",
+                method=request.method,
+                path=request.url.path,
+                client_ip=request.client.host if request.client else None,
+                request_id=request_id,
+                timestamp=start_time.isoformat()
+            )
+            
             # Process request
             response = await call_next(request)
             
             # Log response
             process_time = (datetime.utcnow() - start_time).total_seconds()
             logger.info(
-                f"Request completed: {request.method} {request.url.path}",
-                extra={
-                    'request_id': request_id,
-                    'status_code': response.status_code,
-                    'process_time': process_time
-                }
+                "http.response",
+                status_code=response.status_code,
+                process_time=process_time,
+                request_id=request_id,
+                timestamp=datetime.utcnow().isoformat()
             )
             
             return response
+            
+        except MCPException as e:
+            logger.error(
+                "http.error",
+                error_type=type(e).__name__,
+                message=str(e),
+                status_code=e.status_code,
+                timestamp=datetime.utcnow().isoformat()
+            )
+            return JSONResponse(
+                status_code=e.status_code,
+                content={
+                    'message': e.message,
+                    'details': e.details
+                }
+            )
             
         except Exception as e:
             # Log error
