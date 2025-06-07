@@ -188,8 +188,17 @@ The performance monitoring system is tested in `tests/core/test_performance_moni
 
 ## Alerting
 
-- Threshold-based alerting is now implemented for request latency, cache hit ratio, and error rate.
-- Alerts are included in the health check and performance report endpoints.
+- Threshold-based alerting is implemented for:
+  - Request latency (default: >1.0s)
+  - Cache hit ratio (default: <0.8)
+  - Error rate (default: >0.05)
+- Alerts are included in the health check, performance report, and dashboard endpoints.
+- Alerts are triggered and logged if thresholds are exceeded.
+
+## Dashboard Endpoint
+
+- `GET /api/v1/metrics/dashboard`: Returns a summary of key metrics and alerts for dashboard visualization.
+- Includes: uptime, request count, error count, cache hit ratio, and active alerts.
 
 ## Retention/Cleanup
 
@@ -198,5 +207,6 @@ The performance monitoring system is tested in `tests/core/test_performance_moni
 
 ## Usage Notes
 
-- Use `/metrics/report` for dashboards, admin review, or troubleshooting.
-- Use `/metrics/reset` for manual cleanup/testing. 
+- Use `/metrics/dashboard` for admin dashboards or monitoring UIs.
+- Use `/metrics/report` for detailed metrics and alert review.
+- Alerts are in-memory only and reset every 24 hours or via the reset endpoint. 
