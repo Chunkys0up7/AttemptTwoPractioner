@@ -1,0 +1,44 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="mcp",
+    version="0.1.0",
+    packages=find_packages(where='mcp'),
+    package_dir={'mcp': 'mcp'},
+    install_requires=[
+        "fastapi>=0.100.0",
+        "uvicorn>=0.27.0",
+        "sqlalchemy>=2.0.25",
+        "psycopg2-binary>=2.9.9",
+        "pydantic>=2.5.3",
+        "python-jose[cryptography]>=3.3.0",
+        "passlib[bcrypt]>=1.7.4",
+        "python-multipart>=0.0.6",
+        "prometheus-client>=0.19.0",
+        "psutil>=5.9.8",
+        "alembic>=1.13.1",
+        "redis>=5.0.1",
+        "python-dotenv>=1.0.0",
+        "pydantic-settings>=2.1.0",
+        "httpx>=0.26.0",
+        "aiohttp>=3.9.1",
+        "aiofiles>=23.2.1"
+    ],
+    extras_require={
+        "test": [
+            "pytest>=7.0.0",
+            "pytest-asyncio>=0.20.3",
+            "pytest-cov>=6.1.1",
+            "pytest-mock>=3.14.0",
+            "pytest-xdist>=3.6.1"
+        ],
+        "lint": [
+            "black>=23.11.0",
+            "isort>=5.13.2",
+            "flake8>=7.0.0",
+            "mypy>=1.8.0"
+        ]
+    },
+    python_requires=">=3.10",
+    include_package_data=True
+)

@@ -1,0 +1,7 @@
+components
+core
+db
+external_db
+monitoring
+schemas
+utils

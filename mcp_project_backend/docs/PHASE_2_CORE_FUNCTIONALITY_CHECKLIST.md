@@ -55,6 +55,13 @@
 - [x] Ensure all workflow data is validated and persisted correctly
 - [x] API documentation for workflow template endpoints added to docs/API.md
 - [x] Devlog updated for backend workflow builder implementation
+- [x] Apply DB migration for advanced monitoring, alerting, and sharing features
+  - [x] Created `template_shares` table for template sharing/permissions
+  - [x] Created `metrics` table for performance/usage metrics
+  - [x] Created `alerts` table for threshold-based alerts
+  - [x] Created `workflow_step_executions` table for detailed workflow step tracking
+  - [x] Updated `workflow_definitions` and `workflow_runs` schema to match models
+  - [x] See README and CHANGES.md for details
 
 ### Acceptance Criteria
 
