@@ -144,8 +144,8 @@ def startup_event():
 async def create_workflow_definition(
     wf_def_in: WorkflowDefinitionCreate,
     request: Request,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    current_user = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
     """
     Create a new Workflow Definition, optionally with steps.
@@ -308,12 +308,12 @@ def create_workflow_definition(
 @workflow_rate_limiter
 @cache_response(timeout=definition_cache_timeout)
 async def list_workflow_definitions(
+    request: Request,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     search: Optional[str] = Query(None, min_length=1),
     mcp_type: Optional[str] = Query(None),
     include_archived: bool = Query(False),
-    request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -555,8 +555,8 @@ async def list_workflow_definitions(
 @cache_response(timeout=definition_cache_timeout)
 async def get_workflow_definition(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request
 ):
     """
     Get a Workflow Definition by ID, including its steps.
@@ -625,8 +625,8 @@ async def get_workflow_definition(
 async def update_workflow_definition(
     wf_def_id: int,
     wf_def_update: WorkflowDefinitionUpdate,
-    request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request
 ):
     """
     Update a Workflow Definition.
