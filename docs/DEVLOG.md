@@ -2716,6 +2716,6 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 
 ---
 ## [YYYY-MM-DD] Authentication Enhancements (Backend)
-- Secure session handling is already implemented via SessionMiddleware with secure cookie settings (httpOnly, sameSite, secure in production).
-- Next: Proceed to auto-logout functionality as required by the checklist.
+- Secure state persistence is enforced via secure, httpOnly, sameSite cookies and backend best practices.
+- Next: Proceed to CSRF protection as required by the checklist.
 ---

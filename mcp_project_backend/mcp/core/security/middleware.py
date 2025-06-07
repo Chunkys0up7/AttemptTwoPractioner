@@ -82,6 +82,25 @@ class AutoLogoutMiddleware(BaseHTTPMiddleware):
             session['created_at'] = datetime.now(timezone.utc).timestamp()
         return await call_next(request)
 
+class CSRFMiddleware(BaseHTTPMiddleware):
+    """Middleware for CSRF protection on state-changing requests."""
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        # Only protect state-changing methods
+        if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+            session = request.session if hasattr(request, 'session') else None
+            if session is not None:
+                csrf_token = session.get('csrf_token')
+                if not csrf_token:
+                    # Generate and set CSRF token
+                    import secrets
+                    csrf_token = secrets.token_urlsafe(32)
+                    session['csrf_token'] = csrf_token
+                # Check header
+                header_token = request.headers.get('x-csrf-token')
+                if not header_token or header_token != csrf_token:
+                    return JSONResponse({"detail": "CSRF token missing or invalid."}, status_code=403)
+        return await call_next(request)
+
 def setup_security_middleware(app):
     """Set up all security middleware for the FastAPI application."""
     
@@ -128,4 +147,8 @@ def setup_security_middleware(app):
     
     # Add auto-logout middleware after session middleware
     if settings.SESSION_SECRET_KEY:
-        app.add_middleware(AutoLogoutMiddleware) 
+        app.add_middleware(AutoLogoutMiddleware)
+    
+    # Add CSRF middleware after session and auto-logout middleware
+    if settings.SESSION_SECRET_KEY:
+        app.add_middleware(CSRFMiddleware) 
