@@ -2719,3 +2719,7 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 - Added and pushed tests for password change endpoint (success and failure cases).
 - Next: Update API documentation for the password change endpoint as required by the checklist.
 ---
+
+## [YYYY-MM-DD] Template System Recovery (Backend)
+- Implemented, tested, and documented /templates/categories endpoint (in-memory).
+- Next: Proceed to the next actionable performance monitoring checklist item (dashboard/visualization endpoints, DB migrations skipped).

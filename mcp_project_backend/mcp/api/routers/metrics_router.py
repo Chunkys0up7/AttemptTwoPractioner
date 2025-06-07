@@ -45,3 +45,22 @@ async def reset_metrics():
     """
     monitor.reset_metrics()
     return {"message": "Performance metrics reset."}
+
+@router.get("/dashboard", response_model=dict)
+async def performance_dashboard():
+    """
+    Get a dashboard summary of key performance metrics and alerts (for visualization).
+    """
+    metrics = await monitor.get_metrics()
+    alerts = await monitor.check_thresholds()
+    return {
+        "metrics": metrics,
+        "alerts": alerts,
+        "dashboard": {
+            "uptime": metrics.get("uptime"),
+            "request_count": metrics["requests"]["count"],
+            "error_count": metrics["errors"]["total"],
+            "cache_hit_ratio": metrics["cache"]["hit_ratio"],
+            "active_alerts": len(alerts)
+        }
+    }

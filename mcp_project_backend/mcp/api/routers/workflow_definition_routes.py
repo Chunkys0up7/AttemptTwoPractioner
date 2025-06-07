@@ -2,10 +2,12 @@
 API Endpoints for managing Workflow Definitions and their Workflow Steps.
 
 This router provides CRUD operations for WorkflowDefinitions and for managing WorkflowSteps within a workflow (adding, removing, reordering MCP versions as steps).
+Includes monitoring, caching, and circuit breaker integration.
 """
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, Path, Query, Request
 from sqlalchemy.orm import Session, joinedload
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, TypeVar, Generic, Type
 from pydantic import ValidationError
 from mcp.db.session import get_db
 from mcp.core.config import settings
@@ -26,7 +28,6 @@ from mcp.core.circuit_breaker import workflow_circuit_breaker, CircuitBreakerOpe
 from mcp.core.rate_limiter import workflow_rate_limiter, workflow_steps_rate_limiter, RateLimitExceededError
 from mcp.core.monitoring import monitor
 from sqlalchemy import func
-from typing import TypeVar, Generic, Type
 
 # Type variables for generic functions
 T = TypeVar('T', bound=Any)
@@ -47,13 +48,24 @@ async def request_id_middleware(request: Request, call_next):
 
 # Custom exception handlers
 async def handle_validation_error(exc: ValidationError, request: Request):
+    """
+    Handle validation errors with proper logging and monitoring.
+    
+    Args:
+        exc: Pydantic ValidationError
+        request: FastAPI Request object
+        
+    Returns:
+        JSONResponse with error details
+    """
     logger.error(f"[Request {request.state.request_id}] Validation error: {str(exc)}")
+    monitor.increment_error("workflow_validation", str(exc))
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
-            "detail": "Validation error",
-            "errors": exc.errors(),
-            "request_id": request.state.request_id
+            "request_id": request.state.request_id,
+            "error": "Validation Error",
+            "details": exc.errors()
         }
     )
 
@@ -68,7 +80,17 @@ async def handle_workflow_error(exc: WorkflowDefinitionError, request: Request):
         }
     )
 
-async def handle_auth_error(request: Request, exc: AuthenticationError):
+async def handle_auth_error(exc: AuthenticationError, request: Request):
+    """
+    Handle authentication errors with proper logging and monitoring.
+    
+    Args:
+        exc: Authentication error exception
+        request: FastAPI Request object
+        
+    Returns:
+        JSONResponse with error details
+    """
     logger.error(f"[Request {request.state.request_id}] Authentication error: {str(exc)}")
     return JSONResponse(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -558,9 +580,9 @@ async def get_workflow_definition(
 
 @router.put("/{wf_def_id}", response_model=WorkflowDefinitionRead)
 def update_workflow_definition(
-    db: Session = Depends(get_db),
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    wf_def_update: WorkflowDefinitionUpdate
+    wf_def_update: WorkflowDefinitionUpdate,
+    db: Session = Depends(get_db)
 ):
     """
     Update a Workflow Definition.
@@ -634,8 +656,8 @@ def delete_workflow_definition(
 @router.post("/{wf_def_id}/steps", response_model=WorkflowStepRead, status_code=status.HTTP_201_CREATED)
 def add_workflow_step(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    db: Session = Depends(get_db),
-    step_in: WorkflowStepCreate
+    step_in: WorkflowStepCreate,
+    db: Session = Depends(get_db)
 ):
     """
     Add a new step to a Workflow Definition.
