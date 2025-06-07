@@ -55,4 +55,26 @@ def test_metrics_report_and_reset(client):
     # Test /metrics/reset resets metrics (should always succeed)
     response = client.post("/api/v1/metrics/reset")
     assert response.status_code == 200
-    assert response.json()["message"] == "Performance metrics reset." 
+    assert response.json()["message"] == "Performance metrics reset."
+
+def test_change_password_success_and_failure(client, db_session):
+    # Create a test user with a known password
+    from mcp.core.core_security import hash_password
+    from mcp.db.models.user import User
+    test_user = User(email="test@example.com", hashed_password=hash_password("oldpass"))
+    db_session.add(test_user)
+    db_session.commit()
+
+    # Patch dependency to use test_user
+    import mcp.api.services.auth_service as auth_service
+    auth_service.Depends = lambda x: (lambda: test_user) if x.__name__ == '<lambda>' else x
+
+    # Test successful password change
+    response = client.post("/api/v1/auth/change-password", json={"current_password": "oldpass", "new_password": "newpass"})
+    assert response.status_code == 200
+    assert response.json()["message"] == "Password changed successfully"
+
+    # Test failure with wrong current password
+    response = client.post("/api/v1/auth/change-password", json={"current_password": "wrongpass", "new_password": "newpass2"})
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Current password is incorrect" 

@@ -2716,6 +2716,6 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 
 ---
 ## [YYYY-MM-DD] Authentication Enhancements (Backend)
-- Implemented and pushed CSRF protection middleware for state-changing requests.
-- Next: Implement secure password change flow as required by the checklist.
+- Implemented and pushed secure password hashing and password change endpoint.
+- Next: Add or update tests for the password change flow as required by the checklist.
 ---
