@@ -971,3 +971,43 @@ GET /api/templates/stats
   "categories": 3
 }
 ```
+
+## Performance Monitoring Endpoints
+
+### Get Performance Report
+
+`GET /api/v1/metrics/report`
+
+Returns a JSON summary of key performance metrics and any current alerts.
+
+**Response Example:**
+```json
+{
+  "metrics": {
+    "requests": {"count": 123, "latency": 0.12},
+    "cache": {"hits": 100, "misses": 23, "hit_ratio": 0.81},
+    "errors": {"total": 2}
+  },
+  "alerts": [
+    "High request latency: 1.23s (threshold: 1.0s)",
+    "Low cache hit ratio: 75.00% (threshold: 80.00%)"
+  ]
+}
+```
+
+### Reset Performance Metrics
+
+`POST /api/v1/metrics/reset`
+
+Resets all in-memory performance metrics (admin only).
+
+**Response Example:**
+```json
+{
+  "message": "Performance metrics reset."
+}
+```
+
+**Notes:**
+- Use `/metrics/report` for dashboards, admin review, or troubleshooting.
+- Use `/metrics/reset` for manual cleanup/testing; metrics are also reset automatically every 24 hours.

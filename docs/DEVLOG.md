@@ -2713,3 +2713,9 @@ Updated Material-UI to version 5.15.12 to ensure compatibility with React 19 and
 - Added/updated API endpoints for workflow template management in the backend.
 - Updated docs/API.md to include full documentation for workflow template endpoints (CRUD, versioning, search, stats).
 - Checklist and documentation are now in sync with backend implementation.
+
+---
+## [YYYY-MM-DD] Authentication Enhancements (Backend)
+- Secure session handling is already implemented via SessionMiddleware with secure cookie settings (httpOnly, sameSite, secure in production).
+- Next: Proceed to auto-logout functionality as required by the checklist.
+---

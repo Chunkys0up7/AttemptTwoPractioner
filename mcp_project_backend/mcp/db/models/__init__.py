@@ -16,7 +16,7 @@ from .external_db_config import ExternalDatabaseConfig
 from .user import User
 from .api_key import APIKey
 from .action_log import ActionLog
-from .workflow_template import WorkflowTemplate, WorkflowTemplateVersion
+from .workflow_template import WorkflowTemplate, WorkflowTemplateVersion, TemplateShare
 
 __all__ = [
     "MCPDefinition",
@@ -29,5 +29,6 @@ __all__ = [
     "APIKey",
     "ActionLog",
     "WorkflowTemplate",
-    "WorkflowTemplateVersion"
+    "WorkflowTemplateVersion",
+    "TemplateShare"
 ]

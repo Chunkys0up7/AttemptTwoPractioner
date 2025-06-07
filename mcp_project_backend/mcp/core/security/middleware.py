@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.responses import JSONResponse
 
 from mcp.core.config import settings
 from mcp.core.logging import logger
@@ -63,6 +64,24 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         
         return await call_next(request)
 
+class AutoLogoutMiddleware(BaseHTTPMiddleware):
+    """Middleware for auto-logout after session expiration."""
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        session = request.session if hasattr(request, 'session') else None
+        if session and 'created_at' in session:
+            from datetime import datetime, timezone
+            now = datetime.now(timezone.utc).timestamp()
+            created_at = session['created_at']
+            max_age = settings.SESSION_MAX_AGE
+            if now - created_at > max_age:
+                session.clear()
+                return JSONResponse({"detail": "Session expired. Please log in again."}, status_code=401)
+        elif session is not None and 'created_at' not in session:
+            # Set session creation time
+            from datetime import datetime, timezone
+            session['created_at'] = datetime.now(timezone.utc).timestamp()
+        return await call_next(request)
+
 def setup_security_middleware(app):
     """Set up all security middleware for the FastAPI application."""
     
@@ -105,4 +124,8 @@ def setup_security_middleware(app):
             max_age=settings.SESSION_MAX_AGE,
             same_site="lax",
             https_only=not settings.DEBUG
-        ) 
+        )
+    
+    # Add auto-logout middleware after session middleware
+    if settings.SESSION_SECRET_KEY:
+        app.add_middleware(AutoLogoutMiddleware) 

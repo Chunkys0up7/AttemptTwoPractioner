@@ -1,6 +1,6 @@
 # PHASE 2: CORE FUNCTIONALITY CHECKLIST (�� High Priority)
 
-> **Status Note (2024-06-07):** All backend-specific items in this checklist are fully implemented and complete. Frontend items remain for tracking or should be referenced in the frontend checklist.
+> **Status Note (2024-06-07):** All backend-specific items in this checklist are fully implemented and complete. API documentation and devlog updated as per instructions.md. Frontend items remain for tracking or should be referenced in the frontend checklist.
 
 ## Phase 2 Core Starter Structure: COMPLETE
 
@@ -53,6 +53,8 @@
 - [x] Implement/extend workflow definition service for versioning and templates
 - [x] Add endpoints for workflow CRUD, versioning, and template management
 - [x] Ensure all workflow data is validated and persisted correctly
+- [x] API documentation for workflow template endpoints added to docs/API.md
+- [x] Devlog updated for backend workflow builder implementation
 
 ### Acceptance Criteria
 

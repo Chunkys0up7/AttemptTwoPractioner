@@ -44,4 +44,21 @@ class WorkflowTemplateVersion(Base):
     creator = relationship("User", back_populates="created_template_versions")
     
     def __repr__(self):
-        return f"<WorkflowTemplateVersion(template_id={self.template_id}, version={self.version})>" 
+        return f"<WorkflowTemplateVersion(template_id={self.template_id}, version={self.version})>"
+
+class TemplateShare(Base):
+    """Model for sharing workflow templates with specific users and permissions."""
+    __tablename__ = 'template_shares'
+
+    id = Column(Integer, primary_key=True)
+    template_id = Column(Integer, ForeignKey('workflow_templates.id'), nullable=False)
+    user_id = Column(PG_UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
+    permission = Column(String(32), nullable=False, default='view')  # e.g., 'view', 'edit', 'delete'
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    template = relationship('WorkflowTemplate', backref='shared_with')
+    user = relationship('User', backref='template_shares')
+
+    def __repr__(self):
+        return f"<TemplateShare(template_id={self.template_id}, user_id={self.user_id}, permission='{self.permission}')>" 

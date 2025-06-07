@@ -41,3 +41,46 @@ class JWTManager:
             return payload
         except JWTError:
             return None
+
+    @staticmethod
+    def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+        """
+        Creates a JWT refresh token with the given data and expiration.
+        Args:
+            data (dict): The payload data to encode in the token.
+            expires_delta (Optional[timedelta]): Optional expiration delta. Defaults to settings.REFRESH_TOKEN_EXPIRE_DAYS.
+        Returns:
+            str: The encoded JWT token as a string.
+        """
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now(timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        to_encode.update({"exp": expire, "type": "refresh"})
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        return encoded_jwt
+
+    @staticmethod
+    def verify_refresh_token(token: str) -> Optional[Dict[str, Any]]:
+        """
+        Verifies a refresh token and returns the payload if valid and type is 'refresh'.
+        Args:
+            token (str): The JWT refresh token to verify.
+        Returns:
+            Optional[Dict[str, Any]]: The decoded payload if valid, otherwise None.
+        """
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+            if payload.get("type") != "refresh":
+                return None
+            return payload
+        except JWTError:
+            return None
+
+    @staticmethod
+    def get_subject_from_refresh_token(token: str) -> Optional[str]:
+        payload = JWTManager.verify_refresh_token(token)
+        if payload:
+            return payload.get("sub")
+        return None

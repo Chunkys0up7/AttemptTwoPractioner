@@ -179,4 +179,24 @@ The performance monitoring system is tested in `tests/core/test_performance_moni
 3. **Visualization**
    - Add Grafana dashboards
    - Implement metric visualization
-   - Add performance reports 
+   - Add performance reports
+
+## New Endpoints (2024-06)
+
+- `GET /api/v1/metrics/report`: Returns a JSON summary of key metrics and current alerts.
+- `POST /api/v1/metrics/reset`: Resets all in-memory performance metrics (admin only).
+
+## Alerting
+
+- Threshold-based alerting is now implemented for request latency, cache hit ratio, and error rate.
+- Alerts are included in the health check and performance report endpoints.
+
+## Retention/Cleanup
+
+- Metrics are reset automatically every 24 hours (in-memory cleanup).
+- Metrics can also be reset manually via the `/metrics/reset` endpoint.
+
+## Usage Notes
+
+- Use `/metrics/report` for dashboards, admin review, or troubleshooting.
+- Use `/metrics/reset` for manual cleanup/testing. 

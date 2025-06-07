@@ -1,3 +1,0 @@
-# This file makes the 'external_db' directory a Python sub-package.
-# It is responsible for managing connections and interactions with
-# external (user-defined) databases.

@@ -43,3 +43,16 @@ def test_health_check_debug_mode(monkeypatch):
 
     # Clean up monkeypatch or ensure settings are reset if they affect other tests.
     # Pytest typically handles this for function-scoped fixtures. 
+
+def test_metrics_report_and_reset(client):
+    # Test /metrics/report returns metrics and alerts
+    response = client.get("/api/v1/metrics/report")
+    assert response.status_code == 200
+    data = response.json()
+    assert "metrics" in data
+    assert "alerts" in data
+
+    # Test /metrics/reset resets metrics (should always succeed)
+    response = client.post("/api/v1/metrics/reset")
+    assert response.status_code == 200
+    assert response.json()["message"] == "Performance metrics reset." 

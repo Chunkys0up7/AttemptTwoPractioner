@@ -31,6 +31,10 @@ class Settings(BaseSettings):
         API_KEY_PREFIX: str = "mcp_"
         API_KEY_LENGTH: int = 32
         API_V1_STR: str = "/api/v1"
+        # Performance thresholds
+        REQUEST_LATENCY_THRESHOLD: float = 1.0  # seconds
+        CACHE_HIT_RATIO_THRESHOLD: float = 0.8  # 80%
+        ERROR_RATE_THRESHOLD: float = 0.05  # 5%
     """
     APP_NAME: str = "MCP Backend"
     DEBUG: bool = False
@@ -50,6 +54,10 @@ class Settings(BaseSettings):
     API_KEY_PREFIX: str = "mcp_"
     API_KEY_LENGTH: int = 32
     API_V1_STR: str = "/api/v1"
+    # Performance thresholds
+    REQUEST_LATENCY_THRESHOLD: float = 1.0  # seconds
+    CACHE_HIT_RATIO_THRESHOLD: float = 0.8  # 80%
+    ERROR_RATE_THRESHOLD: float = 0.05  # 5%
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
