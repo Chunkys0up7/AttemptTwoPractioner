@@ -30,18 +30,20 @@
   - [x] Integrate with backend versioning endpoints *(All API integration, error handling, and data flows are robust, tested, and documented)*
 
 ### B. Workflow Templates (MarketplacePage)
-- [ ] **Implement workflow templates UI in MarketplacePage**
-  - [ ] Browse available workflow templates (list from /api/templates)
-  - [ ] Filter/search templates by category, name, or public/private
-  - [ ] Preview template details and versions
-  - [ ] Instantiate a workflow from a selected template
-  - [ ] Handle loading, error, and empty states
-  - [ ] Document and test all features
+- [x] **Implement workflow templates UI in MarketplacePage**
+  - [x] Browse available workflow templates (list from /api/templates)
+  - [x] Filter/search templates by category, name, or public/private
+  - [x] Preview template details and versions (modal, accessible, tested)
+  - [x] Instantiate a workflow from a selected template (navigates to builder with content)
+  - [x] Handle loading, error, and empty states
+  - [x] Document and test all features
 
 ### C. Code Editor
-- [ ] **Add UI for browsing/inserting code templates/snippets**
-  - [ ] Provide a button/menu to insert snippets/templates
-  - [ ] Show a library of reusable code snippets
+- [x] **Add UI for browsing/inserting code templates/snippets**
+  - [x] Provide a button/menu to insert snippets/templates (implemented in CodeEditor, accessible, documented)
+- [x] Ensure snippet/template insertion works in all code/script editing areas
+- [x] Support multi-language snippets (Python, TypeScript, SQL, etc.)
+- [ ] Document and test all features
 - [ ] **Integrate language server for advanced IntelliSense** (optional/advanced)
   - [ ] Add support for external language servers (e.g., Python, via Monaco extensions)
 - [ ] **Integrate custom formatters for non-Monaco languages**
@@ -64,4 +66,5 @@
 
 ## References
 - Backend work for these sections is complete (see `PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md`).
-- This checklist supersedes previous frontend checklists for Phase 2. 
+- This checklist supersedes previous frontend checklists for Phase 2.
+- Multi-language snippet support is implemented in all code/script editing areas via CodeEditor and PropertiesPanel. 

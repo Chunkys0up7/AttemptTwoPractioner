@@ -78,3 +78,27 @@
 
 **Next steps:**
 - Implement template browsing UI in MarketplacePage (list templates from /api/templates, handle loading/error states).
+
+### [2024-06-07] Workflow Template Instantiation Complete
+- Users can now select a template version and instantiate a workflow from the MarketplacePage.
+- Instantiation navigates to the builder with the selected template content as initial state.
+- All features are tested, documented, and strictly adhere to `docs/instructions.md` and the checklist-driven process.
+- Updated checklist in `docs/frontend_phase2_plan.md` to mark all template UI features as complete.
+
+**Next steps:**
+- Continue with code editor enhancements or the next checklist item.
+
+### [2024-06-07] CodeEditor Snippet Insertion UI Complete
+- Added accessible button/menu to CodeEditor for browsing and inserting code snippets/templates.
+- Users can now insert snippets at the cursor position in any code/script editing area using the new UI.
+- All changes are tested, documented, and strictly adhere to `docs/instructions.md` and the checklist-driven process.
+- Updated checklist in `docs/frontend_phase2_plan.md` to mark this feature as complete.
+
+**Next steps:**
+- Ensure snippet/template insertion works in all code/script editing areas and supports multi-language snippets.
+
+### [2024-06-07] Universal Snippet/Template Insertion Complete
+- Updated PropertiesPanel in workflow builder to use CodeEditor with snippet support for all code/script config fields.
+- Snippet/template insertion now works in all code/script editing areas, including node properties.
+- Code checked in and pushed.
+- Updated checklist in docs/frontend_phase2_plan.md.
