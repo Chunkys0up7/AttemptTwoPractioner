@@ -138,3 +138,8 @@
 - Added SnippetLibrary component for user snippet/template management (create, edit, delete, search, insert).
 - Integrated as a modal in CodeEditor; users can insert custom snippets at the cursor.
 - Updated checklist and pushed code.
+
+### [2024-06-07] Workflow Validation UI Improved
+- Added a summary/status panel at the top of the workflow builder showing all current errors/warnings.
+- Nodes with errors now display a badge/icon for quick identification.
+- Checklist updated and code pushed.

@@ -28,6 +28,10 @@
   - [x] Add UI to create new workflow versions *(Save as New Version modal implemented, API integrated, tested, and documented)*
   - [x] Show version history and allow rollback to previous versions *(Restore Version feature implemented, tested, and documented)*
   - [x] Integrate with backend versioning endpoints *(All API integration, error handling, and data flows are robust, tested, and documented)*
+- [x] **Improve UI for displaying workflow validation results**
+  - [x] Show errors/warnings directly on the canvas and/or nodes
+  - [x] Add summary/status indicator for workflow validity
+  - [x] A summary/status panel and node error/warning badges are now implemented in the workflow builder UI.
 
 ### B. Workflow Templates (MarketplacePage)
 - [x] **Implement workflow templates UI in MarketplacePage**
