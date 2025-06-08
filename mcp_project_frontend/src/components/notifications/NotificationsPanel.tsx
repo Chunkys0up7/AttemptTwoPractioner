@@ -3,6 +3,7 @@ import { LoadingSpinner } from '../LoadingSpinner';
 import { ErrorMessage } from '../ErrorMessage';
 import { EmptyState } from '../common/EmptyState';
 import { NotificationContext, Notification } from '../../contexts/NotificationContext';
+import { WebSocketContext } from '../../contexts/WebSocketContext';
 
 // TODO: Ensure NotificationsPanel is wrapped in NotificationProvider and WebSocketProvider in the app entry/layout for real-time updates
 
@@ -12,6 +13,7 @@ export const NotificationsPanel: React.FC = () => {
   const { notifications, setNotifications, markAsRead, fetchNotifications } = useContext(NotificationContext);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const { error: wsError } = useContext(WebSocketContext);
 
   useEffect(() => {
     setLoading(true);
@@ -34,6 +36,7 @@ export const NotificationsPanel: React.FC = () => {
 
   if (loading) return <LoadingSpinner size="md" color="primary" className="mx-auto" />;
   if (error) return <ErrorMessage message={error} />;
+  if (wsError) return <ErrorMessage message={wsError} />;
   if (notifications.length === 0) return <EmptyState message="No notifications." />;
 
   return (
