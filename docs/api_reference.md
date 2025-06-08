@@ -495,6 +495,244 @@ GET /metrics/summary
 }
 ```
 
+## Recommendation System API
+
+### Get Recommendations
+
+`GET /api/recommendations`
+
+- Returns a list of recommended items for the current user.
+- Query parameters: `user_id` (optional), `category` (optional), `top_n` (optional)
+- Example response:
+```json
+[
+  {"id": 1, "title": "Example Recommendation", "score": 0.95, "category": "A"},
+  {"id": 3, "title": "Third Recommendation", "score": 0.85, "category": "A"}
+]
+```
+- Requires authentication. Standard error responses apply.
+
+## Notification System API
+
+### Get Notifications
+
+`GET /api/notifications`
+
+- Returns a list of notifications for the current user.
+- Query parameters: `severity`, `type`, `search`, `start`, `end` (all optional)
+- Example response:
+```json
+{
+  "data": [
+    {"id": "uuid-string", "metricName": "string", "severity": "high", "message": "string", "timestamp": "2024-03-21T10:00:00Z", "acknowledged": false, "value": 42, "threshold": 50}
+  ],
+  "error": null
+}
+```
+
+### Acknowledge Notification
+
+`POST /api/notifications/{id}/acknowledge`
+
+- Marks a notification as acknowledged.
+- Example response:
+```json
+{
+  "data": {"id": "uuid-string", "acknowledged": true},
+  "error": null
+}
+```
+
+### Get Notification Analytics
+
+`GET /api/notifications/analytics`
+
+- Returns analytics data for notifications.
+- Query parameters: `start` (required), `end` (required)
+- Example response:
+```json
+{
+  "data": {"totalAlerts": 10, "acknowledgedAlerts": 8, "alertsBySeverity": {"high": 2, "medium": 5, "low": 3}, "averageResponseTime": 120, "alertsByMetric": {"CPU": 4, "Memory": 6}},
+  "error": null
+}
+```
+
+## Workflow Templates API
+
+### Create Workflow Template
+
+`POST /api/templates`
+
+- Creates a new workflow template.
+- Request body: name, description, category, template_metadata, is_public, content
+- Example response:
+```json
+{
+  "id": 1,
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "created_by": "uuid-string",
+  "created_at": "timestamp",
+  "updated_at": "timestamp"
+}
+```
+
+### List Workflow Templates
+
+`GET /api/templates`
+
+- Query parameters: `category`, `search`, `public_only`
+- Example response:
+```json
+{
+  "items": [
+    {"id": 1, "name": "string", "description": "string", "category": "string", "template_metadata": {"key": "value"}, "is_public": true, "created_by": "uuid-string", "created_at": "timestamp", "updated_at": "timestamp"}
+  ],
+  "total": 1
+}
+```
+
+### Get Workflow Template by ID
+
+`GET /api/templates/{id}`
+
+- Example response:
+```json
+{
+  "id": 1,
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "template_metadata": {"key": "value"},
+  "is_public": true,
+  "created_by": "uuid-string",
+  "created_at": "timestamp",
+  "updated_at": "timestamp",
+  "versions": [
+    {"id": 1, "version": 1, "content": {"workflow": "definition"}, "created_at": "timestamp"}
+  ]
+}
+```
+
+### Update Workflow Template
+
+`PUT /api/templates/{id}`
+
+- Request body: name, description, category, template_metadata, is_public, content, changes
+- Example response: same as create
+
+### Delete Workflow Template
+
+`DELETE /api/templates/{id}`
+
+- Example response:
+```json
+{"message": "Template deleted successfully"}
+```
+
+### List Template Versions
+
+`GET /api/templates/{id}/versions`
+
+- Example response:
+```json
+{"versions": [{"id": 1, "version": 1, "content": {"workflow": "definition"}, "created_at": "timestamp"}]}
+```
+
+### Get Specific Template Version
+
+`GET /api/templates/{id}/versions/{version}`
+
+- Example response:
+```json
+{
+  "id": 1,
+  "template_id": 1,
+  "version": 1,
+  "content": {"workflow": "definition"},
+  "changes": "string",
+  "created_by": "uuid-string",
+  "created_at": "timestamp"
+}
+```
+
+### Search Templates
+
+`GET /api/templates/search?query=example`
+
+- Example response:
+```json
+{"items": [{"id": 1, "name": "string", "description": "string"}], "total": 1}
+```
+
+### Get Template Statistics
+
+`GET /api/templates/stats`
+
+- Example response:
+```json
+{"total_templates": 10, "public_templates": 5, "categories": 3}
+```
+
+### List Template Categories
+
+`GET /api/v1/templates/categories`
+
+- Example response:
+```json
+[
+  "Data Processing",
+  "Machine Learning",
+  "ETL",
+  "Visualization",
+  "Reporting",
+  "Automation",
+  "Custom"
+]
+```
+
+## Performance Monitoring Endpoints
+
+### Get Performance Report
+
+`GET /api/v1/metrics/report`
+
+- Returns a JSON summary of key performance metrics and any current alerts.
+- Example response:
+```json
+{
+  "metrics": {"requests": {"count": 123, "latency": 0.12}, "cache": {"hits": 100, "misses": 23, "hit_ratio": 0.81}, "errors": {"total": 2}},
+  "alerts": ["High request latency: 1.23s (threshold: 1.0s)", "Low cache hit ratio: 75.00% (threshold: 80.00%)"]
+}
+```
+
+### Reset Performance Metrics
+
+`POST /api/v1/metrics/reset`
+
+- Resets all in-memory performance metrics (admin only).
+- Example response:
+```json
+{"message": "Performance metrics reset."}
+```
+
+### Dashboard Visualization
+
+`GET /api/v1/metrics/dashboard`
+
+- Returns a summary of key performance metrics and alerts for dashboard visualization.
+- Example response:
+```json
+{
+  "metrics": { ... },
+  "alerts": [ ... ],
+  "dashboard": {"uptime": 12345, "request_count": 100, "error_count": 2, "cache_hit_ratio": 0.85, "active_alerts": 1}
+}
+```
+
 ## Error Responses
 
 All endpoints may return the following error responses:
@@ -581,3 +819,4 @@ All responses include the following security headers:
 - [YYYY-MM-DD] Documentation best practices and changelog section added.
 - [YYYY-MM-DD] All outstanding technical tasks completed and documented.
 - [YYYY-MM-DD] Initial API reference created.
+- [YYYY-MM-DD] Added/updated documentation for recommendations, notifications, workflow templates, and performance monitoring endpoints. Expanded examples and clarified authentication/error handling for new endpoints.

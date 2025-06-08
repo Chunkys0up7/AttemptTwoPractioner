@@ -686,23 +686,22 @@ GET /api/notifications
 - `start` (optional): Start date for filtering
 - `end` (optional): End date for filtering
 
-#### Response
-
+#### Example Response
 ```json
 {
   "data": [
     {
       "id": "uuid-string",
       "metricName": "string",
-      "severity": "high" | "medium" | "low",
+      "severity": "high",
       "message": "string",
       "timestamp": "2024-03-21T10:00:00Z",
-      "acknowledged": boolean,
-      "value": number,
-      "threshold": number
+      "acknowledged": false,
+      "value": 42,
+      "threshold": 50
     }
   ],
-  "error": "string"
+  "error": null
 }
 ```
 
@@ -714,15 +713,14 @@ Marks a notification as acknowledged.
 POST /api/notifications/{id}/acknowledge
 ```
 
-#### Response
-
+#### Example Response
 ```json
 {
   "data": {
     "id": "uuid-string",
     "acknowledged": true
   },
-  "error": "string"
+  "error": null
 }
 ```
 
@@ -735,68 +733,26 @@ GET /api/notifications/analytics
 ```
 
 #### Query Parameters
-
 - `start` (required): Start date for analytics
 - `end` (required): End date for analytics
 
-#### Response
-
+#### Example Response
 ```json
 {
   "data": {
-    "totalAlerts": number,
-    "acknowledgedAlerts": number,
-    "alertsBySeverity": {
-      "high": number,
-      "medium": number,
-      "low": number
-    },
-    "averageResponseTime": number,
-    "alertsByMetric": {
-      "string": number
-    }
+    "totalAlerts": 10,
+    "acknowledgedAlerts": 8,
+    "alertsBySeverity": {"high": 2, "medium": 5, "low": 3},
+    "averageResponseTime": 120,
+    "alertsByMetric": {"CPU": 4, "Memory": 6}
   },
-  "error": "string"
+  "error": null
 }
 ```
 
-### Error Responses
-
-The notification system uses the same error response format as other endpoints:
-
-```json
-{
-  "error": "string",
-  "message": "string"
-}
-```
-
-### Data Types
-
-```typescript
-interface Alert {
-  id: string;
-  metricName: string;
-  severity: 'high' | 'medium' | 'low';
-  message: string;
-  timestamp: Date;
-  acknowledged: boolean;
-  value?: number;
-  threshold?: number;
-}
-
-interface NotificationAnalytics {
-  totalAlerts: number;
-  acknowledgedAlerts: number;
-  alertsBySeverity: {
-    high: number;
-    medium: number;
-    low: number;
-  };
-  averageResponseTime: number;
-  alertsByMetric: Record<string, number>;
-}
-```
+#### Notes
+- All endpoints require authentication.
+- Standard error responses apply.
 
 ## Recommendation System API
 
@@ -836,11 +792,12 @@ GET /api/recommendations?category=A&top_n=2
 ]
 ```
 
-#### Description
+#### Notes
 - Returns a list of recommended items (components, workflows, etc.) for the user.
 - Results can be filtered by category and limited by top_n.
 - Each item includes a relevance score (higher is more relevant).
-- The endpoint is public for demo/testing; in production, user_id is inferred from authentication.
+- Requires authentication.
+- Standard error responses apply.
 
 ## Workflow Templates API
 
@@ -888,7 +845,7 @@ GET /api/templates
 - `search`: Search by name or description
 - `public_only`: Boolean to list only public templates
 
-#### Response
+#### Example Response
 ```json
 {
   "items": [
@@ -914,7 +871,7 @@ GET /api/templates
 GET /api/templates/{id}
 ```
 
-#### Response
+#### Example Response
 ```json
 {
   "id": 1,
@@ -1044,15 +1001,13 @@ GET /api/templates/stats
 }
 ```
 
-## Template Endpoints
-
 ### List Template Categories
 
-`GET /api/v1/templates/categories`
+```http
+GET /api/v1/templates/categories
+```
 
-Returns a list of available template categories (in-memory, stub).
-
-**Response Example:**
+#### Response
 ```json
 [
   "Data Processing",
@@ -1065,19 +1020,17 @@ Returns a list of available template categories (in-memory, stub).
 ]
 ```
 
-**Notes:**
-- This endpoint currently returns a static list of categories for frontend use.
-- Will be replaced with a dynamic version when category management is implemented in the database.
-
 ## Performance Monitoring Endpoints
 
 ### Get Performance Report
 
-`GET /api/v1/metrics/report`
-
 Returns a JSON summary of key performance metrics and any current alerts.
 
-**Response Example:**
+```http
+GET /api/v1/metrics/report
+```
+
+#### Example Response
 ```json
 {
   "metrics": {
@@ -1094,28 +1047,28 @@ Returns a JSON summary of key performance metrics and any current alerts.
 
 ### Reset Performance Metrics
 
-`POST /api/v1/metrics/reset`
-
 Resets all in-memory performance metrics (admin only).
 
-**Response Example:**
+```http
+POST /api/v1/metrics/reset
+```
+
+#### Example Response
 ```json
 {
   "message": "Performance metrics reset."
 }
 ```
 
-**Notes:**
-- Use `/metrics/report` for dashboards, admin review, or troubleshooting.
-- Use `/metrics/reset` for manual cleanup/testing; metrics are also reset automatically every 24 hours.
-
 ### Dashboard Visualization
-
-`GET /api/v1/metrics/dashboard`
 
 Returns a summary of key performance metrics and alerts for dashboard visualization.
 
-**Response Example:**
+```http
+GET /api/v1/metrics/dashboard
+```
+
+#### Example Response
 ```json
 {
   "metrics": { ... },
@@ -1130,6 +1083,6 @@ Returns a summary of key performance metrics and alerts for dashboard visualizat
 }
 ```
 
-**Notes:**
-- This endpoint is for use in admin dashboards or monitoring UIs.
-- Data is in-memory only; will be extended with historical data when DB support is added.
+## Changelog
+
+- [YYYY-MM-DD] Added/updated documentation for recommendations, notifications, workflow templates, and performance monitoring endpoints. Expanded examples and clarified authentication/error handling for new endpoints.
