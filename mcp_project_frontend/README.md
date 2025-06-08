@@ -557,7 +557,7 @@ As mentioned above, for the AI Coding Assistant in the "Submit Component" page t
 
 - **No Backend**: This is a frontend-only application. All "backend" operations (like saving components, user authentication) are mocked using `localStorage` or dummy data. A real backend would be needed for persistent storage, user management, and actual workflow execution.
 - **Workflow Builder Canvas**: The Workflow Builder page currently has a placeholder for the visual canvas. Integration with a library like React Flow is planned for full drag-and-drop functionality.
-- **API Key for AI Assistant**: The method for providing `process.env.API_KEY` in a purely static frontend setup (without a build step) is a common challenge. The current code relies on it being available in the global `process.env` object.
+- **API Key for AI Assistant**: The method for providing `process.env.API_KEY` in a purely static frontend setup (without a build step) is a common challenge. The current code relies on it being available in the global `process` object.
 - **Code Editor in Submit Form**: The "Python Script" and "TypeScript Script" submission forms use basic `<textarea>` elements. For a better user experience, integrating a proper code editor component (e.g., Monaco Editor) would be beneficial.
 - **Jupyter Notebook Form**: The notebook cell editor is a simplified representation. A more feature-rich editor or direct `.ipynb` file parsing could be implemented.
 - **Error Handling**: While some basic error handling is present (e.g., for AI Assistant API calls, form validation), it could be made more robust and user-friendly across the application.
@@ -605,8 +605,33 @@ The project uses a reusable Monaco-based `CodeEditor` component (`src/components
 - Auto-completion and code snippets
 - Auto-format on save
 - File upload (drag-and-drop and file picker)
+- **Snippet/template insertion via accessible button/menu in all code/script editing areas, including workflow builder node properties**
 
 All previous `<textarea>` and `<TextArea>` code/script inputs have been replaced with this editor. To add support for new languages or features, extend the `CodeEditor` component as needed.
+
+### Snippet/Template Insertion
+
+- All code/script editing areas (including workflow builder node properties) support snippet/template insertion via an accessible "Insert Snippet" button/menu in the top-right of the editor.
+- Snippets are language-specific and can be provided via the `snippets` prop.
+- The snippet menu is fully keyboard accessible and screen reader friendly.
+
+**Example:**
+
+```tsx
+const PYTHON_SNIPPETS = [
+  { label: 'Print Hello', documentation: 'Prints Hello World', body: 'print("Hello, World!")' },
+  { label: 'For Loop', documentation: 'Basic for loop', body: 'for i in range(10):\n    print(i)' },
+];
+
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  snippets={PYTHON_SNIPPETS}
+/>
+```
+
+To add support for new languages or extend snippets, provide a new array of snippet objects and pass it to the `snippets` prop. The workflow builder's node properties panel will auto-detect code/script fields and provide appropriate snippets based on the field name.
 
 ### Auto-format on Save
 
