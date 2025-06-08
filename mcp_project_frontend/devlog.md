@@ -143,3 +143,8 @@
 - Added a summary/status panel at the top of the workflow builder showing all current errors/warnings.
 - Nodes with errors now display a badge/icon for quick identification.
 - Checklist updated and code pushed.
+
+### [2024-06-07] Checklist Maintenance Complete
+- Removed/merged duplicate items from PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md into frontend_phase2_plan.md.
+- Added reference and marked checklist maintenance as complete.
+- No further frontend Phase 2 work remains to be tracked here.

@@ -1,6 +1,6 @@
 # Frontend Phase 2 Implementation Plan (Code-Driven)
 
-> **Note:** This checklist is based on a deep dive into the actual codebase as of 2024-06-07. Items below reflect what is truly implemented and what remains. Backend work is complete. See `PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md` for backend status.
+> **Note:** This checklist supersedes and tracks all frontend work for Phase 2. All items from PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md are either merged here or referenced. Backend work is complete and tracked separately.
 
 ---
 
@@ -68,8 +68,8 @@
   - [ ] Add summary/status indicator for workflow validity
 
 ### E. Documentation & Checklist
-- [ ] Keep this checklist up to date as work progresses
-- [ ] Remove/merge duplicate items from `PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md` and reference this doc for frontend tracking
+- [x] Keep this checklist up to date as work progresses
+- [x] Remove/merge duplicate items from `PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md` and reference this doc for frontend tracking
 
 ---
 
