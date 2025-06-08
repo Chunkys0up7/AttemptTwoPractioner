@@ -169,3 +169,9 @@
 - Added API tests for /api/recommendations (default, category, top_n).
 - All tests pass locally.
 - Checklist: Phase 4, Section 4.1 (recommendation system) - backend tests complete, proceeding to frontend tests next.
+
+## [YYYY-MM-DD] Frontend Recommendation System Tests
+- Added tests for RecommendationsPanel (loading, error, filter, display states) using React Testing Library and MSW v2.
+- Confirmed correct MSW v2+ usage and API mocking.
+- All tests pass locally.
+- Checklist: Phase 4, Section 4.1 (recommendation system) - frontend tests complete, proceeding to documentation update next.
