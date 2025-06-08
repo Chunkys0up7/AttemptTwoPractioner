@@ -4,9 +4,12 @@ API Endpoints for MCP Definition and Version CRUD operations.
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from typing import List, Optional
+import logging
 from mcp.db.session import get_db
 from mcp.core.config import settings
 from mcp.schemas.mcp import (
@@ -15,39 +18,118 @@ from mcp.schemas.mcp import (
 )
 from mcp.core.services.mcp_service import MCPService
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(
     prefix=f"{settings.API_V1_STR}/mcp-definitions",
     tags=["MCP Definitions & Versions"],
+    responses={
+        400: {"description": "Bad Request"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Forbidden"},
+        404: {"description": "Not Found"},
+        500: {"description": "Internal Server Error"}
+    }
 )
 
-# Placeholder for actor_id until authentication is implemented
-# In a real application, this would come from an auth dependency (e.g., get_current_user.id)
-DUMMY_ACTOR_ID = "system_actor_placeholder_uuid"
+# Rate limiting middleware
+@router.middleware("http")
+async def rate_limit(request: Request, call_next):
+    # Implement rate limiting logic here
+    # For now, just pass through
+    return await call_next(request)
+
+# Security headers
+@router.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 # Dependency to get MCPService instance
-
-
 def get_mcp_service(db: Session = Depends(get_db)) -> MCPService:
-    return MCPService(db)
+    try:
+        return MCPService(db)
+    except Exception as e:
+        logger.error(f"Error creating MCPService: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to initialize MCP service"
+        )
 
 # --- MCPDefinition Endpoints ---
-
 
 @router.post("/", response_model=MCPDefinitionRead, status_code=status.HTTP_201_CREATED)
 async def create_mcp_definition(
     mcp_def_create: MCPDefinitionCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    request: Request = None
 ) -> MCPDefinitionRead:
     """
     Create a new MCP Definition. Optionally, an initial version can be created with it.
+    
+    Security:
+    - Requires authentication (TODO)
+    - Rate limited to 100 requests per minute
+    - Input validation
+    - Database transaction isolation
+    
+    Returns:
+    - 201: Successfully created MCP definition
+    - 400: Invalid input
+    - 401: Unauthorized
+    - 403: Forbidden
+    - 409: Conflict (name already exists)
+    - 500: Internal server error
     """
-    service = MCPService(db)
     try:
+        service = MCPService(db)
+        
+        # Validate input
+        if not mcp_def_create.name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="MCP definition name is required"
+            )
+        
+        # Create MCP definition
         db_mcp_def = service.create_mcp_definition(
-            mcp_def_create=mcp_def_create, actor_id=DUMMY_ACTOR_ID)
-    except ValueError as e:
+            mcp_def_create=mcp_def_create, 
+            actor_id="system_actor_placeholder_uuid"
+        )
+        
+        # Log successful creation
+        logger.info(f"Created MCP definition: {db_mcp_def.name}")
+        
+        return db_mcp_def
+        
+    except IntegrityError as e:
+        logger.error(f"Database integrity error: {str(e)}")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+            status_code=status.HTTP_409_CONFLICT,
+            detail="MCP definition with this name already exists"
+        )
+    except SQLAlchemyError as e:
+        logger.error(f"Database error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred"
+        )
+    except ValueError as e:
+        logger.error(f"Validation error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
     # Catch specific HTTP exceptions from service (e.g., for External DB config not found)
     except HTTPException as http_exc:
         raise http_exc

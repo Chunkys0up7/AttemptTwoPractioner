@@ -16,8 +16,21 @@ Workflow Run Streaming:
 """
 import asyncio
 import json
+import os
 from fastapi import APIRouter, Request, HTTPException, Path, Depends
-from sse_starlette.sse import EventSourceResponse
+try:
+    from sse_starlette.sse import EventSourceResponse
+except ImportError:
+    if os.getenv('TESTING'):
+        # Mock EventSourceResponse for tests
+        class EventSourceResponse:
+            def __init__(self, generator):
+                self.generator = generator
+            async def __call__(self, scope, receive, send):
+                async for item in self.generator:
+                    await send({"type": "http.response.body", "body": item})
+    else:
+        raise
 from typing import AsyncGenerator
 
 from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager

@@ -39,11 +39,15 @@ def main():
     for test_file in test_files:
         try:
             with open(test_file, 'r', encoding='utf-8') as f:
-                test_contents[str(test_file)] = f.read()
+                content = f.read()
         except UnicodeDecodeError:
-            # Try with different encoding
-            with open(test_file, 'r', encoding='latin1') as f:
-                test_contents[str(test_file)] = f.read()
+            try:
+                with open(test_file, 'r', encoding='latin1') as f:
+                    content = f.read()
+            except Exception as e:
+                print(f"Warning: Could not read file {test_file}: {str(e)}")
+                content = ""
+        test_contents[str(test_file)] = content
     
     # Track failures
     failed_tests = {}
@@ -54,43 +58,46 @@ def main():
         
         # Try running the test up to 3 times
         for attempt in range(3):
-            success, output = run_test(test_path)
-            print(f"Attempt {attempt + 1}:")
-            print(output)
-            
-            if success:
-                print(f"Test passed after {attempt + 1} attempts")
-                break
-            else:
-                print(f"Test failed on attempt {attempt + 1}")
+            try:
+                success, output = run_test(test_path)
+                print(f"Attempt {attempt + 1}:")
+                print(output)
                 
-                # If this is the third attempt, rebuild the test
-                if attempt == 2:
-                    print("Final attempt failed - rebuilding test...")
-                    rebuild_test(test_path, test_contents[test_path])
+                if success:
+                    print(f"Test passed after {attempt + 1} attempts")
+                    break
+                else:
+                    print(f"Test failed on attempt {attempt + 1}")
                     
-                    # Run the rebuilt test once more
-                    success, output = run_test(test_path)
-                    print("Final attempt after rebuild:")
-                    print(output)
-                    
-                    if not success:
-                        print(f"Test still failing after rebuild: {test_path}")
-                        failed_tests[test_path] = output
-                        break
+                    # If this is the third attempt, rebuild the test
+                    if attempt == 2:
+                        print("Final attempt failed - rebuilding test...")
+                        rebuild_test(test_path, test_contents[test_path])
+                        
+                        # Run the rebuilt test once more
+                        success, output = run_test(test_path)
+                        print("Final attempt after rebuild:")
+                        print(output)
+                        
+                        if not success:
+                            print(f"Test still failing after rebuild: {test_path}")
+                            failed_tests[test_path] = output
+                            print("\n=== TESTS THAT FAILED AFTER REBUILD ===")
+                            print(f"\nFailed test: {test_path}")
+                            print("Failure output:")
+                            print(output)
+                            raise Exception(f"Test failed after rebuild: {test_path}")
+            except Exception as e:
+                print(f"Error running test: {str(e)}")
+                failed_tests[test_path] = str(e)
+                print("\n=== TESTS THAT FAILED ===")
+                print(f"\nFailed test: {test_path}")
+                print("Error:")
+                print(str(e))
+                raise
         
         # Small delay between tests to avoid overwhelming the system
         time.sleep(1)
-    
-    # Print summary of failed tests
-    if failed_tests:
-        print("\n=== TESTS THAT FAILED AFTER REBUILD ===")
-        for test, output in failed_tests.items():
-            print(f"\nFailed test: {test}")
-            print("Failure output:")
-            print(output)
-    else:
-        print("\nAll tests passed after rebuild if needed!")
 
 if __name__ == "__main__":
     main()

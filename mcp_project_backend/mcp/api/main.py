@@ -8,26 +8,6 @@ variables, and defines global application event handlers and basic health check 
 # This section MUST be at the very top of the file
 import os
 import sys
-
-# Set TESTING environment variable before any imports
-os.environ['TESTING'] = 'true'
-
-# Add project root to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
-from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager
-# from mcp.db import base_class # For creating tables if needed, or use Alembic
-# Assuming SessionLocal and engine are setup
-# from mcp.db.session import get_db # SessionLocal, engine are unused, get_db also unused
-from mcp.api.routers import (
-    mcp_crud_routes,
-    workflow_execution_routes,
-    external_db_config_routes,
-    streaming_routes,
-    dashboard_routes,
-    entity_routes,    # Add entity_routes
-)
-from mcp.core.config import settings  # Import after .env is loaded
 from pathlib import Path
 from dotenv import load_dotenv
 import logging
@@ -37,6 +17,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 import uvicorn
+
+# Set TESTING environment variable before any imports
+os.environ['TESTING'] = 'true'
+
+# Add project root to Python path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
+from mcp.core.pubsub.redis_pubsub_manager import redis_pubsub_manager
+from mcp.api.routers import (
+    mcp_crud_routes,
+    workflow_execution_routes,
+    external_db_config_routes,
+    streaming_routes,
+    dashboard_routes,
+    entity_routes,    # Add entity_routes
+)
+from mcp.core.config import settings  # Import after .env is loaded
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO)
@@ -119,16 +116,24 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors()}
     )
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from mcp.db.base import Base
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("MCP Backend starting up...")
     # Create database tables (if not using Alembic for all DDL management initially)
-    # try:
-    #     base_class.Base.metadata.create_all(bind=engine)
-    #     logger.info("Database tables checked/created.")
-    # except Exception as e:
-    #     logger.error(f"Error creating database tables: {e}")
+    try:
+        # Create engine
+        engine = create_engine(settings.DATABASE_URL)
+        # Create tables
+        Base.metadata.create_all(bind=engine)
+        logger.info("Database tables checked/created.")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {e}")
+        raise
 
     # Connect Redis Pub/Sub publisher
     if settings.REDIS_URL:
@@ -148,6 +153,12 @@ async def lifespan(app: FastAPI):
     # Disconnect Redis Pub/Sub publisher
     if redis_pubsub_manager._publisher_client:  # Check if client was initialized
         await redis_pubsub_manager.disconnect_publisher()
+    
+    # Clean up database
+    try:
+        engine.dispose()
+    except Exception as e:
+        logger.error(f"Error cleaning up database: {e}")
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -199,30 +210,18 @@ async def shutdown_event():
     logger.info("Application shutdown...")
 
 
+# Include routers with API prefix
+app.include_router(mcp_crud_routes.router, prefix=settings.API_V1_STR)
+app.include_router(workflow_execution_routes.router, prefix=settings.API_V1_STR)
+app.include_router(external_db_config_routes.router, prefix=settings.API_V1_STR)
+app.include_router(streaming_routes.router, prefix=settings.API_V1_STR)
+app.include_router(dashboard_routes.router, prefix=settings.API_V1_STR)
+app.include_router(entity_routes.router, prefix=settings.API_V1_STR)
+
 @app.get("/health", tags=["Health"])
 async def health_check():
     """Simple health check endpoint to verify the application is running."""
     return {"status": "ok", "app_name": settings.APP_NAME}
-
-# Include the MCP CRUD router
-app.include_router(mcp_crud_routes.router, prefix=settings.API_V1_STR)
-
-# Include the Workflow Execution router
-app.include_router(workflow_execution_routes.router,
-                   prefix=settings.API_V1_STR)
-
-# Include the External DB Config router
-app.include_router(external_db_config_routes.router,
-                   prefix=settings.API_V1_STR)
-
-# Include the Streaming routes router
-app.include_router(streaming_routes.router, prefix=settings.API_V1_STR)
-
-# Include the Dashboard routes router
-app.include_router(dashboard_routes.router, prefix=settings.API_V1_STR)
-
-# Include the Entity routes router
-app.include_router(entity_routes.router, prefix=settings.API_V1_STR)
 
 # To run the app (example from project root):
 # Ensure .env file is in mcp_project_backend/ directory or project root if path adjusted

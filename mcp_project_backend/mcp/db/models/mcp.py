@@ -3,7 +3,6 @@ Database models for MCP Definitions and Versions.
 """
 import uuid
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func, JSON
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from typing import Optional, Dict, Any
@@ -11,41 +10,39 @@ from typing import Optional, Dict, Any
 from mcp.db.base import Base
 from mcp.core.mcp_configs import MCPConfigPayload, parse_mcp_config
 
-
 class MCPDefinition(Base):
     __tablename__ = "mcp_definitions"
 
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, nullable=True)
-    created_at = Column(DateTime(timezone=True), default=func.now())
-    updated_at = Column(DateTime(timezone=True),
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime,
                         default=func.now(), onupdate=func.now())
 
     versions = relationship("MCPVersion", back_populates="mcp_definition",
                             cascade="all, delete-orphan", order_by="MCPVersion.version_number.desc()")
 
-
 class MCPVersion(Base):
     __tablename__ = "mcp_versions"
 
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    mcp_definition_id = Column(PG_UUID(as_uuid=True), ForeignKey(
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    mcp_definition_id = Column(String, ForeignKey(
         "mcp_definitions.id"), nullable=False, index=True)
     version_number = Column(Integer, nullable=False, default=1)
     name = Column(String, nullable=True)
     description = Column(String, nullable=True)
     mcp_type = Column(String, nullable=False)
-    config_payload_data = Column(JSONB, nullable=True)
+    config_payload_data = Column(JSON, nullable=True)
 
     # New field to store a list of ExternalDatabaseConfig IDs
-    external_db_config_ids = Column(JSONB, nullable=True, default=lambda: [])
+    external_db_config_ids = Column(JSON, nullable=True, default=lambda: [])
 
     # Add a field for data visualization metadata
     visualization_metadata = Column(JSON, nullable=True, default=None)
 
-    created_at = Column(DateTime(timezone=True), default=func.now())
-    updated_at = Column(DateTime(timezone=True),
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime,
                         default=func.now(), onupdate=func.now())
 
     mcp_definition = relationship("MCPDefinition", back_populates="versions")

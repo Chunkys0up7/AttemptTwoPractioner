@@ -3,9 +3,8 @@ Database models for Workflow Definitions and Runs with enhanced validation and m
 """
 import uuid
 import enum
-from sqlalchemy import Column, String, ForeignKey, DateTime, Text, Enum as SAEnum, Index, Boolean
+from sqlalchemy import Column, String, ForeignKey, DateTime, Text, Enum as SAEnum, Index, Boolean, JSON
 from sqlalchemy.orm import relationship, validates
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
 from datetime import datetime
 import logging
 
@@ -17,10 +16,10 @@ logger = logging.getLogger(__name__)
 class WorkflowDefinition(Base):
     __tablename__ = "workflow_definitions"
 
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255), nullable=False, index=True, unique=True)
     description = Column(Text, nullable=True)
-    graph_representation = Column(JSONB, nullable=False)
+    graph_representation = Column(JSON, nullable=False)
     version = Column(String(50), nullable=False, default="1.0.0")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow,
