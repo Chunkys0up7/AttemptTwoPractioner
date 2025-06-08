@@ -798,6 +798,50 @@ interface NotificationAnalytics {
 }
 ```
 
+## Recommendation System API
+
+### Get Recommendations
+
+Retrieves personalized recommendations for the current user.
+
+```http
+GET /api/recommendations
+```
+
+#### Query Parameters
+- `user_id` (optional, string): User identifier (default: demo)
+- `category` (optional, string): Filter recommendations by category
+- `top_n` (optional, integer): Number of recommendations to return (default: 3)
+
+#### Example Request
+```http
+GET /api/recommendations?category=A&top_n=2
+```
+
+#### Example Response
+```json
+[
+  {
+    "id": 1,
+    "title": "Example Recommendation",
+    "score": 0.95,
+    "category": "A"
+  },
+  {
+    "id": 3,
+    "title": "Third Recommendation",
+    "score": 0.85,
+    "category": "A"
+  }
+]
+```
+
+#### Description
+- Returns a list of recommended items (components, workflows, etc.) for the user.
+- Results can be filtered by category and limited by top_n.
+- Each item includes a relevance score (higher is more relevant).
+- The endpoint is public for demo/testing; in production, user_id is inferred from authentication.
+
 ## Workflow Templates API
 
 ### Create Workflow Template
