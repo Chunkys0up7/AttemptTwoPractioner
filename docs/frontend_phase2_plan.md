@@ -46,14 +46,15 @@
 - [x] Document and test all features
 - [x] **Integrate language server for advanced IntelliSense** (optional/advanced)
   - [x] Add support for external language servers (e.g., Python, via Monaco extensions)
-- [ ] **Integrate custom formatters for non-Monaco languages**
-  - [ ] Add Black for Python, Prettier for JS/TS, etc. (if needed)
+- [x] **Integrate custom formatters for non-Monaco languages**
+  - [x] Add Black for Python, Prettier for JS/TS, etc. (if needed)
 - [ ] **Expand custom linting rules for MCP scripts**
   - [ ] Add more rules or UI for MCP-specific errors/warnings
 - [ ] **Add code snippet/template library management UI**
   - [ ] Allow users to create, edit, and manage their own snippets/templates
 - [x] Documentation and accessibility for snippet/template insertion and multi-language support are complete.
 - [x] Advanced Python IntelliSense (LSP) is available as an option in all code/script editing areas. Requires a running Python language server at ws://localhost:3001.
+- [x] Custom formatters for Python (Ruff WASM) and JS/TS (Prettier) are available via the customFormatter prop and formatCode utility.
 
 ### D. Validation
 - [ ] **Improve UI for displaying workflow validation results**

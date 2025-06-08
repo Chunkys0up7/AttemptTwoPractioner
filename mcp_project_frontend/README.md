@@ -695,3 +695,27 @@ Example:
   enablePythonLsp={true}
 />
 ```
+
+### Custom Formatters for Non-Monaco Languages
+
+- The `CodeEditor` component supports a `customFormatter` prop for advanced formatting of non-Monaco languages.
+- Use the provided `formatCode` utility to enable in-browser formatting for Python (via Ruff WASM) and JS/TS (via Prettier).
+- The formatter is used for both the Format button and format-on-save (Ctrl+S).
+- Errors during formatting are shown in the UI.
+
+**Example:**
+
+```tsx
+import { formatCode } from './components/common/formatters';
+
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  customFormatter={formatCode}
+/>
+```
+
+- For Python, this uses Ruff WASM in-browser.
+- For JS/TS, this uses Prettier in-browser.
+- For other languages, the code is returned unchanged by default.

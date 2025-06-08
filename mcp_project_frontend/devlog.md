@@ -118,3 +118,13 @@
 - Documented usage and requirements in README.
 - Updated checklist in docs/frontend_phase2_plan.md.
 - Note: Requires a running Python language server at ws://localhost:3001 for full functionality.
+
+### [2024-06-07] Begin Custom Formatter Integration
+- Installed @wasm-fmt/ruff_fmt (WASM Python formatter) for in-browser Python code formatting.
+- Ensured Prettier is available for in-browser JS/TS formatting.
+- Preparing to integrate both formatters into CodeEditor for custom format-on-save and format button support.
+
+### [2024-06-07] Custom Formatter Integration Complete
+- Integrated custom formatter support in CodeEditor via the customFormatter prop.
+- Provided formatCode utility for Python (Ruff WASM) and JS/TS (Prettier) formatting in-browser.
+- Updated documentation and checklist.
