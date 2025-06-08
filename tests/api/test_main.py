@@ -4,25 +4,20 @@ Tests for the main API endpoints.
 import pytest
 from pathlib import Path
 from fastapi.testclient import TestClient
-import sys
-import os
-
-# Add project root to Python path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from mcp.api.main import app
+from mcp.core.config import settings
+from tests.api.test_data import test_data
 
 @pytest.fixture
-def test_data():
+async def test_client():
+    """Test client fixture."""
+    client = TestClient(app)
+    return client
+
+@pytest.fixture
+async def test_data():
     """Test data fixture."""
-    return {
-        "mcp": {
-            "name": "test_mcp",
-            "description": "test description"
-        },
-        "workflow": {
-            "name": "test_workflow",
-            "steps": []
-        }
-    }
+    return test_data
 
 def test_health_check(test_client):
     """Test the health check endpoint."""

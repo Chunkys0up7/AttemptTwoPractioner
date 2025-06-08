@@ -1,20 +1,18 @@
 """
 API Endpoints for Workflow Execution with enhanced error handling and monitoring.
 """
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 import logging
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import ValidationError
-
 from mcp.db.session import get_db
 from mcp.core.config import settings
 from mcp.core.services.workflow_engine_service import WorkflowEngineService
-from mcp.schemas.workflow import WorkflowRunRead, WorkflowRunCreate
+from mcp.schemas.workflow import WorkflowRunRead, WorkflowRunCreate, WorkflowRunList
 from mcp.monitoring.performance import performance_monitor
 
 # Placeholder for actor_id until authentication is implemented
@@ -22,7 +20,15 @@ DUMMY_ACTOR_ID = "system_actor_placeholder_uuid"
 
 router = APIRouter(
     prefix=f"{settings.API_V1_STR}/workflow-runs",
-    tags=["Workflow Runs"]
+    tags=["Workflow Runs"],
+    responses={
+        400: {"description": "Bad Request"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Forbidden"},
+        404: {"description": "Not Found"},
+        422: {"description": "Unprocessable Entity"},
+        500: {"description": "Internal Server Error"}
+    }
 )
 
 logger = logging.getLogger(__name__)
@@ -49,9 +55,23 @@ async def start_workflow_run(
 ):
     """
     Start a new workflow run based on a Workflow Definition ID and optional input parameters.
-    The `workflow_definition_id` is part of the `run_create` request body.
 
     The response indicates acceptance, and the workflow execution starts asynchronously.
+
+    Security:
+    - Requires authentication (TODO)
+    - Rate limited to 100 requests per minute
+    - Input validation
+    - Database transaction isolation
+
+    Returns:
+    - 202: Workflow run accepted
+    - 400: Invalid input
+    - 401: Unauthorized
+    - 403: Forbidden
+    - 404: Workflow definition not found
+    - 422: Validation error
+    - 500: Internal server error
     """
     try:
         # Validate workflow definition ID
@@ -105,12 +125,113 @@ async def start_workflow_run(
             detail="An unexpected error occurred"
         )
 
-# GET endpoints for runs (e.g., get by ID, list runs) would go here
-# These are read operations and typically don't involve actor_id for auditing creation/modification.
-# Example:
-# @router.get("/{run_id}", response_model=WorkflowRunRead)
-# async def get_workflow_run_details(
-#     run_id: uuid.UUID,
+@router.get("/", response_model=WorkflowRunList)
+async def list_workflow_runs(
+    request: Request,
+    skip: int = 0,
+    limit: int = 100,
+    status: Optional[str] = None,
+    workflow_definition_id: Optional[UUID] = None,
+    service: WorkflowEngineService = Depends(get_workflow_engine_service)
+):
+    """
+    List workflow runs with optional filtering.
+
+    Security:
+    - Requires authentication (TODO)
+    - Rate limited to 100 requests per minute
+    - Input validation
+
+    Returns:
+    - 200: List of workflow runs
+    - 400: Invalid input
+    - 401: Unauthorized
+    - 403: Forbidden
+    - 422: Validation error
+    """
+    try:
+        runs, total = await service.list_workflow_runs(
+            skip=skip,
+            limit=limit,
+            status=status,
+            workflow_definition_id=workflow_definition_id
+        )
+        
+        logger.info(
+            f"[Request {request.state.request_id}] Listed {len(runs)} workflow runs (total: {total})"
+        )
+        
+        return WorkflowRunList(items=runs, total=total)
+        
+    except ValueError as e:
+        logger.error(f"[Request {request.state.request_id}] Filter error: {e}")
+        performance_monitor.increment_error("workflow_filter_error", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except SQLAlchemyError as e:
+        logger.error(f"[Request {request.state.request_id}] Database error: {e}")
+        performance_monitor.increment_error("workflow_db_error", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred"
+        )
+    except Exception as e:
+        logger.error(f"[Request {request.state.request_id}] Unexpected error: {e}")
+        performance_monitor.increment_error("workflow_unexpected_error", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
+
+@router.get("/{run_id}", response_model=WorkflowRunRead)
+async def get_workflow_run(
+    request: Request,
+    run_id: UUID,
+    service: WorkflowEngineService = Depends(get_workflow_engine_service)
+):
+    """
+    Get details of a specific workflow run.
+
+    Security:
+    - Requires authentication (TODO)
+    - Rate limited to 100 requests per minute
+
+    Returns:
+    - 200: Workflow run details
+    - 401: Unauthorized
+    - 403: Forbidden
+    - 404: Workflow run not found
+    """
+    try:
+        run = await service.get_workflow_run(run_id)
+        if not run:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Workflow run not found"
+            )
+            
+        logger.info(
+            f"[Request {request.state.request_id}] Retrieved workflow run {run_id}"
+        )
+        
+        return run
+        
+    except SQLAlchemyError as e:
+        logger.error(f"[Request {request.state.request_id}] Database error: {e}")
+        performance_monitor.increment_error("workflow_db_error", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred"
+        )
+    except Exception as e:
+        logger.error(f"[Request {request.state.request_id}] Unexpected error: {e}")
+        performance_monitor.increment_error("workflow_unexpected_error", str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred"
+        )
 #     service: WorkflowEngineService = Depends(get_workflow_engine_service)
 # ):
 #     run = service.get_workflow_run(run_id)

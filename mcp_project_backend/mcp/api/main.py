@@ -210,13 +210,13 @@ async def shutdown_event():
     logger.info("Application shutdown...")
 
 
-# Include routers with API prefix
-app.include_router(mcp_crud_routes.router, prefix=settings.API_V1_STR)
-app.include_router(workflow_execution_routes.router, prefix=settings.API_V1_STR)
-app.include_router(external_db_config_routes.router, prefix=settings.API_V1_STR)
-app.include_router(streaming_routes.router, prefix=settings.API_V1_STR)
-app.include_router(dashboard_routes.router, prefix=settings.API_V1_STR)
-app.include_router(entity_routes.router, prefix=settings.API_V1_STR)
+# Include routers with their own prefixes
+app.include_router(mcp_crud_routes.router)
+app.include_router(workflow_execution_routes.router)
+app.include_router(external_db_config_routes.router)
+app.include_router(streaming_routes.router)
+app.include_router(dashboard_routes.router)
+app.include_router(entity_routes.router)
 
 @app.get("/health", tags=["Health"])
 async def health_check():
