@@ -2,7 +2,6 @@
 Database models for Workflow Definitions and Runs with enhanced validation and monitoring.
 """
 import enum
-import uuid
 from sqlalchemy import Column, String, ForeignKey, DateTime, Text, Enum as SAEnum, Index, Boolean, JSON
 from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql import func
@@ -89,7 +88,6 @@ class WorkflowRun(Base):
 
     # Relationships
     definition = relationship("WorkflowDefinition", back_populates="runs")
-    # workflow_steps_executions = relationship("WorkflowStepExecution", back_populates="workflow_run", cascade="all, delete-orphan") # Future
 
     def __repr__(self):
         return f"<WorkflowRun(id={self.id}, definition_id={self.workflow_definition_id}, status='{self.status.value}')>"

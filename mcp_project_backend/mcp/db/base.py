@@ -5,7 +5,9 @@ This module provides the declarative base for all SQLAlchemy models in the appli
 It also includes a helper for common table arguments like table name generation.
 """
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, Column, Integer, DateTime
+from sqlalchemy.sql import func
+from datetime import datetime, timezone
 
 # Recommended naming convention for constraints
 # See: https://alembic.sqlalchemy.org/en/latest/naming.html
@@ -23,13 +25,11 @@ Base = declarative_base(metadata=metadata)
 
 # You could also add a Base class with common columns like id, created_at, updated_at here
 # For example:
-# from sqlalchemy import Column, Integer, DateTime
-# from datetime import datetime
-# class BaseTimestampedModel(Base):
-#     __abstract__ = True # Important: tells SQLAlchemy not to create a table for this model
-#     id = Column(Integer, primary_key=True, index=True)
-#     created_at = Column(DateTime, default=datetime.utcnow)
-#     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+class BaseTimestampedModel(Base):
+    __abstract__ = True # Important: tells SQLAlchemy not to create a table for this model
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 # Then other models can inherit from BaseTimestampedModel
 
 # Import all the models, so that Base has them before being

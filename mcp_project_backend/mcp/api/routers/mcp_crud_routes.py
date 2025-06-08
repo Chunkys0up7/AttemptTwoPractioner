@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from typing import List, Optional
 import logging
 from mcp.db.session import get_db
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.schemas.mcp import (
     MCPDefinitionCreate, MCPDefinitionRead, MCPDefinitionUpdate, MCPDefinitionList,
     MCPVersionCreate, MCPVersionRead, MCPVersionUpdate

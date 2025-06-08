@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from mcp.db.session import get_db
 from mcp.db.models.mcp import MCPDefinition, MCPVersion
 from mcp.db.models.workflow import WorkflowRun, WorkflowRunStatus
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import func
 
 router = APIRouter()
@@ -15,7 +15,7 @@ def get_dashboard_summary(db: Session = Depends(get_db)):
         total_mcp_versions = db.query(MCPVersion).count()
         total_workflow_runs = db.query(WorkflowRun).count()
         active_workflow_runs = db.query(WorkflowRun).filter(WorkflowRun.status.in_([WorkflowRunStatus.RUNNING, WorkflowRunStatus.PENDING])).count()
-        today_date = datetime.utcnow().date()
+        today_date = datetime.now(timezone.utc).date()
         successful_runs_today = db.query(WorkflowRun).filter(WorkflowRun.status == WorkflowRunStatus.SUCCESS).filter(WorkflowRun.ended_at != None).filter(WorkflowRun.ended_at.cast('date') == today_date).count()
         failed_runs_today = db.query(WorkflowRun).filter(WorkflowRun.status == WorkflowRunStatus.FAILED).filter(WorkflowRun.ended_at != None).filter(WorkflowRun.ended_at.cast('date') == today_date).count()
         return {

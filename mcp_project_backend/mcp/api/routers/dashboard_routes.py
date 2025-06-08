@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 from mcp.db.session import get_db
 from mcp.core.services.dashboard_service import DashboardService
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.monitoring.performance import performance_monitor
 from pydantic import BaseModel
 from mcp.api.services.data_visualization_service import router as data_visualization_router

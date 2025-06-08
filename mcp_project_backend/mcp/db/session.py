@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import time
 import logging
 
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.monitoring.performance import performance_monitor
 
 # Database connection pool configuration

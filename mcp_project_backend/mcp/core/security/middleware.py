@@ -7,7 +7,7 @@ from starlette.middleware.gzip import GZipMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import JSONResponse
 
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.core.logging import logger
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):

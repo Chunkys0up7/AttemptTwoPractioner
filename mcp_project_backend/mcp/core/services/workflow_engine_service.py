@@ -6,7 +6,7 @@ Handles workflow run lifecycle management, execution, and monitoring.
 import os
 import uuid
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 from sqlalchemy.orm import Session
@@ -71,7 +71,7 @@ class WorkflowEngineService:
                 workflow_definition_id=workflow_definition_id,
                 status=WorkflowRunStatus.PENDING,
                 parameters=run_params,
-                started_at=datetime.utcnow(),
+                started_at=datetime.now(timezone.utc),
                 actor_id=actor_id
             )
 

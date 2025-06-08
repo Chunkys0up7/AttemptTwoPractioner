@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import json
 import logging
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.core.monitoring import monitor
 
 # Set up logging

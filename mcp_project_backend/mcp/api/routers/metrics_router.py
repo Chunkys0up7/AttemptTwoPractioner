@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from prometheus_client.multiprocess import MultiProcessCollector
 from prometheus_client import CollectorRegistry
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from fastapi import Response
 
 # Set TESTING environment variable before any imports

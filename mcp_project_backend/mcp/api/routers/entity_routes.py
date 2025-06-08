@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 # from pydantic import BaseModel # BaseModel is unused
 
 from mcp.db.session import get_db
-from mcp.core.config import settings
+from mcp.core.settings import settings
 
 # Import relevant Pydantic Read schemas and Service classes
 from mcp.schemas.mcp import MCPVersionRead, MCPDefinitionRead, MCPDefinitionCreate, MCPDefinitionUpdate, MCPVersionCreate, MCPVersionUpdate

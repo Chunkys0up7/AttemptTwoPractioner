@@ -6,7 +6,7 @@ import os
 os.environ['TESTING'] = 'true'
 
 # Import after setting TESTING
-from mcp.core.config import settings
+from mcp.core.settings import settings
 import re
 import logging
 from datetime import datetime

@@ -6,7 +6,6 @@ can interact with.
 """
 import uuid
 from sqlalchemy import Column, String, Integer, Text
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 from mcp.db.base import Base  # Common Base for all models
 
@@ -14,7 +13,7 @@ from mcp.db.base import Base  # Common Base for all models
 class ExternalDatabaseConfig(Base):
     __tablename__ = "external_database_configs"
 
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(255), nullable=False, unique=True, index=True,
                   comment="User-defined name for this database configuration.")
     description = Column(

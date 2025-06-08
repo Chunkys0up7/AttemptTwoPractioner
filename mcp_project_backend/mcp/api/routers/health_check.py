@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from mcp.db.session import get_db
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from typing import Dict, Any
 import asyncio
 from datetime import datetime

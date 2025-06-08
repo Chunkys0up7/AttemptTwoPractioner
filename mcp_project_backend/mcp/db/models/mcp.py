@@ -5,10 +5,12 @@ import uuid
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List, Union
+from datetime import timezone
 
 from mcp.db.base import Base
 from mcp.core.mcp_configs import MCPConfigPayload, parse_mcp_config
+from typing import Optional, Dict, Any, List, Union
 
 class MCPDefinition(Base):
     __tablename__ = "mcp_definitions"
@@ -27,8 +29,8 @@ class MCPVersion(Base):
     __tablename__ = "mcp_versions"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    mcp_definition_id = Column(String, ForeignKey(
-        "mcp_definitions.id"), nullable=False, index=True)
+    mcp_definition_id: str = Column(String, ForeignKey(
+        "mcp_definitions.id"), nullable=False, index=True)  # Stores UUID as string
     version_number = Column(Integer, nullable=False, default=1)
     name = Column(String, nullable=True)
     description = Column(String, nullable=True)
@@ -36,7 +38,7 @@ class MCPVersion(Base):
     config_payload_data = Column(JSON, nullable=True)
 
     # New field to store a list of ExternalDatabaseConfig IDs
-    external_db_config_ids = Column(JSON, nullable=True, default=lambda: [])
+    external_db_config_ids = Column(JSON, nullable=True, default=lambda: [])  # Stores list of UUID strings
 
     # Add a field for data visualization metadata
     visualization_metadata = Column(JSON, nullable=True, default=None)
@@ -68,7 +70,7 @@ class MCPVersion(Base):
                 self.mcp_type = new_config.type
 
     @classmethod
-    def create_new_version(cls, db, *, mcp_definition_id: uuid.UUID, version_data: Dict[str, Any]):
+    def create_new_version(cls, db, *, mcp_definition_id: str, version_data: Dict[str, Any]):  # mcp_definition_id is UUID as string
         # Simplified version creation logic, assuming version_data is a dict from a Pydantic model
         latest_version = db.query(cls).filter(
             cls.mcp_definition_id == mcp_definition_id).order_by(cls.version_number.desc()).first()

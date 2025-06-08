@@ -1,7 +1,7 @@
 from functools import wraps
 from typing import Callable, Any, Optional, TypeVar, Generic
 from datetime import datetime, timedelta
-from mcp.core.config import settings
+from mcp.core.settings import settings
 import redis
 import pickle
 import logging
@@ -36,6 +36,9 @@ redis_pool = redis.ConnectionPool(
 )
 
 redis_client = redis.Redis(connection_pool=redis_pool, decode_responses=True)
+
+# Export cache_manager for external use
+cache_manager = redis_client
 
 T = TypeVar('T')
 

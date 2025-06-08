@@ -4,7 +4,7 @@ Notification service for sending and managing user notifications.
 
 from typing import List, Dict, Any
 import uuid
-import datetime
+from datetime import datetime, timezone
 
 class NotificationService:
     def __init__(self):
@@ -18,7 +18,7 @@ class NotificationService:
             "message": message,
             "type": type_,
             "read": False,
-            "timestamp": datetime.datetime.utcnow().isoformat(),
+            "timestamp": datetime.datetime.now(timezone.utc).isoformat(),
         }
         self.notifications.setdefault(user_id, []).append(notification)
         return notification

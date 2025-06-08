@@ -16,7 +16,7 @@ os.environ['TESTING'] = 'true'
 
 # Import after setting TESTING
 from mcp.db.session import get_db
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.api.schemas.workflow_definition_schemas import (
     WorkflowDefinitionCreate, WorkflowDefinitionRead, WorkflowDefinitionUpdate,
     WorkflowStepCreate, WorkflowStepRead
@@ -582,8 +582,8 @@ async def list_workflow_definitions(
 @cache_response(timeout=definition_cache_timeout)
 async def get_workflow_definition(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    db: Session = Depends(get_db),
-    request: Request
+    request: Request,
+    db: Session = Depends(get_db)
 ):
     """
     Get a Workflow Definition by ID, including its steps.
@@ -650,9 +650,9 @@ async def get_workflow_definition(
 @workflow_rate_limiter
 @cache_response(timeout=definition_cache_timeout)
 async def update_workflow_definition(
-    wf_def_id: int,
-    wf_def_update: WorkflowDefinitionUpdate,
+    wf_def_id: int = Path(..., description="Workflow Definition ID"),
     db: Session = Depends(get_db),
+    wf_def_update: WorkflowDefinitionUpdate,
     request: Request
 ):
     """
@@ -693,9 +693,9 @@ async def update_workflow_definition(
 @workflow_rate_limiter
 @cache_response(timeout=definition_cache_timeout)
 async def delete_workflow_definition(
-    wf_def_id: int,
-    request: Request,
-    db: Session = Depends(get_db)
+    wf_def_id: int = Path(..., description="Workflow Definition ID"),
+    db: Session = Depends(get_db),
+    request: Request
 ):
     """
     Delete a Workflow Definition and all its steps.
@@ -734,8 +734,8 @@ async def delete_workflow_definition(
 @cache_response(timeout=steps_cache_timeout)
 async def add_workflow_step(
     wf_def_id: int,
-    step_in: WorkflowStepCreate,
     db: Session = Depends(get_db),
+    step_in: WorkflowStepCreate,
     request: Request
 ):
     """
@@ -775,8 +775,8 @@ async def add_workflow_step(
 @router.delete("/{wf_def_id}/steps/{step_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_workflow_step(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    step_id: int = Path(..., description="Step ID"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    step_id: int = Path(..., description="Step ID")
 ):
     """
     Delete a step from a Workflow Definition.
@@ -790,8 +790,8 @@ def delete_workflow_step(
 @router.put("/{wf_def_id}/steps/{step_id}", response_model=WorkflowStepRead)
 def update_workflow_step(
     wf_def_id: int = Path(..., description="Workflow Definition ID"),
-    step_id: int = Path(..., description="Step ID"),
     db: Session = Depends(get_db),
+    step_id: int = Path(..., description="Step ID"),
     step_update: WorkflowStepCreate
 ):
     """

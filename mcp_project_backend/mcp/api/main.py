@@ -21,13 +21,13 @@ from fastapi.middleware import Middleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware import Middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from starlette.middleware.gzip import GZipMiddleware
-from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.trustedhost import TrustedHostMiddleware
-from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 import time
 from typing import Callable, Optional
@@ -70,7 +70,7 @@ from mcp.api.routers import (
     dashboard_routes,
     entity_routes,    # Add entity_routes
 )
-from mcp.core.config import settings  # Import after .env is loaded
+from mcp.core.settings import settings  # Import after .env is loaded
 
 # Configure basic logging
 logging.basicConfig(level=logging.INFO)

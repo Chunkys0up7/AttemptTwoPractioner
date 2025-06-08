@@ -3,7 +3,7 @@ Service layer for dashboard-related data aggregation.
 """
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import datetime
+from datetime import datetime, timezone
 
 from mcp.db.models.mcp import MCPDefinition, MCPVersion
 from mcp.db.models.workflow import WorkflowRun, WorkflowRunStatus
@@ -25,7 +25,7 @@ class DashboardService:
             .filter(WorkflowRun.status.in_([WorkflowRunStatus.RUNNING, WorkflowRunStatus.PENDING]))\
             .scalar()
 
-        today_date = datetime.utcnow().date()
+        today_date = datetime.now(timezone.utc).date()
 
         successful_runs_today = self.db.query(func.count(WorkflowRun.id))\
             .filter(WorkflowRun.status == WorkflowRunStatus.SUCCESS)\

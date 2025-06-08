@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
-from mcp.core.config import settings
+from mcp.core.settings import settings
 
 class JWTManager:
     """

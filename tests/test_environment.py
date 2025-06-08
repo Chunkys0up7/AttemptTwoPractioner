@@ -3,8 +3,9 @@ Test environment setup and configuration.
 """
 import os
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
-from mcp.core.config import Settings
+from mcp.core.settings import settings
 from mcp.db.base import Base, metadata
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -30,10 +31,12 @@ for dir_path in test_dirs:
     Path(dir_path).mkdir(parents=True, exist_ok=True)
 
 # Initialize settings with test configuration
-settings = Settings()
+# Use the global settings instance
+settings = settings
 
 # Create database engine and session
-engine = create_engine(settings.DATABASE_URL)
+# Create database engine with test URL from environment
+engine = create_engine(os.environ['DATABASE_URL'])
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Create all tables

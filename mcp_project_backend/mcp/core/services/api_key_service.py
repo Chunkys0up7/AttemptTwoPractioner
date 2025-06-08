@@ -39,7 +39,7 @@ class APIKeyService:
         
         # Set expiration if specified
         if expires_in_days:
-            api_key.expires_at = datetime.utcnow() + timedelta(days=expires_in_days)
+            api_key.expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
         
         # Save to database
         self.db.add(api_key)
@@ -128,7 +128,7 @@ class APIKeyService:
             return None
         
         # Update last used timestamp
-        api_key.last_used_at = datetime.utcnow()
+        api_key.last_used_at = datetime.now(timezone.utc)
         self.db.commit()
         
         return api_key 

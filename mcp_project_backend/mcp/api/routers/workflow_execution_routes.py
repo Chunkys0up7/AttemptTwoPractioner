@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import ValidationError
 from mcp.db.session import get_db
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from mcp.core.services.workflow_engine_service import WorkflowEngineService
 from mcp.schemas.workflow import WorkflowRunRead, WorkflowRunCreate, WorkflowRunList
 from mcp.monitoring.performance import performance_monitor

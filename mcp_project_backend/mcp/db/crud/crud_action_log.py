@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from .base_crud import CRUDBase
 from mcp.db.models.action_log import ActionLog
 from typing import Optional, Dict, Any, List
-from datetime import datetime
+from datetime import datetime, timezone
 
 class CRUDActionLog(CRUDBase[ActionLog, dict, dict]):
     """
@@ -32,7 +32,7 @@ class CRUDActionLog(CRUDBase[ActionLog, dict, dict]):
             ActionLog: The created ActionLog instance.
         """
         log_entry = self.model(
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             actor_id=actor_id,
             action_type=action_type,
             entity_type=entity_type,

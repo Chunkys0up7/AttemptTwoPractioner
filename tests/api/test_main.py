@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 from fastapi.testclient import TestClient
 from mcp.api.main import app
-from mcp.core.config import settings
+from mcp.core.settings import settings
 from tests.api.test_data import test_data
 
 @pytest.fixture

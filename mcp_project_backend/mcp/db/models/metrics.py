@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float, JSON, ForeignKey, Boolean, Text
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from datetime import datetime
+from sqlalchemy.sql import func
+from datetime import datetime, timezone
 from mcp.db.base import Base
 
 class Metric(Base):
@@ -9,7 +9,7 @@ class Metric(Base):
     name = Column(String(255), nullable=False, index=True)
     value = Column(Float, nullable=False)
     labels = Column(JSON, nullable=True)  # e.g., {"workflow_id": ..., "type": ...}
-    recorded_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    recorded_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     source = Column(String(100), nullable=True)  # e.g., 'backend', 'worker', etc.
 
     def __repr__(self):
@@ -24,8 +24,8 @@ class Alert(Base):
     threshold = Column(Float, nullable=False)
     comparison = Column(String(10), nullable=False, default='>')  # e.g., '>', '<', '=='
     is_active = Column(Boolean, default=True, nullable=False)
-    triggered_at = Column(DateTime, nullable=True)
-    resolved_at = Column(DateTime, nullable=True)
+    triggered_at = Column(DateTime(timezone=True), nullable=True)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
     details = Column(JSON, nullable=True)
 
     def __repr__(self):

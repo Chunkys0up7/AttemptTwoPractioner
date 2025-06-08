@@ -1,8 +1,8 @@
 from typing import Dict, Any, Optional, Callable, TypeVar, Generic, List, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import asyncio
 from prometheus_client import Gauge, Counter, Histogram, Summary, Enum
-from mcp.core.config import settings
+from mcp.core.settings import settings
 import logging
 from functools import wraps
 from contextlib import contextmanager
@@ -169,7 +169,7 @@ class PerformanceMonitor:
         )
         
         # Initialize system metrics
-        self.last_update = datetime.utcnow()
+        self.last_update = datetime.now(timezone.utc)
         self.update_system_metrics()
         # Start periodic updates only if an event loop is running
         try:
@@ -188,7 +188,7 @@ class PerformanceMonitor:
 
     def update_system_metrics(self):
         """Update system-level metrics."""
-        self.system_uptime.set((datetime.utcnow() - self.last_update).total_seconds())
+        self.system_uptime.set((datetime.now(timezone.utc) - self.last_update).total_seconds())
         self.memory_usage.set(psutil.virtual_memory().percent)
         self.cpu_usage.set(psutil.cpu_percent())
 

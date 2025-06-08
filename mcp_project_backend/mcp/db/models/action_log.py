@@ -2,8 +2,7 @@
 Database model for Action Logs.
 """
 import uuid
-from sqlalchemy import Column, String, DateTime, func, Index
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+from sqlalchemy import Column, String, DateTime, func, Index, JSON
 # from sqlalchemy.orm import relationship # Unused
 
 # Assuming Base is defined in mcp.db.base_class
@@ -13,7 +12,7 @@ from mcp.db.base import Base
 class ActionLog(Base):
     __tablename__ = "action_logs"
 
-    id = Column(PG_UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     timestamp = Column(DateTime(timezone=True),
                        default=func.now(), nullable=False)
 
@@ -32,8 +31,8 @@ class ActionLog(Base):
     # The actual ID (UUID or other string representation) of the entity involved.
     # Using String to accommodate various ID types, though UUIDs are common in this project.
 
-    details = Column(JSONB, nullable=True)
-    # Additional contextual information about the action.
+    action_metadata = Column(JSON, nullable=True)
+    # Additional contextual information about the action (e.g., error details, IP address, etc.).
     # E.g., for an update: {"old_values": {...}, "new_values": {...}}
     # E.g., for a login: {"ip_address": "1.2.3.4"}
     # E.g., for an error: {"error_message": "...", "stack_trace": "..."}
@@ -50,4 +49,4 @@ class ActionLog(Base):
     )
 
     def __repr__(self):
-        return f"<ActionLog(id={self.id}, timestamp='{self.timestamp}', actor='{self.actor_id}', action='{self.action_type}', entity='{self.entity_type}:{self.entity_id}')>"
+        return f"<ActionLog(id={self.id}, timestamp='{self.timestamp}', actor='{self.actor_id}', action='{self.action_type}', entity='{self.entity_type}:{self.entity_id}', metadata={self.action_metadata})>"

@@ -2,7 +2,7 @@ import logging
 import sys
 import json
 from typing import Any, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -46,7 +46,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         try:
             # Log request
-            start_time = datetime.utcnow()
+            start_time = datetime.now(timezone.utc)
             request_id = request.headers.get('X-Request-ID', 'unknown')
             
             logger.info(
