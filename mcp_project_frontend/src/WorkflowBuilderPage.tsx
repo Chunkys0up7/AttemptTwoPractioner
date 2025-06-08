@@ -6,9 +6,10 @@ import { useParams } from 'react-router-dom';
 import ComponentPalette from './workflow_builder/ComponentPalette';
 import PropertiesPanel from './workflow_builder/PropertiesPanel';
 import Button from './components/common/Button';
-import { PlayIcon, WorkflowBuilderIcon, MenuIcon, XIcon } from './components/common/icons';
+import { PlayIcon, WorkflowBuilderIcon, MenuIcon, XIcon, ExclamationTriangleIcon, ExclamationCircleIcon } from './components/common/icons';
 import { AIComponent } from './types';
 import { workflowApi } from './services/api';
+import { WorkflowValidator } from './utils/workflow/validation';
 
 const initialNodes: Node[] = [
   { id: '1', type: 'input', data: { label: 'Start Node' }, position: { x: 250, y: 5 } },
@@ -41,6 +42,8 @@ const WorkflowBuilderPage: React.FC = () => {
 
   const [restoreLoadingId, setRestoreLoadingId] = useState<string | null>(null);
   const [restoreError, setRestoreError] = useState<string | null>(null);
+
+  const [validationResult, setValidationResult] = useState({ errors: [], warnings: [], nodeErrors: {}, edgeErrors: {}, isValid: true });
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -119,6 +122,12 @@ const WorkflowBuilderPage: React.FC = () => {
         .finally(() => setVersionLoading(false));
     }
   }, [isVersionHistoryOpen, workflowId]);
+
+  // Run validation whenever nodes/edges change
+  useEffect(() => {
+    const result = WorkflowValidator.validateWorkflow(nodes, edges, []); // TODO: pass components if needed
+    setValidationResult(result);
+  }, [nodes, edges]);
 
   return (
     <div className="flex flex-col h-full">
@@ -344,6 +353,41 @@ const WorkflowBuilderPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Add summary/status panel at the top */}
+      <div className="mb-4">
+        {(!validationResult.isValid || validationResult.warnings.length > 0) && (
+          <div role="region" aria-label="Workflow validation summary" className="p-2 rounded border bg-yellow-50 border-yellow-300 text-yellow-900 mb-2">
+            <div className="flex items-center gap-2">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+              <span className="font-bold">Workflow Validation</span>
+              <span className="ml-2">{validationResult.errors.length} error(s), {validationResult.warnings.length} warning(s)</span>
+            </div>
+            <ul className="mt-2 ml-7 list-disc">
+              {validationResult.errors.map((err, i) => (
+                <li key={i} className="text-red-700 cursor-pointer" tabIndex={0} onClick={() => {/* TODO: focus node if possible */}}>
+                  <ExclamationCircleIcon className="inline w-4 h-4 text-red-600 mr-1" /> {err}
+                </li>
+              ))}
+              {validationResult.warnings.map((warn, i) => (
+                <li key={i} className="text-yellow-700 cursor-pointer" tabIndex={0} onClick={() => {/* TODO: focus node if possible */}}>
+                  <ExclamationTriangleIcon className="inline w-4 h-4 text-yellow-600 mr-1" /> {warn}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Add error/warning badges to nodes */}
+      {nodes.map((node) => (
+        <div key={node.id} className="relative">
+          <span>{node.data.name}</span>
+          {validationResult.nodeErrors[node.id]?.length > 0 && (
+            <ExclamationCircleIcon className="absolute left-0 top-0 w-4 h-4 text-red-600" title="Node has errors" />
+          )}
+        </div>
+      ))}
     </div>
   );
 };
