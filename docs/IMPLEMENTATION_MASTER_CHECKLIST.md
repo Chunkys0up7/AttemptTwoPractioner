@@ -43,6 +43,15 @@ This document merges and supersedes all previous implementation checklists and t
   - **Acceptance Criteria:** Real-time updates are visible in the UI, connection is robust, and tests pass.
   - **Files:** `src/hooks/useWebSocket.ts`, `src/contexts/WebSocketContext.tsx`, `mcp_project_backend/mcp/core/websocket_manager.py`
 
+- [x] **Phase 4, Section 4.1: Backend recommendation system tests**
+    - Unit tests for RecommendationService (top_n, category, analytics logging)
+    - API tests for /api/recommendations (default, category, top_n)
+    - All tests pass locally
+    - [devlog entry: Backend Recommendation System Tests]
+- [ ] **Phase 4, Section 4.1: Frontend recommendation system tests**
+    - Add tests for RecommendationsPanel (loading, error, filter, display)
+    - Update documentation and devlog
+
 ### 4.2 Performance Optimization
 
 **Priority:** 🟢 Medium/Low
