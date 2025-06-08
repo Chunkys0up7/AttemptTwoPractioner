@@ -1,12 +1,11 @@
 import React, { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@components/common/Button';
+import { Button } from '@components/ui/Button';
 import Card from '@components/common/Card';
-import { FormRow } from '@components/common/FormRow';
-import { Input } from '@components/common/Input';
-import { Select } from '@components/common/Select';
-import { TextArea } from '@components/common/TextArea';
-import { UploadIcon, CheckCircleIcon, XCircleIcon, PlusCircleIcon, TrashIcon } from '@components/icons';
+import { FormRow } from '@components/ui/FormRow';
+import { Input } from '@components/ui/Input';
+import { TextArea } from '@components/ui/TextArea';
+import { UploadIcon, DataIcon } from '@components/icons';
 import ChatAssistant from '@components/submit_component/ChatAssistant';
 import CodeEditor from '@components/common/CodeEditor';
 import { useComponents } from '@context/ComponentContext';
@@ -126,8 +125,8 @@ const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
                   <option value="code">Code</option>
                   <option value="markdown">Markdown</option>
                 </select>
-                <Button variant="danger" size="sm" onClick={() => removeCell(cell.id)} className="!p-1">
-                  <TrashIcon className="w-3.5 h-3.5" />
+                <Button variant="destructive" size="sm" onClick={() => removeCell(cell.id)} className="!p-1">
+                  <DataIcon className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
@@ -153,11 +152,11 @@ const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
       ))}
       <div className="flex gap-2 mt-2">
         <Button variant="secondary" size="sm" onClick={() => addCell('code')}>
-          <PlusCircleIcon className="w-4 h-4 mr-1" />
+          <DataIcon className="w-4 h-4 mr-1" />
           Add Code Cell
         </Button>
         <Button variant="secondary" size="sm" onClick={() => addCell('markdown')}>
-          <PlusCircleIcon className="w-4 h-4 mr-1" />
+          <DataIcon className="w-4 h-4 mr-1" />
           Add Markdown Cell
         </Button>
       </div>
@@ -579,17 +578,17 @@ const SubmitComponentPage: React.FC = () => {
 
               {submissionStatus === 'success' && (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-md text-sm text-green-700 flex items-center">
-                  <CheckCircleIcon className="w-5 h-5 mr-2"/> Component submitted successfully! Redirecting...
+                  <DataIcon className="w-5 h-5 mr-2"/> Component submitted successfully! Redirecting...
                 </div>
               )}
               {submissionStatus === 'error' && Object.keys(errors).length > 0 && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700 flex items-center">
-                  <XCircleIcon className="w-5 h-5 mr-2"/> Please correct the errors above.
+                  <DataIcon className="w-5 h-5 mr-2"/> Please correct the errors above.
                 </div>
               )}
               {submissionStatus === 'error' && !Object.keys(errors).length && selectedType && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700 flex items-center">
-                  <XCircleIcon className="w-5 h-5 mr-2"/> Submission failed. Please try again.
+                  <DataIcon className="w-5 h-5 mr-2"/> Submission failed. Please try again.
                 </div>
               )}
 
