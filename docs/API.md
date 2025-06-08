@@ -1086,3 +1086,47 @@ GET /api/v1/metrics/dashboard
 ## Changelog
 
 - [YYYY-MM-DD] Added/updated documentation for recommendations, notifications, workflow templates, and performance monitoring endpoints. Expanded examples and clarified authentication/error handling for new endpoints.
+
+## Notifications API
+
+### POST /api/notifications
+Send a notification to a user.
+- **Request Body:**
+  - `user_id` (string, required)
+  - `message` (string, required)
+  - `type_` (string, optional, default: "info")
+- **Response:**
+  - Notification object
+- **Example:**
+```json
+{
+  "user_id": "user123",
+  "message": "You have a new message!",
+  "type_": "info"
+}
+```
+
+### GET /api/notifications
+Fetch notifications for a user.
+- **Query Params:**
+  - `user_id` (string, required)
+  - `unread_only` (bool, optional)
+- **Response:**
+  - List of notification objects
+- **Example:**
+`/api/notifications?user_id=user123&unread_only=true`
+
+### POST /api/notifications/read
+Mark a notification as read.
+- **Request Body:**
+  - `user_id` (string, required)
+  - `notification_id` (string, required)
+- **Response:**
+  - `{ "success": true }`
+
+**Authentication:**
+- Requires user authentication (to be enforced in production).
+
+**Error Handling:**
+- Returns 400 for missing/invalid parameters.
+- Returns 404 if notification not found.
