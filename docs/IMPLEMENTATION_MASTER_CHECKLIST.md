@@ -75,6 +75,12 @@ This document merges and supersedes all previous implementation checklists and t
     - Registered in frontend entry (index.tsx)
     - [devlog entry: Service Worker for Advanced Caching & Offline Support]
 
+- [x] **Phase 4, Section 4.2: Performance monitoring**
+    - Frontend: LCP, FID, CLS, page load, navigation, API/component metrics tracked
+    - Backend: HTTP, DB, cache, workflow, system, error, and rate limiting metrics (Prometheus)
+    - Metrics dashboard and endpoints available
+    - [devlog entry: Performance Monitoring Complete]
+
 ### 4.3 User Experience Polish
 
 **Priority:** 🟢 Low
