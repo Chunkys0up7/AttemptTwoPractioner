@@ -124,6 +124,11 @@ This document merges and supersedes all previous implementation checklists and t
     - Ensured dark mode and transitions are consistent
     - [devlog entry: Modal Component Polish]
 
+- [x] **Phase 4.3: User Experience Polish**
+  - [x] Button polish (done)
+  - [x] Modal polish (done)
+  - [x] Feedback/loading component polish (LoadingSpinner, ErrorMessage, empty states) _(done, see devlog)_
+
 ### 4.4 Documentation & Support
 
 **Priority:** 🟢 Low

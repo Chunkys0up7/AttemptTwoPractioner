@@ -213,3 +213,11 @@
 - Improved accessibility: added role="dialog", aria-modal, aria-labelledby, focus trap, ESC close.
 - Ensured dark mode and transitions are consistent.
 - Checklist updated. Proceeding to feedback/loading component polish next.
+
+## [YYYY-MM-DD] Feedback/Loading Component Polish
+- Polished and standardized `LoadingSpinner` for accessibility, dark mode, and consistent usage.
+- Standardized error feedback with `ErrorMessage` component.
+- Created new `EmptyState` component for consistent empty state UI.
+- Refactored all major empty state usages in recommendations, component palette, workflows, dashboard, and marketplace to use `EmptyState` with appropriate icons and messages.
+- Fixed all related linter errors and import issues.
+- No tests were run at this stage (per instructions).

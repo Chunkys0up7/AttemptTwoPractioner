@@ -1,5 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import { EmptyState } from '../components/common/EmptyState';
+import { WorkflowBuilderIcon } from '../components/common/icons';
 
 const WorkflowBuilderPage: React.FC = () => {
   const location = useLocation();
@@ -14,7 +16,7 @@ const WorkflowBuilderPage: React.FC = () => {
             {JSON.stringify(initialData, null, 2)}
           </pre>
         ) : (
-          <div className="text-gray-500">Workflow builder interface will be implemented here.</div>
+          <EmptyState message="Workflow builder interface will be implemented here." icon={<WorkflowBuilderIcon className="w-12 h-12 text-neutral-300 mx-auto" />} />
         )}
       </div>
     </div>

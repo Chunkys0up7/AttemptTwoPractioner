@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EmptyState } from '../components/common/EmptyState';
-import { DocumentTextIcon } from '../components/common/icons';
+import { DocumentTextIcon, CubeIcon } from '../components/common/icons';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const DashboardPage: React.FC = () => {
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Components</h2>
-          <p className="text-gray-500">Browse our library of workflow components.</p>
+          <EmptyState message="Browse our library of workflow components." icon={<CubeIcon className="w-12 h-12 text-neutral-300 mx-auto" />} />
           <button
             onClick={() => navigate('/components')}
             className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mt-4"
