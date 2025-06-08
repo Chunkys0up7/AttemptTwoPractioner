@@ -108,3 +108,13 @@
 - Accessibility and usage instructions for snippet insertion UI are now covered.
 - Code checked in and pushed.
 - Updated checklist in docs/frontend_phase2_plan.md.
+
+### [2024-06-07] Begin Advanced IntelliSense Integration
+- Installed monaco-languageclient, vscode-ws-jsonrpc, and monaco-python to enable Monaco language server (LSP) integration for Python.
+- Preparing to integrate Python LSP for advanced IntelliSense in all code/script editing areas.
+
+### [2024-06-07] Python LSP (Advanced IntelliSense) Integration Complete
+- Integrated optional Python LSP (advanced IntelliSense) support in CodeEditor via monaco-languageclient and monaco-python.
+- Documented usage and requirements in README.
+- Updated checklist in docs/frontend_phase2_plan.md.
+- Note: Requires a running Python language server at ws://localhost:3001 for full functionality.

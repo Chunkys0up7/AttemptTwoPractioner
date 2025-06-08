@@ -676,3 +676,22 @@ Example:
   }}
 />
 ```
+
+### Advanced Python IntelliSense (LSP)
+
+- The `CodeEditor` component supports optional advanced Python IntelliSense via Language Server Protocol (LSP).
+- To enable, pass the prop `enablePythonLsp={true}` and set `language="python"`.
+- This requires a running Python language server (e.g., pylsp, pyright) accessible via WebSocket at `ws://localhost:3001`.
+- When enabled, you get advanced completions, go-to-definition, hover, and more, powered by the language server.
+- If the server is not running, the editor will fall back to basic Monaco Python support.
+
+**Example:**
+
+```tsx
+<CodeEditor
+  value={code}
+  language="python"
+  onChange={setCode}
+  enablePythonLsp={true}
+/>
+```
