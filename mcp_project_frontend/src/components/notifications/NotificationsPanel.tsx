@@ -4,6 +4,8 @@ import { ErrorMessage } from '../ErrorMessage';
 import { EmptyState } from '../common/EmptyState';
 import { NotificationContext, Notification } from '../../contexts/NotificationContext';
 
+// TODO: Ensure NotificationsPanel is wrapped in NotificationProvider and WebSocketProvider in the app entry/layout for real-time updates
+
 export const NotificationsPanel: React.FC = () => {
   // TODO: Replace with real user context
   const userId = 'demo';

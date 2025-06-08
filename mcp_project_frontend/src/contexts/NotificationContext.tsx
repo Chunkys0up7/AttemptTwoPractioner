@@ -1,4 +1,5 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useContext, useEffect } from 'react';
+import { WebSocketContext } from './WebSocketContext';
 
 export interface Notification {
   id: string;
@@ -25,6 +26,7 @@ export const NotificationContext = createContext<NotificationContextType>({
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { lastMessage } = useContext(WebSocketContext);
 
   const fetchNotifications = useCallback((userId: string) => {
     // TODO: Add real-time updates and notification preferences integration
@@ -43,6 +45,14 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
       setNotifications((prev) => prev.map(n => n.id === notificationId ? { ...n, read: true } : n));
     });
   }, []);
+
+  useEffect(() => {
+    // Listen for real-time notifications
+    if (lastMessage && lastMessage.id && lastMessage.message) {
+      setNotifications((prev) => [{ ...lastMessage, read: false }, ...prev]);
+    }
+    // TODO: Add advanced handling (deduplication, preferences, etc.)
+  }, [lastMessage]);
 
   return (
     <NotificationContext.Provider value={{ notifications, setNotifications, markAsRead, fetchNotifications }}>
