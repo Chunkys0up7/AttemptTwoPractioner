@@ -128,3 +128,8 @@
 - Integrated custom formatter support in CodeEditor via the customFormatter prop.
 - Provided formatCode utility for Python (Ruff WASM) and JS/TS (Prettier) formatting in-browser.
 - Updated documentation and checklist.
+
+### [2024-06-07] MCP-Specific Linting Complete
+- Added a linter utility for MCP scripts (YAML/JSON) with rules for required keys, forbidden patterns, and best practices.
+- Wired up to CodeEditor for MCP config fields; errors/warnings now shown inline.
+- Updated checklist and pushed code.
