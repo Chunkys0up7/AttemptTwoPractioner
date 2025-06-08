@@ -67,11 +67,12 @@ This document merges and supersedes all previous implementation checklists and t
 
 **Outstanding Tasks:**
 - [ ] Add performance features (beyond bundle size, caching, lazy loading)
-  - [ ] Implement additional performance monitoring
-  - [ ] Add advanced caching strategies (service worker, offline support)
+  - [x] Implement additional performance monitoring
+  - [x] Add advanced caching strategies (service worker, offline support)
   - [ ] Performance benchmark tests
   - **Acceptance Criteria:** Performance metrics are collected, offline support is robust, and benchmarks show improvement.
   - **Files:** `public/sw.js`, `src/utils/performanceMonitor.ts`, `src/hooks/useOfflineStatus.ts`
+  - _Frontend and backend performance monitoring and caching are robust and complete. Proceeding to benchmark tests (backend deferred, frontend planned)._
 
 - [x] **Phase 4, Section 4.2: Service worker and offline support**
     - Service worker (public/sw.js) implemented for static asset and API caching
@@ -89,11 +90,13 @@ This document merges and supersedes all previous implementation checklists and t
     - Test suite exists, but test client is not connected to real backend app (workflow endpoints unavailable in mock app)
     - Benchmark tests deferred; will run after test setup is updated
     - [devlog entry: Backend Performance Benchmark Tests Deferred]
+    - _Status: Deferred. No further action required at this stage._
 
 - [ ] **Phase 4, Section 4.2: Frontend performance benchmark tests (planned)**
     - Plan documented: will run Lighthouse/Web Vitals on main user flows (dashboard, workflow builder, settings) at a later stage
     - Will document results and improvement areas after tests are run
     - [devlog entry: Frontend Performance Benchmark Plan]
+    - _Status: Planned. No further action required at this stage._
 
 ### 4.3 User Experience Polish
 
