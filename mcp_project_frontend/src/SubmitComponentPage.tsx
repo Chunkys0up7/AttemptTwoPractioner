@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@components/common/Button';
 import Card from '@components/common/Card';
@@ -12,6 +12,7 @@ import CodeEditor from '@components/common/CodeEditor';
 import { useComponents } from '@context/ComponentContext';
 import { AIComponent, SpecificComponentType, NotebookCell, AIComponentCostTier } from '../types';
 import { SUBMITTABLE_COMPONENT_TYPES, COMPONENT_COMPLIANCE_OPTIONS, COMPONENT_COST_TIERS, COMPONENT_VISIBILITY_OPTIONS, LLM_MODELS, getIconForComponentType } from '../constants';
+import { lintMcpScript } from './components/common/mcpLinter';
 
 interface TypeSpecificData {
   codeContent?: string;
@@ -37,22 +38,56 @@ interface TypeSpecificFormProps {
   errors: Partial<Record<keyof TypeSpecificData, string>>;
 }
 
+// Example snippets for each language
+const PYTHON_SNIPPETS = [
+  { label: 'Print Hello', documentation: 'Prints Hello World', body: 'print("Hello, World!")' },
+  { label: 'For Loop', documentation: 'Basic for loop', body: 'for i in range(10):\n    print(i)' },
+];
+const TYPESCRIPT_SNIPPETS = [
+  { label: 'Log', documentation: 'Console log', body: 'console.log("Hello, World!");' },
+  { label: 'Function', documentation: 'TypeScript function', body: 'function greet(name: string): void {\n  console.log(`Hello, ${name}`);\n}' },
+];
+const MARKDOWN_SNIPPETS = [
+  { label: 'Header', documentation: 'Markdown header', body: '# Header' },
+  { label: 'Link', documentation: 'Markdown link', body: '[Link text](https://example.com)' },
+];
+const YAML_SNIPPETS = [
+  { label: 'Key-Value', documentation: 'YAML key-value', body: 'key: value' },
+  { label: 'List', documentation: 'YAML list', body: '- item1\n- item2' },
+];
+const PLAINTEXT_SNIPPETS = [
+  { label: 'TODO', documentation: 'Add a TODO', body: 'TODO: ...' },
+];
+
 // --- Sub-Form Components ---
 
-const CodeEditorForm: React.FC<TypeSpecificFormProps & { language: string }> = ({ data, onChange, errors, language }) => (
-  <div>
-    <label htmlFor="codeContent" className="block text-sm font-medium text-neutral-700 mb-1">
-      {language} Code <span className="text-red-500">*</span>
-    </label>
-    <CodeEditor
-      value={data?.codeContent || ''}
-      language={language.toLowerCase()}
-      onChange={(value: string | undefined) => onChange('codeContent', value || '')}
-      height="300px"
-    />
-    {errors?.codeContent && <p className="mt-1 text-xs text-red-500">{errors.codeContent}</p>}
-  </div>
-);
+const CodeEditorForm: React.FC<TypeSpecificFormProps & { language: string }> = ({ data, onChange, errors, language }) => {
+  const snippets = useMemo(() => {
+    switch (language.toLowerCase()) {
+      case 'python': return PYTHON_SNIPPETS;
+      case 'typescript': return TYPESCRIPT_SNIPPETS;
+      case 'markdown': return MARKDOWN_SNIPPETS;
+      case 'yaml': return YAML_SNIPPETS;
+      case 'plaintext': return PLAINTEXT_SNIPPETS;
+      default: return [];
+    }
+  }, [language]);
+  return (
+    <div>
+      <label htmlFor="codeContent" className="block text-sm font-medium text-neutral-700 mb-1">
+        {language} Code <span className="text-red-500">*</span>
+      </label>
+      <CodeEditor
+        value={data?.codeContent || ''}
+        language={language.toLowerCase()}
+        onChange={(value: string | undefined) => onChange('codeContent', value || '')}
+        height="300px"
+        snippets={snippets}
+      />
+      {errors?.codeContent && <p className="mt-1 text-xs text-red-500">{errors.codeContent}</p>}
+    </div>
+  );
+};
 
 const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, errors }) => {
   const cells = data?.notebookCells || [];
@@ -99,16 +134,18 @@ const NotebookEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
             {cell.type === 'code' ? (
               <CodeEditor
                 value={cell.content}
-                language="python"
+                language={cell.type === 'code' ? 'python' : 'markdown'}
                 onChange={(value: string | undefined) => updateCellContent(cell.id, value || '')}
                 height="150px"
+                snippets={cell.type === 'code' ? PYTHON_SNIPPETS : MARKDOWN_SNIPPETS}
               />
             ) : (
               <CodeEditor
                 value={cell.content}
-                language="markdown"
+                language={cell.type === 'code' ? 'python' : 'markdown'}
                 onChange={(value: string | undefined) => updateCellContent(cell.id, value || '')}
                 height="150px"
+                snippets={cell.type === 'code' ? PYTHON_SNIPPETS : MARKDOWN_SNIPPETS}
               />
             )}
           </div>
@@ -149,6 +186,7 @@ const LLMAgentEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
           language="markdown"
           onChange={(value) => handleChange('systemPrompt', value || '')}
           height="300px"
+          snippets={MARKDOWN_SNIPPETS}
         />
       </FormRow>
       <FormRow label="User Prompt Template" htmlFor="userPromptTemplate">
@@ -157,6 +195,7 @@ const LLMAgentEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, e
           language="markdown"
           onChange={(value) => handleChange('userPromptTemplate', value || '')}
           height="300px"
+          snippets={MARKDOWN_SNIPPETS}
         />
       </FormRow>
       <div className="grid grid-cols-2 gap-4">
@@ -207,6 +246,7 @@ const StreamlitAppEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChang
           language="plaintext"
           onChange={(value) => handleChange('requirements', value || '')}
           height="300px"
+          snippets={PLAINTEXT_SNIPPETS}
         />
       </FormRow>
       {errors?.streamlitAppData && <p className="mt-1 text-xs text-red-500">{errors.streamlitAppData as string}</p>}
@@ -224,6 +264,8 @@ const MCPEditorForm: React.FC<TypeSpecificFormProps> = ({ data, onChange, errors
       language="yaml"
       onChange={(value: string | undefined) => onChange('mcpConfiguration', value || '')}
       height="300px"
+      snippets={YAML_SNIPPETS}
+      validate={lintMcpScript}
     />
     {errors?.mcpConfiguration && <p className="mt-1 text-xs text-red-500">{errors.mcpConfiguration}</p>}
   </div>
