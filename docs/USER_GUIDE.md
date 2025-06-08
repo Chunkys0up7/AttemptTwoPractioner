@@ -462,3 +462,30 @@ The notification system provides real-time alerts and updates about system event
 3. Describe the issue
 4. Include steps to reproduce
 5. Submit report
+
+## Recommendation System
+
+The Recommendation System provides personalized suggestions to help you discover relevant components, workflows, and templates based on your activity and preferences.
+
+### Where to Find Recommendations
+- **Dashboard**: See recommended components and trending workflows at a glance.
+- **Marketplace**: Filter and browse recommended items tailored to your interests.
+- **Workflow Builder**: Get suggestions for components to add to your workflow.
+
+### How Recommendations Work
+- Recommendations are generated based on your recent activity, selected categories, and system analytics.
+- Each recommendation includes a score (0–1) indicating its relevance to you.
+- You can filter recommendations by category or limit the number shown.
+
+### Using Recommendations
+1. Navigate to any page with a "Recommendations" panel or section.
+2. Use the filter controls (e.g., category, top N) to refine suggestions.
+3. Click on a recommended item to view details or add it to your workflow.
+
+### Example
+- **Score**: Higher scores mean more relevant suggestions.
+- **Category Filter**: Show only recommendations from a specific category (e.g., Data Processing).
+
+### Troubleshooting
+- If no recommendations appear, try adjusting your filters or check your recent activity.
+- For persistent issues, contact support.
