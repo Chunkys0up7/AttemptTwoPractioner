@@ -69,6 +69,12 @@ This document merges and supersedes all previous implementation checklists and t
   - **Acceptance Criteria:** Performance metrics are collected, offline support is robust, and benchmarks show improvement.
   - **Files:** `public/sw.js`, `src/utils/performanceMonitor.ts`, `src/hooks/useOfflineStatus.ts`
 
+- [x] **Phase 4, Section 4.2: Service worker and offline support**
+    - Service worker (public/sw.js) implemented for static asset and API caching
+    - Offline fallback for navigation
+    - Registered in frontend entry (index.tsx)
+    - [devlog entry: Service Worker for Advanced Caching & Offline Support]
+
 ### 4.3 User Experience Polish
 
 **Priority:** 🟢 Low

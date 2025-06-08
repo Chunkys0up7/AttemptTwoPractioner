@@ -180,3 +180,9 @@
 - Added user-facing documentation for the Recommendation System to USER_GUIDE.md (usage, filters, scoring, troubleshooting).
 - Added API documentation for /api/recommendations endpoint to API.md (parameters, example, description).
 - Checklist and documentation updated and pushed.
+
+## [YYYY-MM-DD] Service Worker for Advanced Caching & Offline Support
+- Implemented service worker (public/sw.js) for static asset and API caching (stale-while-revalidate strategy).
+- Added offline fallback for navigation requests.
+- Registered service worker in frontend entry point (index.tsx).
+- Checklist: Phase 4, Section 4.2 (performance optimization) - service worker and offline support implemented, proceeding to performance monitoring review next.
