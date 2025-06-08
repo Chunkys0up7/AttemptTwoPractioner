@@ -4,29 +4,33 @@ interface Recommendation {
   id: number;
   title: string;
   score: number;
+  category?: string;
 }
 
-const fetchRecommendations = async (): Promise<Recommendation[]> => {
-  // TODO: Replace with real API call
-  return [
-    { id: 1, title: 'Example Recommendation', score: 0.95 },
-    { id: 2, title: 'Another Recommendation', score: 0.90 },
-  ];
-};
+interface RecommendationsPanelProps {
+  category?: string;
+  topN?: number;
+}
 
-export const RecommendationsPanel: React.FC = () => {
+export const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ category, topN = 3 }) => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Placeholder for analytics tracking
-    // TODO: Track recommendation panel view
-    fetchRecommendations()
-      .then(setRecommendations)
+    // TODO: Track recommendation panel view (analytics)
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (topN) params.append('top_n', String(topN));
+    fetch(`/api/recommendations?${params.toString()}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch recommendations');
+        return res.json();
+      })
+      .then((data) => setRecommendations(Array.isArray(data) ? data : data.recommendations || []))
       .catch((err) => setError(err.message || 'Failed to load recommendations'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [category, topN]);
 
   if (loading) return <div>Loading recommendations...</div>;
   if (error) return <div>Error: {error}</div>;
