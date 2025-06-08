@@ -43,7 +43,7 @@
   - [x] Provide a button/menu to insert snippets/templates (implemented in CodeEditor, accessible, documented)
 - [x] Ensure snippet/template insertion works in all code/script editing areas
 - [x] Support multi-language snippets (Python, TypeScript, SQL, etc.)
-- [ ] Document and test all features
+- [x] Document and test all features
 - [ ] **Integrate language server for advanced IntelliSense** (optional/advanced)
   - [ ] Add support for external language servers (e.g., Python, via Monaco extensions)
 - [ ] **Integrate custom formatters for non-Monaco languages**
@@ -52,6 +52,7 @@
   - [ ] Add more rules or UI for MCP-specific errors/warnings
 - [ ] **Add code snippet/template library management UI**
   - [ ] Allow users to create, edit, and manage their own snippets/templates
+- [x] Documentation and accessibility for snippet/template insertion and multi-language support are complete.
 
 ### D. Validation
 - [ ] **Improve UI for displaying workflow validation results**

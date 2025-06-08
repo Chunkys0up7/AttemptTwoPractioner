@@ -102,3 +102,9 @@
 - Snippet/template insertion now works in all code/script editing areas, including node properties.
 - Code checked in and pushed.
 - Updated checklist in docs/frontend_phase2_plan.md.
+
+### [2024-06-07] Code Editor Documentation & Accessibility Complete
+- Updated README to document universal snippet/template insertion, multi-language support, and workflow builder node properties.
+- Accessibility and usage instructions for snippet insertion UI are now covered.
+- Code checked in and pushed.
+- Updated checklist in docs/frontend_phase2_plan.md.
