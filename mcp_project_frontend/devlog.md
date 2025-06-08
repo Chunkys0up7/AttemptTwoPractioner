@@ -175,3 +175,8 @@
 - Confirmed correct MSW v2+ usage and API mocking.
 - All tests pass locally.
 - Checklist: Phase 4, Section 4.1 (recommendation system) - frontend tests complete, proceeding to documentation update next.
+
+## [YYYY-MM-DD] Recommendation System Documentation
+- Added user-facing documentation for the Recommendation System to USER_GUIDE.md (usage, filters, scoring, troubleshooting).
+- Added API documentation for /api/recommendations endpoint to API.md (parameters, example, description).
+- Checklist and documentation updated and pushed.

@@ -52,6 +52,10 @@ This document merges and supersedes all previous implementation checklists and t
     - Tests for RecommendationsPanel (loading, error, filter, display)
     - All tests pass locally
     - [devlog entry: Frontend Recommendation System Tests]
+- [x] **Phase 4, Section 4.1: Recommendation system documentation**
+    - User-facing documentation in USER_GUIDE.md
+    - API documentation in API.md
+    - [devlog entry: Recommendation System Documentation]
 
 ### 4.2 Performance Optimization
 
