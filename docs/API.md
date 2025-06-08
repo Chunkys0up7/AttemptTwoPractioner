@@ -1130,3 +1130,18 @@ Mark a notification as read.
 **Error Handling:**
 - Returns 400 for missing/invalid parameters.
 - Returns 404 if notification not found.
+
+### WebSocket: /ws/notifications
+Real-time notifications for users.
+- **Connect:** `ws://<host>/ws/notifications?user_id=<user_id>`
+- **Messages:**
+  - Server can send notification objects as JSON
+  - Client can send messages (currently echoed back)
+- **Usage:**
+  - Connect with user_id as query param
+  - On connect, server will push notifications in real time (future work)
+- **Example:**
+```
+const ws = new WebSocket('ws://localhost:8000/ws/notifications?user_id=user123');
+ws.onmessage = (event) => { console.log(event.data); };
+```
