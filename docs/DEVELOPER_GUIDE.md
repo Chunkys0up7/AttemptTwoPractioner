@@ -29,6 +29,18 @@ The AI Ops Console is a modern web application built with:
    - Prompt engineering
    - Response handling
 
+### 1.3 New Architecture & Features (2024)
+
+The following features and architectural changes have been added:
+
+- **Recommendation System**: Backend service and API for personalized recommendations, with analytics and frontend integration.
+- **Notification System**: Real-time notifications, notification center, analytics dashboard, and user preferences.
+- **Real-Time Updates**: WebSocket-based updates for workflows, notifications, and metrics.
+- **Performance Monitoring**: Prometheus-based backend metrics, frontend Web Vitals, service worker for offline support.
+- **Workflow Templates**: CRUD, versioning, stats, and search for reusable workflow templates.
+
+See `ARCHITECTURE.md` and `architecture/testing_and_contribution.md` for detailed diagrams and flow.
+
 ## 2. Development Environment
 
 ### 2.1 Prerequisites
@@ -84,6 +96,19 @@ SECRET_KEY=your_secret_key
 JWT_EXPIRE_MINUTES=30
 ```
 
+## 2.3 Developer Onboarding
+
+1. **Clone the repository**
+2. **Setup environment** (see above)
+3. **Read `DOCUMENTATION_STRUCTURE.md` for doc organization**
+4. **Read `architecture/testing_and_contribution.md` for code/test standards**
+5. **Start with a small issue or feature**
+6. **Create a feature branch**
+7. **Write code and tests**
+8. **Open a Pull Request (PR)**
+9. **Request review and address feedback**
+10. **Update documentation as needed**
+
 ## 3. Development Workflow
 
 ### 3.1 Git Workflow
@@ -121,6 +146,15 @@ JWT_EXPIRE_MINUTES=30
    - Peer review
    - Merge approval
    - CI/CD checks
+
+### 3.3 Contribution Workflow (2024)
+
+- **Branching**: Use `feature/`, `bugfix/`, `hotfix/`, `release/` prefixes
+- **Commits**: Conventional commits (`feat:`, `fix:`, `docs:`, etc.)
+- **Pull Requests**: PRs must reference checklist items and include test results
+- **Code Review**: Peer review required, use review checklist (see `architecture/testing_and_contribution.md`)
+- **CI/CD**: All PRs must pass CI (tests, lint, coverage)
+- **Documentation**: Update docs for all new features/changes
 
 ## 4. Code Style
 
@@ -162,6 +196,12 @@ JWT_EXPIRE_MINUTES=30
    - Keep state minimal
    - Use proper hooks
    - Handle errors
+
+### 4.3 Code Standards (2024)
+
+- **TypeScript/React**: Strict mode, interfaces for props, enums for fixed values, error boundaries, memoization, accessibility, path aliases, generics, type guards, readonly types, union types, functional components, hooks, context, composition (see `instructions.md`)
+- **Python/FastAPI**: Pydantic for validation, dependency injection, transactions, async/await, type hints, error handling, API versioning, OpenAPI docs
+- **General**: Modular code, clear separation, reusable components, maintainable code, JSDoc/docstrings, update docs with code
 
 ## 5. Testing
 
@@ -215,6 +255,15 @@ JWT_EXPIRE_MINUTES=30
    - Component guide
    - Workflow guide
    - Troubleshooting
+
+### 6.2 Documentation Standards & Review
+
+- All public APIs, components, and services must be documented
+- Follow structure in `DOCUMENTATION_STRUCTURE.md`
+- Update docs with each major change
+- All doc changes must be reviewed for accuracy and clarity
+- Use diagrams and examples where helpful
+- Reference user and developer guides in PRs
 
 ## 7. Deployment
 
