@@ -127,18 +127,14 @@ This document merges and supersedes all previous implementation checklists and t
 - [x] **Phase 4.3: User Experience Polish**
   - [x] Button polish (done)
   - [x] Modal polish (done)
-  - [x] Feedback/loading component polish (LoadingSpinner, ErrorMessage, empty states) _(done, see devlog)_
+  - [x] Feedback/loading component polish (LoadingSpinner, ErrorMessage, empty states) _(done, see devlog; all placeholder/empty states now use shared EmptyState component with consistent icons/messages)_
 
 ### 4.4 Documentation & Support
 
 **Priority:** 🟢 Low
 
 **Outstanding Tasks:**
-- [ ] Update API documentation
-  - [ ] Document new endpoints, add request/response examples, create API guides
-  - **Acceptance Criteria:** API docs are complete, accurate, and up to date.
-  - **Files:** `docs/api/`, `mcp_project_backend/mcp/api/`
-
+- [x] Update API documentation _(done, see devlog; all new endpoints and features documented with examples and error handling)_
 - [ ] Create user guides and help system
   - [ ] Write feature documentation, tutorials, troubleshooting guides, FAQ
   - [ ] Add in-app help (tooltips, guided tours, context help, video tutorials, search)

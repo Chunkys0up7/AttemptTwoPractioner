@@ -1,12 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAnalytics } from '../hooks/useAnalytics';
 
 export const Navbar: React.FC = () => {
-  const { trackEvent } = useAnalytics();
-
   const handleNavClick = (path: string) => {
-    trackEvent('navigation_click', { path });
+    // trackEvent('navigation_click', { path });
   };
 
   return (
@@ -31,6 +28,15 @@ export const Navbar: React.FC = () => {
               className="text-neutral-600 dark:text-neutral-300 hover:text-primary dark:hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
             >
               Settings
+            </Link>
+          </div>
+          <div className="flex items-center">
+            <Link
+              to="/help"
+              onClick={() => handleNavClick('/help')}
+              className="text-neutral-600 dark:text-neutral-300 hover:text-primary dark:hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Help
             </Link>
           </div>
         </div>
