@@ -133,3 +133,8 @@
 - Added a linter utility for MCP scripts (YAML/JSON) with rules for required keys, forbidden patterns, and best practices.
 - Wired up to CodeEditor for MCP config fields; errors/warnings now shown inline.
 - Updated checklist and pushed code.
+
+### [2024-06-07] Snippet/Template Library Management UI Complete
+- Added SnippetLibrary component for user snippet/template management (create, edit, delete, search, insert).
+- Integrated as a modal in CodeEditor; users can insert custom snippets at the cursor.
+- Updated checklist and pushed code.

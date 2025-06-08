@@ -50,8 +50,9 @@
   - [x] Add Black for Python, Prettier for JS/TS, etc. (if needed)
 - [x] **Expand custom linting rules for MCP scripts**
   - [x] Add more rules or UI for MCP-specific errors/warnings
-- [ ] **Add code snippet/template library management UI**
-  - [ ] Allow users to create, edit, and manage their own snippets/templates
+- [x] **Add code snippet/template library management UI**
+  - [x] Allow users to create, edit, and manage their own snippets/templates
+- [x] Users can now create, edit, delete, and insert custom snippets via the SnippetLibrary modal in CodeEditor.
 - [x] Documentation and accessibility for snippet/template insertion and multi-language support are complete.
 - [x] Advanced Python IntelliSense (LSP) is available as an option in all code/script editing areas. Requires a running Python language server at ws://localhost:3001.
 - [x] Custom formatters for Python (Ruff WASM) and JS/TS (Prettier) are available via the customFormatter prop and formatCode utility.
