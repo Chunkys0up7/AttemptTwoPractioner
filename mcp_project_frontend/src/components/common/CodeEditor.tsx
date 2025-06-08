@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import MonacoEditor, { OnChange, OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
+import { SnippetLibrary, Snippet } from './SnippetLibrary';
 
 interface CodeSnippet {
   label: string;
@@ -32,6 +33,10 @@ interface CodeEditorProps {
    * Enable advanced Python IntelliSense via LSP (requires a running Python language server and WebSocket proxy). Default: false.
    */
   enablePythonLsp?: boolean;
+  /**
+   * Optional custom formatter for non-Monaco languages. Receives code and language, returns formatted code.
+   */
+  customFormatter?: (code: string, language: string) => Promise<string>;
 }
 
 const defaultOptions = {
@@ -58,9 +63,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   snippets = [],
   formatOnSave = true,
   enablePythonLsp = false,
+  customFormatter,
 }) => {
   const editorRef = useRef<any>(null);
   const [showSnippetMenu, setShowSnippetMenu] = useState(false);
+  const [showSnippetLibrary, setShowSnippetLibrary] = useState(false);
+  const [formatting, setFormatting] = useState(false);
+  const [formatError, setFormatError] = useState<string | null>(null);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -106,6 +115,25 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   }, [language, JSON.stringify(snippets)]);
 
+  // Format handler
+  const handleFormat = async () => {
+    setFormatError(null);
+    if (customFormatter) {
+      setFormatting(true);
+      try {
+        const formatted = await customFormatter(value, language);
+        onChange(formatted);
+      } catch (err: any) {
+        setFormatError(err?.message || 'Formatting failed');
+      } finally {
+        setFormatting(false);
+      }
+    } else if (editorRef.current) {
+      // Use Monaco's built-in formatter
+      editorRef.current.getAction('editor.action.formatDocument').run();
+    }
+  };
+
   // Register format on save
   React.useEffect(() => {
     if (!formatOnSave) return;
@@ -115,14 +143,27 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     if (!model) return;
     const disposable = editor.addCommand(
       monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-      () => {
-        editor.getAction('editor.action.formatDocument').run();
+      async () => {
+        if (customFormatter) {
+          setFormatting(true);
+          setFormatError(null);
+          try {
+            const formatted = await customFormatter(editor.getValue(), language);
+            onChange(formatted);
+          } catch (err: any) {
+            setFormatError(err?.message || 'Formatting failed');
+          } finally {
+            setFormatting(false);
+          }
+        } else {
+          editor.getAction('editor.action.formatDocument').run();
+        }
       }
     );
     return () => {
       if (disposable && disposable.dispose) disposable.dispose();
     };
-  }, [formatOnSave, language]);
+  }, [formatOnSave, language, customFormatter, onChange]);
 
   // --- Python LSP Integration ---
   React.useEffect(() => {
@@ -185,17 +226,37 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
-  const insertSnippet = (body: string) => {
+  // Insert snippet at cursor
+  function insertSnippet(snippetBody: string) {
     const editor = editorRef.current;
     if (editor) {
+      const selection = editor.getSelection();
+      editor.executeEdits('', [
+        {
+          range: selection,
+          text: snippetBody,
+          forceMoveMarkers: true,
+        },
+      ]);
       editor.focus();
-      editor.trigger('keyboard', 'type', { text: body });
     }
-    setShowSnippetMenu(false);
-  };
+  }
 
   return (
     <div onDrop={handleDrop} onDragOver={e => e.preventDefault()} style={{ border: '1px solid #e5e7eb', borderRadius: 6, position: 'relative' }}>
+      {/* Format button */}
+      <div style={{ position: 'absolute', top: 8, left: 8, zIndex: 10 }}>
+        <button
+          type="button"
+          className="px-2 py-1 bg-secondary text-white rounded text-xs hover:bg-secondary-dark focus:outline-none mr-2"
+          onClick={handleFormat}
+          disabled={formatting}
+          aria-busy={formatting}
+        >
+          {formatting ? 'Formatting...' : 'Format'}
+        </button>
+        {formatError && <span className="text-xs text-red-500 ml-2">{formatError}</span>}
+      </div>
       {snippets.length > 0 && (
         <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
           <button
@@ -224,6 +285,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
                   </li>
                 ))}
               </ul>
+              <button onClick={() => setShowSnippetLibrary(true)} aria-label="Manage Snippets">
+                Manage Snippets
+              </button>
             </div>
           )}
         </div>
@@ -260,6 +324,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       <label htmlFor="code-editor-file-upload" style={{ cursor: 'pointer', display: 'block', marginTop: 8, color: '#2563eb', fontSize: 13 }}>
         Upload file
       </label>
+      {showSnippetLibrary && (
+        <SnippetLibrary
+          onInsertSnippet={snippet => {
+            insertSnippet(snippet.body);
+            setShowSnippetLibrary(false);
+          }}
+          onClose={() => setShowSnippetLibrary(false)}
+        />
+      )}
     </div>
   );
 };
