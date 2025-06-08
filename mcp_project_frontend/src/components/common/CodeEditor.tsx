@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import MonacoEditor, { OnChange, OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 
@@ -28,6 +28,10 @@ interface CodeEditorProps {
    * Enable auto-format on save (Ctrl+S/Cmd+S). Default: true.
    */
   formatOnSave?: boolean;
+  /**
+   * Enable advanced Python IntelliSense via LSP (requires a running Python language server and WebSocket proxy). Default: false.
+   */
+  enablePythonLsp?: boolean;
 }
 
 const defaultOptions = {
@@ -53,8 +57,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   validate,
   snippets = [],
   formatOnSave = true,
+  enablePythonLsp = false,
 }) => {
   const editorRef = useRef<any>(null);
+  const [showSnippetMenu, setShowSnippetMenu] = useState(false);
 
   const handleEditorDidMount: OnMount = (editor, monacoInstance) => {
     editorRef.current = editor;
@@ -118,6 +124,50 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     };
   }, [formatOnSave, language]);
 
+  // --- Python LSP Integration ---
+  React.useEffect(() => {
+    let disposeLsp: (() => void) | undefined;
+    if (enablePythonLsp && language === 'python') {
+      (async () => {
+        try {
+          // Dynamically import monaco-python and LSP client
+          const monacoPy = await import('monaco-python');
+          // @ts-ignore
+          monacoPy.loadPyodide(); // Loads Pyodide for Monaco Python (optional, fallback)
+          // Set up LSP connection
+          const { MonacoLanguageClient, CloseAction, ErrorAction, createConnection } = await import('monaco-languageclient');
+          const ReconnectingWebSocket = (await import('reconnecting-websocket')).default;
+          const url = 'ws://localhost:3001'; // Python LSP WebSocket endpoint
+          const webSocket = new ReconnectingWebSocket(url);
+          webSocket.onopen = () => {
+            const connection = createConnection(webSocket as any);
+            const languageClient = new MonacoLanguageClient({
+              name: 'Python Language Client',
+              clientOptions: {
+                documentSelector: ['python'],
+                errorHandler: {
+                  error: () => ErrorAction.Continue,
+                  closed: () => CloseAction.Restart,
+                },
+              },
+              connectionProvider: {
+                get: () => Promise.resolve(connection),
+              },
+            });
+            languageClient.start();
+            disposeLsp = () => languageClient.stop();
+          };
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to initialize Python LSP:', err);
+        }
+      })();
+    }
+    return () => {
+      if (disposeLsp) disposeLsp();
+    };
+  }, [enablePythonLsp, language]);
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -135,8 +185,49 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   };
 
+  const insertSnippet = (body: string) => {
+    const editor = editorRef.current;
+    if (editor) {
+      editor.focus();
+      editor.trigger('keyboard', 'type', { text: body });
+    }
+    setShowSnippetMenu(false);
+  };
+
   return (
-    <div onDrop={handleDrop} onDragOver={e => e.preventDefault()} style={{ border: '1px solid #e5e7eb', borderRadius: 6 }}>
+    <div onDrop={handleDrop} onDragOver={e => e.preventDefault()} style={{ border: '1px solid #e5e7eb', borderRadius: 6, position: 'relative' }}>
+      {snippets.length > 0 && (
+        <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10 }}>
+          <button
+            type="button"
+            className="px-2 py-1 bg-primary text-white rounded text-xs hover:bg-primary-dark focus:outline-none"
+            aria-haspopup="true"
+            aria-expanded={showSnippetMenu}
+            aria-controls="snippet-menu"
+            onClick={() => setShowSnippetMenu(v => !v)}
+          >
+            Insert Snippet
+          </button>
+          {showSnippetMenu && (
+            <div id="snippet-menu" className="absolute right-0 mt-2 w-64 bg-white border border-neutral-200 rounded shadow-lg z-20">
+              <ul className="max-h-60 overflow-y-auto">
+                {snippets.map((snippet, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      className="w-full text-left px-4 py-2 hover:bg-neutral-100 text-sm"
+                      onClick={() => insertSnippet(snippet.body)}
+                    >
+                      <span className="font-semibold">{snippet.label}</span>
+                      <div className="text-xs text-neutral-500">{snippet.documentation}</div>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
       <MonacoEditor
         value={value}
         language={language}
