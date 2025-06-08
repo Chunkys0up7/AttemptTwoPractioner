@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';  // FastAPI default port
+const baseURL = API_BASE_URL;
 
 export const api = axios.create({
   baseURL,
@@ -56,4 +57,19 @@ export const endpoints = {
     update: (id: string, data: any) => api.put(`/analytics/${id}`, data),
     delete: (id: string) => api.delete(`/analytics/${id}`),
   },
+};
+
+// Workflow API
+export const workflowApi = {
+  getWorkflow: (workflowId: string) => api.get(`/api/workflows/${workflowId}`),
+  // Add more workflow-related endpoints as needed
+  saveWorkflowVersion: (workflowId: string, payload: any) =>
+    api.put(`/api/workflows/${workflowId}`, payload),
+};
+
+// Template API
+export const templateApi = {
+  listTemplates: (params?: any) => api.get('/api/templates', { params }),
+  getTemplate: (id: string) => api.get(`/api/templates/${id}`),
+  // Add more endpoints as needed (e.g., getTemplateVersion, createTemplate, etc.)
 }; 

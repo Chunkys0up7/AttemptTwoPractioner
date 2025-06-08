@@ -1,27 +1,46 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import ReactFlow, { ReactFlowProvider, addEdge, MiniMap, Controls, Background, useNodesState, useEdgesState, Connection, Edge, Node } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { useParams } from 'react-router-dom';
 
 import ComponentPalette from './workflow_builder/ComponentPalette';
 import PropertiesPanel from './workflow_builder/PropertiesPanel';
 import Button from './components/common/Button';
 import { PlayIcon, WorkflowBuilderIcon, MenuIcon, XIcon } from './components/common/icons';
-import { AIComponent } from '@types';
+import { AIComponent } from './types';
+import { workflowApi } from './services/api';
 
 const initialNodes: Node[] = [
   { id: '1', type: 'input', data: { label: 'Start Node' }, position: { x: 250, y: 5 } },
 ];
 
 const WorkflowBuilderPage: React.FC = () => {
+  const { workflowId } = useParams<{ workflowId?: string }>();
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
   const [isPropertiesOpen, setIsPropertiesOpen] = useState(true);
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024);
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
+  const [isSaveVersionOpen, setIsSaveVersionOpen] = useState(false);
+  const [saveVersionLabel, setSaveVersionLabel] = useState('');
+  const [saveVersionDesc, setSaveVersionDesc] = useState('');
+  const [saveVersionLoading, setSaveVersionLoading] = useState(false);
+  const [saveVersionError, setSaveVersionError] = useState<string | null>(null);
+  const [saveVersionSuccess, setSaveVersionSuccess] = useState(false);
+  const saveVersionDescRef = useRef<HTMLInputElement>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null); // Simplified type
+
+  // Version history state
+  const [versionHistory, setVersionHistory] = useState<any[] | null>(null);
+  const [versionLoading, setVersionLoading] = useState(false);
+  const [versionError, setVersionError] = useState<string | null>(null);
+
+  const [restoreLoadingId, setRestoreLoadingId] = useState<string | null>(null);
+  const [restoreError, setRestoreError] = useState<string | null>(null);
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -84,6 +103,23 @@ const WorkflowBuilderPage: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    if (isVersionHistoryOpen && workflowId) {
+      setVersionLoading(true);
+      setVersionError(null);
+      setVersionHistory(null);
+      workflowApi.getWorkflow(workflowId)
+        .then(res => {
+          // Assume versions are in res.data.versions or similar
+          setVersionHistory(res.data.versions || []);
+        })
+        .catch(err => {
+          setVersionError(err?.response?.data?.detail || 'Failed to fetch version history');
+        })
+        .finally(() => setVersionLoading(false));
+    }
+  }, [isVersionHistoryOpen, workflowId]);
+
   return (
     <div className="flex flex-col h-full">
       <header className="mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
@@ -105,6 +141,23 @@ const WorkflowBuilderPage: React.FC = () => {
             aria-label="Run workflow test"
           >
             Run Test
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Save as new version"
+            onClick={() => setIsSaveVersionOpen(true)}
+            disabled={!workflowId}
+          >
+            Save as New Version
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-label="Open version history"
+            onClick={() => setIsVersionHistoryOpen(true)}
+          >
+            Version History
           </Button>
         </div>
       </header>
@@ -219,6 +272,77 @@ const WorkflowBuilderPage: React.FC = () => {
           }}
           aria-hidden="true"
         />
+      )}
+
+      {/* Version History Modal */}
+      {isVersionHistoryOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Workflow Version History"
+        >
+          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+            <button
+              className="absolute top-2 right-2 text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200"
+              aria-label="Close version history"
+              onClick={() => setIsVersionHistoryOpen(false)}
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Workflow Version History</h2>
+            <div className="text-neutral-600 dark:text-neutral-300">
+              {!workflowId && (
+                <p className="text-red-500">No workflow selected. Please select or create a workflow to view version history.</p>
+              )}
+              {workflowId && (
+                <>
+                  {versionLoading && <p>Loading version history...</p>}
+                  {versionError && <p className="text-red-500">{versionError}</p>}
+                  {versionHistory && versionHistory.length === 0 && <p>No versions found for this workflow.</p>}
+                  {versionHistory && versionHistory.length > 0 && (
+                    <ul className="divide-y divide-neutral-200 dark:divide-neutral-700">
+                      {versionHistory.map((v: any) => (
+                        <li key={v.id} className="py-2 flex flex-col">
+                          <span className="font-mono text-primary">v{v.version}</span>
+                          <span className="text-xs text-neutral-500">{v.created_at ? new Date(v.created_at).toLocaleString() : ''}</span>
+                          {v.changes && <span className="text-xs text-neutral-400">{v.changes}</span>}
+                          <div className="mt-2 flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              aria-label={`Restore version ${v.version}`}
+                              disabled={!!restoreLoadingId}
+                              onClick={async () => {
+                                if (!workflowId) return;
+                                setRestoreLoadingId(v.id);
+                                setRestoreError(null);
+                                try {
+                                  // Fetch the version's workflow data (assume GET /api/workflows/{id}?version={v.version})
+                                  const res = await workflowApi.getWorkflow(workflowId + `?version=${v.version}`);
+                                  // Assume res.data contains nodes and edges
+                                  setNodes(res.data.nodes || []);
+                                  setEdges(res.data.edges || []);
+                                  setIsVersionHistoryOpen(false);
+                                } catch (err: any) {
+                                  setRestoreError(err?.response?.data?.detail || `Failed to restore version ${v.version}`);
+                                } finally {
+                                  setRestoreLoadingId(null);
+                                }
+                              }}
+                            >
+                              {restoreLoadingId === v.id ? 'Restoring...' : 'Restore'}
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

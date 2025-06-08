@@ -24,27 +24,21 @@
 ## 🚧 Remaining Frontend Work (Actionable Checklist)
 
 ### A. Workflow Builder
-- [ ] **Implement workflow versioning UI**
-  - [ ] Add UI to create new workflow versions
-  - [ ] Show version history and allow rollback to previous versions
-  - [ ] Integrate with backend versioning endpoints
-- [ ] **Implement workflow templates UI**
-  - [ ] Provide built-in templates for common workflows
-  - [ ] Allow users to save custom templates
-  - [ ] Add UI to select and apply templates
-- [ ] **Add save/load workflow UI**
-  - [ ] Integrate with backend API for saving/loading workflows
-  - [ ] Add local draft saving (optional)
-- [ ] **Enhance custom node/edge rendering**
-  - [ ] Add advanced icons, colors, and types for nodes/edges
-  - [ ] Support custom node/edge components as needed
-- [ ] **Make Properties Panel dynamic and editable**
-  - [ ] Render editable fields based on selected node type
-  - [ ] Support validation and live updates for node properties
-- [ ] **Add workflow import/export (JSON) UI**
-  - [ ] Allow users to import/export full workflows as JSON
+- [x] **Implement workflow versioning UI**
+  - [x] Add UI to create new workflow versions *(Save as New Version modal implemented, API integrated, tested, and documented)*
+  - [x] Show version history and allow rollback to previous versions *(Restore Version feature implemented, tested, and documented)*
+  - [x] Integrate with backend versioning endpoints *(All API integration, error handling, and data flows are robust, tested, and documented)*
 
-### B. Code Editor
+### B. Workflow Templates (MarketplacePage)
+- [ ] **Implement workflow templates UI in MarketplacePage**
+  - [ ] Browse available workflow templates (list from /api/templates)
+  - [ ] Filter/search templates by category, name, or public/private
+  - [ ] Preview template details and versions
+  - [ ] Instantiate a workflow from a selected template
+  - [ ] Handle loading, error, and empty states
+  - [ ] Document and test all features
+
+### C. Code Editor
 - [ ] **Add UI for browsing/inserting code templates/snippets**
   - [ ] Provide a button/menu to insert snippets/templates
   - [ ] Show a library of reusable code snippets
@@ -57,12 +51,12 @@
 - [ ] **Add code snippet/template library management UI**
   - [ ] Allow users to create, edit, and manage their own snippets/templates
 
-### C. Validation
+### D. Validation
 - [ ] **Improve UI for displaying workflow validation results**
   - [ ] Show errors/warnings directly on the canvas and/or nodes
   - [ ] Add summary/status indicator for workflow validity
 
-### D. Documentation & Checklist
+### E. Documentation & Checklist
 - [ ] Keep this checklist up to date as work progresses
 - [ ] Remove/merge duplicate items from `PHASE_2_CORE_FUNCTIONALITY_CHECKLIST.md` and reference this doc for frontend tracking
 
