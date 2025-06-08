@@ -153,3 +153,7 @@
 - Deleted docs/frontend_phase2_plan.md after marking all items as complete, including validation UI improvements.
 - All frontend Phase 2 work is now tracked in code, devlog, and documentation.
 - Checklist removed per project instructions.
+
+### [2024-06-07] Merged Implementation Checklists
+- Created docs/IMPLEMENTATION_MASTER_CHECKLIST.md with all outstanding work, merging and updating previous checklists and task lists.
+- Removed IMPLEMENTATION_CHECKLISTS.md and IMPLEMENTATION_TASK_LIST.md as they are now superseded.
