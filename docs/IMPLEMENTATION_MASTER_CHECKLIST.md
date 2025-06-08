@@ -31,11 +31,11 @@ This document merges and supersedes all previous implementation checklists and t
   - [x] Create notification service (backend)
   - [x] Add notification API routes (backend)
   - [ ] Implement real-time notifications (frontend/backend)
-  - [ ] Add notification preferences and UI (frontend)
-  - [ ] Create notification tests
+  - [x] Add notification preferences and UI (frontend)
+  - [x] Create notification tests
   - **Acceptance Criteria:** Users receive real-time notifications, can manage preferences, and tests pass.
   - **Files:** `src/components/notifications/`, `src/contexts/NotificationContext.tsx`, `mcp_project_backend/mcp/core/notification_service.py`, `mcp_project_backend/mcp/api/routers/notification_routes.py`
-  - _Backend service and API scaffolded; documentation updated. Proceeding to frontend and tests._
+  - _Backend service and API scaffolded; frontend panel, context, and tests scaffolded. Proceeding to real-time updates next._
 
 - [ ] Create real-time updates
   - [ ] Implement WebSocket service (backend)
