@@ -1,7 +1,7 @@
 import React from 'react';
 import { AIComponent } from '../../types';
 import Modal from '../common/Modal';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import { CodeBracketIcon, TableCellsIcon, PlusIcon, CubeIcon } from '../../icons';
 
 interface ComponentDetailViewProps {

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { XCircleIcon } from '../../icons';
 
 interface ModalProps {
@@ -11,6 +11,41 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 'md', footer }) => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = title ? 'modal-title' : undefined;
+
+  // Trap focus inside modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const first = focusable?.[0];
+    const last = focusable?.[focusable.length - 1];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+      if (e.key === 'Tab' && focusable && focusable.length > 0) {
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    // Focus first element
+    first?.focus();
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -21,30 +56,23 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
     full: 'max-w-full h-full rounded-none',
   };
 
-  // Keyboard handler for accessibility
-  const handleBackdropKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      onClose();
-    }
-  };
-
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events
     <div
       className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 dark:bg-neutral-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity duration-300 ease-in-out"
       onClick={onClose}
-      role="button"
-      tabIndex={0}
-      aria-label="Close modal"
-      onKeyDown={handleBackdropKeyDown}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby={titleId}
+      tabIndex={-1}
+      ref={modalRef}
     >
       <div
         className={`bg-white dark:bg-neutral-900 rounded-lg shadow-xl transform transition-all duration-300 ease-in-out w-full ${sizeClasses[size]} flex flex-col max-h-[90vh] border border-neutral-200 dark:border-neutral-700`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b border-neutral-200 dark:border-neutral-700">
-          {title && <h2 className="text-xl font-semibold text-neutral-800 dark:text-neutral-100">{title}</h2>}
-          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300">
+          {title && <h2 id={titleId} className="text-xl font-semibold text-neutral-800 dark:text-neutral-100">{title}</h2>}
+          <button onClick={onClose} className="text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-300" aria-label="Close modal">
             <XCircleIcon className="w-6 h-6" />
           </button>
         </div>

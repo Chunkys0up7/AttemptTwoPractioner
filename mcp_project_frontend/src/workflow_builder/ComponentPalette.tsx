@@ -1,11 +1,14 @@
 import React from 'react';
 import Card from '@components/common/Card';
-import { AIComponent } from '../types/index';
-import type { SpecificComponentType } from '../types/index';
+import { AIComponent, SpecificComponentType } from '../types/index';
+import type { SpecificComponentType as SpecificComponentTypeType } from '../types/index';
 import { SearchIcon } from '@components/icons/ui';
 import DefaultIcon from '@components/icons/DefaultIcon';
 import { useComponents } from '@context/index';
 import type { ComponentPaletteProps, PaletteItemProps } from './types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { EmptyState } from '../components/common/EmptyState';
+import { CubeIcon, SearchIcon } from '../components/common/icons';
 
 const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
   const {
@@ -26,7 +29,7 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
 
   const availableForPalette = React.useMemo(() => {
     if (!components) return [];
-    const filtered = filterComponents(searchTerm, selectedTypes as SpecificComponentType[]);
+    const filtered = filterComponents(searchTerm, selectedTypes as SpecificComponentTypeType[]);
     return filtered.filter((component) => 
       component.visibility === 'public' || component.isCustom
     );
@@ -39,9 +42,10 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
   }, [components, loading, isFetching, fetchComponents]);
 
   const handleSort = (field: keyof AIComponent) => {
+    const nextDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     setSortField(field);
-    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
-    sortComponents(field, prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortDirection(nextDirection);
+    sortComponents(field, nextDirection);
   };
 
   if (error) {
@@ -61,8 +65,8 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
   if (loading || isFetching) {
     return (
       <div className="flex flex-col items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mb-2"></div>
-        <p className="text-sm text-neutral-500">
+        <LoadingSpinner size="md" color="primary" />
+        <p className="text-sm text-neutral-500 mt-2">
           {isFetching ? 'Refreshing components...' : 'Loading components...'}
         </p>
       </div>
@@ -72,13 +76,14 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
   if (!components?.length) {
     return (
       <div className="p-4 text-center">
-        <p className="text-neutral-500 mb-2">No components available</p>
-        <button
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          onClick={() => fetchComponents()}
-        >
-          Refresh
-        </button>
+        <EmptyState message="No components available" icon={<CubeIcon className="w-12 h-12 text-neutral-300 mx-auto" />}>
+          <button
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary mt-4"
+            onClick={() => fetchComponents()}
+          >
+            Refresh
+          </button>
+        </EmptyState>
       </div>
     );
   }
@@ -88,7 +93,7 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
   }
 
   if (loading) {
-    return <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>;
+    return <LoadingSpinner size="sm" color="primary" className="mx-auto" />;
   }
 
   const groupedComponents = availableForPalette.reduce((acc: Record<string, AIComponent[]>, component) => {
@@ -172,7 +177,7 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
         )}
         {loading && (
           <div className="flex justify-center py-4">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+            <LoadingSpinner size="sm" color="primary" />
           </div>
         )}
         {!loading && sortedGroupEntries.map(([type, components]) => (
@@ -186,7 +191,7 @@ const ComponentPalette: React.FC<ComponentPaletteProps> = () => {
           </div>
         ))}
         {!loading && availableForPalette.length === 0 && (
-          <p className="text-xs text-neutral-500 text-center py-4">No components match your search or filters.</p>
+          <EmptyState message="No components match your search or filters." icon={<SearchIcon className="w-12 h-12 text-neutral-300 mx-auto" />} />
         )}
       </div>
     </Card>

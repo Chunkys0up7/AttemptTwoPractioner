@@ -1,7 +1,7 @@
 import React from 'react';
 import { AIComponent } from '../../types';
 import Card from '../common/Card';
-import Button from '../common/Button';
+import { Button } from '../ui/Button';
 import { EyeIcon } from '../../icons';
 // Link removed as it's not used directly in this component after changes, but kept for context if needed elsewhere
 // import { Link } from 'react-router-dom';

@@ -192,3 +192,24 @@
 - Backend: Tracks HTTP, DB, cache, workflow, system, error, and rate limiting metrics (Prometheus).
 - Metrics dashboard (frontend) and endpoints (backend) available.
 - Checklist updated. Proceeding to performance benchmark tests next.
+
+## [YYYY-MM-DD] Backend Performance Benchmark Tests Deferred
+- Performance test suite exists, but test client is not connected to real backend app (workflow endpoints unavailable in mock app).
+- Benchmark tests deferred; will run after test setup is updated.
+- Proceeding to frontend performance benchmarks and checklist update.
+
+## [YYYY-MM-DD] Frontend Performance Benchmark Plan
+- Plan: Run Lighthouse/Web Vitals on main user flows (dashboard, workflow builder, settings) at a later stage.
+- Will document results and improvement areas after tests are run.
+- Checklist updated. Proceeding to next checklist item.
+
+## [YYYY-MM-DD] Button UI Polish
+- Unified all button usages to new UI Button (src/components/ui/Button).
+- Deprecated old Button (src/components/common/Button).
+- Ensured consistent variants, sizes, and accessibility.
+- Checklist updated. Proceeding to Modal and feedback component polish next.
+
+## [YYYY-MM-DD] Modal Component Polish
+- Improved accessibility: added role="dialog", aria-modal, aria-labelledby, focus trap, ESC close.
+- Ensured dark mode and transitions are consistent.
+- Checklist updated. Proceeding to feedback/loading component polish next.

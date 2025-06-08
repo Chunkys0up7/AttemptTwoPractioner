@@ -1,7 +1,6 @@
-
 import React from 'react';
 import Card from '../components/common/Card';
-import Button from '../components/common/Button';
+import { Button } from '../components/ui/Button';
 import { DUMMY_COMPONENTS_PRESET, DUMMY_WORKFLOWS, DUMMY_SYSTEM_STATUS } from '../constants';
 import { PlusIcon, StarIcon, PlayIcon, CheckCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '../icons';
 import { Link } from 'react-router-dom';

@@ -1,3 +1,1 @@
-"""
-Tests package initialization.
-"""
+# Makes 'db' tests directory a Python package

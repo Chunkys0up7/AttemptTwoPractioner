@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { EmptyState } from '../components/common/EmptyState';
+import { DocumentTextIcon } from '../components/common/icons';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ const DashboardPage: React.FC = () => {
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Recent Workflows</h2>
-          <p className="text-gray-500">No workflows created yet.</p>
+          <EmptyState message="No workflows created yet." icon={<DocumentTextIcon className="w-12 h-12 text-neutral-300 mx-auto" />} />
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">

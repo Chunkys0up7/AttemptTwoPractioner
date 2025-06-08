@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { EmptyState } from '../components/common/EmptyState';
 
 const WorkflowsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const WorkflowsPage: React.FC = () => {
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="text-gray-500">No workflows created yet.</div>
+        <EmptyState message="No workflows created yet." />
       </div>
     </div>
   );

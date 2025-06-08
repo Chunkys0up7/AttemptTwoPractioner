@@ -2,9 +2,8 @@
 
 # Configuration
 $PROJECT_ROOT = (Get-Item $PSScriptRoot).Parent.FullName
-$BACKEND_DIR = Join-Path $PROJECT_ROOT "mcp_project_backend"
 $TEST_ENV = Join-Path $PROJECT_ROOT "test_env"
-$TEST_SCRIPT = Join-Path $PROJECT_ROOT "test_runner.py"
+$TEST_SCRIPT = Join-Path $PROJECT_ROOT "tests\scripts\test_runner.py"
 
 # Function to log messages
 function Write-Log {
@@ -95,8 +94,12 @@ try {
     Create-VirtualEnv
     Install-Dependencies
     
-    # Run tests
-    Run-Tests
+    # Set up environment
+    $env:PYTHONPATH = ".;mcp_project_backend;tests"
+    $env:TESTING = "true"
+
+    # Run tests with coverage
+    python -m tests.scripts.test_runner --type all --coverage --html --junit
 } catch {
     Write-Log "An error occurred: $_" -Level "ERROR"
     exit 1

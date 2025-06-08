@@ -146,4 +146,11 @@ export const ExclamationCircleIcon: React.FC<React.SVGProps<SVGSVGElement>> = (p
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01" />
   </svg>
+);
+
+export const SearchIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" {...props}>
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
 ); 

@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { LoadingSpinner } from '../LoadingSpinner';
+import { ErrorMessage } from '../ErrorMessage';
+import { EmptyState } from '../common/EmptyState';
+import { RocketLaunchIcon } from '../common/icons';
 
 interface Recommendation {
   id: number;
@@ -32,9 +36,9 @@ export const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ cate
       .finally(() => setLoading(false));
   }, [category, topN]);
 
-  if (loading) return <div>Loading recommendations...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (recommendations.length === 0) return <div>No recommendations available.</div>;
+  if (loading) return <LoadingSpinner size="md" color="primary" className="mx-auto" />;
+  if (error) return <ErrorMessage message={error} />;
+  if (recommendations.length === 0) return <EmptyState message="No recommendations available." icon={<RocketLaunchIcon className="w-12 h-12 text-neutral-300 mx-auto" />} />;
 
   return (
     <div>

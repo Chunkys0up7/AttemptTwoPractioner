@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@wasm-fmt/ruff_fmt": "^0.10.0",
+    "js-yaml": "^4.1.0",
+    "monaco-languageclient": "^8.8.3",
+    "monaco-python": "^0.1.9",
+    "prettier": "^3.5.3",
+    "reconnecting-websocket": "^4.4.0",
+    "vscode-ws-jsonrpc": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "msw": "^2.10.1"
+  }
+}

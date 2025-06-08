@@ -11,6 +11,114 @@ venv/
 .env
 test_env/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
 
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
+# Project specific
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+
+# Test directories and files
+tests/cache/
+tests/reports/
+tests/test_env/
+tests/data/
+tests/logs/
+tests/coverage/
+tests/html/
+tests/junit/
+
+# Test coverage and reports
+.coverage
+.coverage.*
+coverage.xml
+coverage.json
+coverage.html
+
+# Test cache and temporary files
+*.cover
+*.py,cover
+.cache
+.nosetests
+.nox/
+.tox/
+
+# Test logs
+*.log
+pytest.log
+test.log
+
+# Test environment files
+test_env/
+.env.test
+
+# Test data
+*.dat
+test_data/
+
+# Build and distribution
+build/
+dist/
+*.egg
+*.egg-info/
+*.whl
+
+# IDE specific
+classpath
+.project
+.settings/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Other
+*.pyc
+*.pyo
+*.pyd
+*.orig
+*.rej
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
